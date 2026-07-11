@@ -577,11 +577,18 @@ async function boot(){
     $("splash-msg").innerHTML="Downloading the Python runtime (Pyodide)…";
     pyodide = await loadPyodide();
     $("splash-msg").innerHTML="Installing the SOMA interpreter…";
-    // write every bundled python file into the virtual FS
+    // write every bundled python file into the virtual FS.
+    // NB: Emscripten's FS.mkdirTree treats its path as absolute (it creates
+    // /soma at the root), while FS.writeFile resolves relative paths against
+    // the cwd (/home/pyodide) -- so both must be anchored at the cwd
+    // explicitly, and each file's directory created before it is written.
     const files = PAYLOAD.files;
-    pyodide.FS.mkdirTree("soma");
+    const ROOT = pyodide.FS.cwd();
     for(const [path, content] of Object.entries(files)){
-      pyodide.FS.writeFile(path, content);
+      const full = ROOT + "/" + path;
+      const dir = full.slice(0, full.lastIndexOf("/"));
+      pyodide.FS.mkdirTree(dir);
+      pyodide.FS.writeFile(full, content);
     }
     // make the working dir importable and pre-import the bridge
     await pyodide.runPythonAsync(`
@@ -618,8 +625,16 @@ web_bridge.run_command(_CMD, _SRC, _TITLE, **json.loads(_OPTS))`);
     buildExampleList();
     loadExample(PAYLOAD.examples[0].key);
   }catch(e){
-    $("splash-msg").innerHTML="Failed to start: "+esc(String(e))+
-      "<br><br>Check your connection — Pyodide loads from a CDN.";
+    // Emscripten's FS.ErrnoError is not an Error and stringifies as
+    // "[object Object]"; render something a human can act on instead.
+    let msg;
+    if (e instanceof Error) msg = String(e);
+    else if (e && e.name === "ErrnoError") msg = "filesystem error (ErrnoError, errno " + e.errno + ") while installing the interpreter";
+    else { try { msg = JSON.stringify(e); } catch(_) { msg = String(e); } }
+    const hint = (typeof loadPyodide === "undefined" || !pyodide)
+      ? "<br><br>Check your connection — Pyodide loads from a CDN."
+      : "<br><br>Pyodide itself loaded; the failure is in the playground's setup.";
+    $("splash-msg").innerHTML="Failed to start: "+esc(msg)+hint;
   }
 }
 boot();

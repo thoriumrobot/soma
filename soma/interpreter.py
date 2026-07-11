@@ -46,6 +46,11 @@ VALENCE = {
     "wariness": -0.5, "yearning": -0.5,
     "comfort": 0.5, "safety": 0.5, "wonder": 0.8, "anger": -0.7,
     "self_betrayal": -0.85, "ambivalence": -0.4, "resolve": 0.4,
+    # the appraisal-predicted emotions (soma.narrative.appraisal) and the
+    # circumplex dyad qualia (soma.narrative.circumplex)
+    "fear": -0.9, "resentment": -0.65, "frustration": -0.55, "guilt": -0.7,
+    "regret": -0.6, "gratitude": 0.8, "ease": 0.5, "friction": -0.6,
+    "loneliness": -0.7,
     "worthlessness": -0.85, "pride": 0.7, "grief": -0.9,
 }
 
@@ -545,6 +550,7 @@ class Interpreter:
                 threshold = BREAK_K * pi_p / max(pi_s, 0.05)
             else:
                 threshold = lp.overwhelm
+            ls._overwhelm_bound = round(threshold, 3)
             if route == "act" and ls.overwhelm_debt >= threshold:
                 route = "perceive"
                 overwhelmed = True
@@ -555,7 +561,9 @@ class Interpreter:
         self.chron.log(t, f, "settle", lp.name,
                        sense=round(sense, 2), belief=round(ls.belief, 2),
                        error=round(error, 2), pi_s=round(pi_s, 2),
-                       pi_p=round(pi_p, 2), route=route)
+                       pi_p=round(pi_p, 2), route=route,
+                       debt=round(ls.overwhelm_debt, 3),
+                       bound=getattr(ls, "_overwhelm_bound", None))
 
         self._cur_route = route
 

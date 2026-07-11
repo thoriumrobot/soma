@@ -20,4 +20,4 @@ __all__ = ["parse", "run_source", "Interpreter", "Result", "check",
            "SomaTypeError", "ConsentError", "winnow", "viz", "sift",
            "query", "run_query", "observables", "integrated_information",
            "mathlib"]
-__version__ = "0.7.0"
+__version__ = "0.9.0"

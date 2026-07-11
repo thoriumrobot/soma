@@ -38,6 +38,17 @@ from .temperament import (Temperament, anxious, stoic, trusting, guarded,
 from .story import Story, Character
 from .arc import Arc, arc
 from .schema import predict_lie, unmet_needs, COPING_STYLES, PredictedLie
+from .appraisal import predict_feeling, PredictedFeeling, TENDENCIES
+from .attachment import STYLES as ATTACHMENT_STYLES, AttachmentStyle, SeparationReport
+from .circumplex import (Stance, predict_pull, complementarity, Pull,
+                         DyadReport)
+from .preregister import Preregistration, Report as PreregReport
+from .insight import run_with, outcome, series
+from .sensitivity import sensitivity, SensitivityReport
+from .discriminate import discriminate, DiscriminationReport
+from .earlywarning import predict_break_onset, EarlyWarningReport
+from .counterfactual import (minimal_intervention, CounterfactualReport,
+                             Intervention)
 
 __all__ = [
     "Story", "Character", "Temperament", "Arc", "arc",

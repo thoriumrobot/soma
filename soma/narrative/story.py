@@ -881,6 +881,10 @@ class Character:
         from .schema import predict_lie
         p = predict_lie(unmet, coping)
         nm = name or f"{coping}_{_ident(unmet)}"
+        if conviction is not None:
+            self.story._accommodations.append(
+                f"{self.name}.adopts({unmet!r}, {coping!r}): predicted "
+                f"conviction {p.conviction} overridden to {conviction}")
         self.believes(nm, claim=p.claim, disconfirmed_by=disconfirmed_by,
                       feeling=p.feeling, harms=p.harms,
                       conviction=(p.conviction if conviction is None else conviction),
@@ -888,6 +892,71 @@ class Character:
         self.needs(p.truth, opposes=nm, feeling=p.feeling,
                    fed_feeling=fed_feeling)
         self._lie_predictions[nm] = p
+        return self
+
+    # ---- appraisal: predict the feeling instead of naming it ---------------
+    def appraises_event(self, channel: str, *, congruence: float,
+                        agency: str = "circumstance", certainty: float = 0.7,
+                        coping: float = 0.5, norm_compatible: bool = True,
+                        norm_focus: str = "act", was_feared: bool = False,
+                        relevance: float = 1.0, when: Optional[str] = None,
+                        drives: Optional[str] = None, to: float = 100.0,
+                        fades_to: Optional[float] = None,
+                        shows_on: Optional[str] = None, shows_value: float = 8.0):
+        """*Predict* what this character will feel about an event, instead of
+        naming it. The author supplies only the appraisal -- was it bad for
+        their goals, who caused it, how certain, can anything be done, did it
+        break a standard -- and the appraisal engine (Scherer/OCC/Ellsworth
+        convergent mappings) forecasts the discrete emotion and its Frijda
+        action tendency, then compiles the loop that must produce it.
+
+            vera.appraises_event("verdict", congruence=-0.9, agency="other",
+                                 certainty=0.9, coping=0.2)
+            # predicts: resentment -- other-blame without power
+
+        Returns the PredictedFeeling (so the forecast can be preregistered);
+        the character is modified in place, as with every other verb. The
+        predicted quale is falsifiable per-story: it must fire in the Chronicle
+        when the appraised event lands, or the model is wrong."""
+        from .appraisal import predict_feeling
+        pf = predict_feeling(congruence=congruence, agency=agency,
+                             certainty=certainty, coping=coping,
+                             norm_compatible=norm_compatible,
+                             norm_focus=norm_focus, was_feared=was_feared,
+                             relevance=relevance)
+        if pf is None:
+            return None
+        self.appraises(channel, as_threat=(congruence < 0),
+                       feeling=pf.quale, when=when, drives=drives, to=to,
+                       fades_to=fades_to, shows_on=shows_on,
+                       shows_value=shows_value)
+        self._appraisal_predictions = getattr(self, "_appraisal_predictions", {})
+        self._appraisal_predictions[channel] = pf
+        return pf
+
+    # ---- attachment: a style, and the separation it predicts ---------------
+    def attaches(self, style: str, *, to: str = "them", **overrides):
+        """Install an attachment style (secure / anxious / avoidant /
+        disorganized) toward a figure. The style is a parameter bundle from
+        Mikulincer & Shaver's hyperactivation/deactivation model, and it stakes
+        a forecast about separation that `Story.predict_separation` will test:
+        secure settles on reunion; anxious protests and stays up; avoidant
+        narrates calm over a real somatic spike (the confabulation gap);
+        disorganized approaches and avoids the same figure at once.
+
+        Any keyword override of a style parameter is recorded as an
+        accommodation."""
+        from . import attachment as att
+        return att.install(self, style, figure=to,
+                           overrides=overrides or None)
+
+    # ---- circumplex: a stance on the interpersonal circle ------------------
+    def stance(self, *, dominance: float = 0.0, warmth: float = 0.0):
+        """Place this character on the interpersonal circumplex. Used with
+        `Story.meet(a, b)` to compile a dyad whose trajectory the
+        complementarity principle predicts."""
+        from .circumplex import Stance
+        self._stance = Stance(dominance=dominance, warmth=warmth)
         return self
 
     # ---- narration ---------------------------------------------------------
@@ -950,6 +1019,9 @@ class Story:
         self.characters: list[Character] = []
         self._events: list[tuple] = []
         self._scenes: list[tuple] = []
+        # theory defaults overridden by hand -- disclosed by Preregistration so
+        # a run matching a hand-set dial is not mistaken for a prediction
+        self._accommodations: list[str] = []
 
     # ---- building ----------------------------------------------------------
     def character(self, name: str, temperament: Temperament = trusting,
@@ -1138,6 +1210,86 @@ class Story:
             v += step
         return {"who": (who.name if isinstance(who, Character) else who),
                 "channel": channel, "breaks_at": None, "in_range": (lo, hi)}
+
+    # ---- preregistration: forecasts staked before the run -------------------
+    def preregister(self):
+        """Open a preregistration: claims about this story staked BEFORE it is
+        run, checked mechanically after, with theory-default overrides
+        disclosed as accommodations. See soma.narrative.preregister."""
+        from .preregister import Preregistration
+        return Preregistration(self)
+
+    # ---- attachment & circumplex forecasts ----------------------------------
+    def predict_separation(self, who, *, beats: int = 5, reunion_beats: int = 5):
+        """Test an attachment style's staked forecast against a separation the
+        author never scripted (see soma.narrative.attachment)."""
+        from . import attachment as att
+        return att.predict_separation(self, who, beats=beats,
+                                      reunion_beats=reunion_beats)
+
+    def meet(self, a, b, *, lag: str = "1s", gain: float = 0.9):
+        """Bind two characters (each of whom has a `stance`) into a circumplex
+        dyad: manner surfaces, mutual reading through couple/lag, warmth
+        correspondence, and a measurable rapport mood."""
+        from .circumplex import bind_dyad
+        ca = a if isinstance(a, Character) else next(
+            c for c in self.characters if c.name == a)
+        cb = b if isinstance(b, Character) else next(
+            c for c in self.characters if c.name == b)
+        return bind_dyad(ca, cb, a_stance=ca._stance, b_stance=cb._stance,
+                         lag=lag, gain=gain)
+
+    def predict_dyad(self, a, b, *, beats: int = 10):
+        """Forecast, from the two stances alone, whether the interaction
+        settles or strains and who gives ground -- then run the compiled dyad
+        and check each claim (see soma.narrative.circumplex)."""
+        from . import circumplex as cx
+        return cx.predict_dyad(self, a, b, beats=beats)
+
+    # ---- the study layer: insight into predictive characterizations --------
+    def sensitivity(self, *, params: dict, outcome_name: str = "break_time",
+                    character=None, channel: str = "heart", mood=None,
+                    quale=None, n_base: int = 64, seed: int = 0):
+        """Variance-based (Sobol) sensitivity: which dial actually writes this
+        outcome, on its own vs. through interaction. See
+        soma.narrative.sensitivity."""
+        from .sensitivity import sensitivity
+        return sensitivity(self, params=params, outcome_name=outcome_name,
+                           character=character, channel=channel, mood=mood,
+                           quale=quale, n_base=n_base, seed=seed)
+
+    def discriminate(self, who, *, version_a: dict, version_b: dict,
+                     probes: dict, outcome_name: str = "break_time",
+                     beats: int = 8, character=None, channel: str = "heart",
+                     mood=None, quale=None):
+        """Adaptive-design-style model discrimination: find the probe under
+        which two readings of a character diverge most -- the scene to write.
+        See soma.narrative.discriminate."""
+        from .discriminate import discriminate
+        return discriminate(self, who, version_a=version_a, version_b=version_b,
+                            probes=probes, outcome_name=outcome_name,
+                            beats=beats, character=character, channel=channel,
+                            mood=mood, quale=quale)
+
+    def predict_break_onset(self, who, channel: str = "heart", *,
+                            window: int = 4, overrides=None):
+        """Critical-slowing-down early warning: read only the pre-transition
+        dynamics and forecast whether a self-revelation is coming. See
+        soma.narrative.earlywarning."""
+        from .earlywarning import predict_break_onset
+        return predict_break_onset(self, who, channel, window=window,
+                                   overrides=overrides)
+
+    def minimal_intervention(self, *, target, dials: dict, character=None,
+                             channel: str = "heart", mood=None, quale=None,
+                             steps: int = 24):
+        """Counterfactual: the smallest single-dial change that flips the
+        ending -- the margin the ending turns on. See
+        soma.narrative.counterfactual."""
+        from .counterfactual import minimal_intervention
+        return minimal_intervention(self, target=target, dials=dials,
+                                    character=character, channel=channel,
+                                    mood=mood, quale=quale, steps=steps)
 
     def characterize(self, width: int = 88) -> str:
         """Synthesize a *portrait* -- not a log of what happened, but a reading
