@@ -115,3 +115,43 @@ class TestRunCommandStillWorks:
     def test_check_command(self):
         out = _plain(web_bridge.run_command("check", self.SRC, "t", width=72))
         assert "checks clean" in out
+
+
+class TestLibraryManifest:
+    """Every example bundled into the playground's Library rail must actually
+    execute clean through the real browser bridge. This guards against a class
+    of bug that once slipped through: embedding a capstone's raw source (which
+    itself contains nested docstrings and f-string escape sequences) inside the
+    manifest's own triple-quoted Python string silently corrupted escape
+    sequences unless the manifest used a raw string -- syntactically valid
+    Python at every layer, but wrong at runtime, and invisible without actually
+    executing each example."""
+
+    def test_every_manifest_example_runs_without_error(self):
+        import sys
+        sys.path.insert(0, "examples/library")
+        import _manifest
+        examples = _manifest.as_payload()
+        assert len(examples) >= 20, "the manifest lost examples"
+        failures = []
+        for e in examples:
+            out = _plain(web_bridge.run_python(e["code"], width=76))
+            if "Traceback" in out:
+                failures.append((e["key"], out.splitlines()[0] if out else ""))
+        assert not failures, f"examples failed to run: {failures}"
+
+    def test_capstone_examples_are_present_and_substantial(self):
+        """The capstone studies are long, composed programs -- if one silently
+        degenerated to a near-empty stub (as happened once from a quoting
+        bug), it would still 'not error' but say almost nothing."""
+        import sys
+        sys.path.insert(0, "examples/library")
+        import _manifest
+        capstones = [e for e in _manifest.as_payload()
+                    if e["key"].startswith("capstone/")]
+        assert len(capstones) == 8
+        for e in capstones:
+            out = _plain(web_bridge.run_python(e["code"], width=76))
+            assert len(out.splitlines()) >= 30, (
+                f"{e['key']} produced suspiciously little output "
+                f"({len(out.splitlines())} lines)")

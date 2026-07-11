@@ -485,3 +485,32 @@ through the exact browser execution path.
 
 *Version: SOMA 0.14.2. Tests: 281 passing. Fixes: complete `__all__` (+ a
 guard test), corrected `arc` docstring, README test counts.*
+
+## 13. 0.14.3 — the capstone studies, bundled
+
+Eight full command-line programs from `examples/narrative/` — each a complete
+study composing several prediction and insight tools on one character, couple,
+or small group — are now bundled into the playground's Library rail and taught
+in `TUTORIAL_PREDICTIVE.md` as a new Part 5. They were already in the repo and
+already correct; what changed is that they're now reachable without a
+terminal, and each has a full explanation of what its composition reveals that
+no single tool would show alone: every insight tool turned on one man (`the
+anatomy of a breaking`), a computed point of no return in a marriage's slow
+curdling, panic modeled as a positive-feedback loop with genuine hysteresis (a
+mechanism this tutorial had not shown elsewhere), and a jury's accuracy
+staying flat under a deadline while its *coverage* of hard cases collapses.
+
+**A quoting bug, found while bundling.** Embedding a capstone's raw source
+(which itself contains nested docstrings and f-string escape sequences like
+`\n`) inside the manifest's own triple-quoted Python string literal is
+syntactically valid at every layer but silently wrong at runtime: the *outer*
+string literal interprets escape sequences meant for the *inner*, not-yet-
+executed code, corrupting it before it ever reaches the browser. The fix is to
+declare the manifest's code arguments as raw strings (`r"""..."""`). A new
+test (`TestLibraryManifest`) now runs every bundled example end-to-end and
+checks the capstones produce substantial output, specifically to catch this
+class of bug — syntactically valid, semantically wrong, and invisible without
+execution — should it recur.
+
+*Version: SOMA 0.14.3. Tests: 283 passing. New: 8 capstone studies bundled
+into the Library rail and the tutorial; manifest execution guard tests.*

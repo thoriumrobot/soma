@@ -19,7 +19,7 @@ python -m soma query   examples/a_marriage.soma
 python -m soma run     examples/bad_news.soma --phi
 python -m soma run     examples/the_appointment.soma      # medical dismissal
 python -m soma run     examples/the_interrogation.soma    # dissociation in bands
-python -m pytest -q            # 281 tests
+python -m pytest -q            # 283 tests
 ```
 
 ### Run it in a browser — no install
@@ -41,9 +41,13 @@ The playground has **two modes**, switched from the header:
   `gottman_assess`, `predict_conditioning`, `predict_helplessness`,
   `predict_decision`, `tipping_point`, `predict_break_onset`) and the
   **insight** methods (`sensitivity`, `minimal_intervention`, `preregister`,
-  `speed_accuracy`). Fourteen worked examples ship in the drawer, from
-  `hello · a character` to the Strange Situation and the Gottman thin-slice
-  divorce forecast.
+  `speed_accuracy`). Twenty-two worked examples ship in the drawer: fourteen
+  single-concept examples, from `hello · a character` to the Strange Situation
+  and the Gottman thin-slice divorce forecast, plus eight unedited **capstone**
+  studies from `examples/narrative/` — full command-line programs that compose
+  several tools into one worked study (every insight tool turned on one man in
+  `the anatomy of a breaking`; a computed point of no return in `the marriage
+  that could have held`; panic as a positive feedback loop in `the spiral`).
 
 The two modes meet: Library code can call `run_source(...)` on **hand-written
 SOMA text** and run it through the library on the same page, and — conversely —
@@ -621,7 +625,7 @@ soma/
   narrative/      high-level authoring library (Story, Character, temperaments,
                   arcs) that compiles narrative intent to ordinary SOMA
 examples/         17 worked programs (+ examples/narrative/ library scripts)
-tests/            281 tests (pytest; 91 core + 190 narrative, prediction & web)
+tests/            283 tests (pytest; 91 core + 192 narrative, prediction & web)
 ```
 
 ## Invariants the implementation guarantees
