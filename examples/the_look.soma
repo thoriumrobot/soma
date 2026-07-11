@@ -1,0 +1,125 @@
+// the_look.soma
+// Two people at a kitchen table, at the end of something.
+//
+// This is the simulation the language was built for. Neither character can read
+// the other's interior -- the compiler forbids it. Each gets only a FACE,
+// coupled across the table with a gain and a one-second lag, and each must run
+// their own loops to guess what produced it. They guess wrong, in opposite
+// directions, and each wrong guess drives the face that the other will misread
+// next. The loop between them closes, and it is a loop neither of them chose.
+//
+//   ANA  is anxious: LOW conviction, HIGH sensory precision. Every flicker of
+//        his face is news. She updates constantly, and so is never at rest.
+//   IVO  is avoidant: HIGH conviction, and it LEARNS. Every time his prior
+//        ("she is angry, I should go quiet") fires, it hardens a little more.
+//        Within a scene it becomes unfalsifiable.
+//
+// Trust is an affine resource. It is spent, and it is never conjured.
+// The dramatic result: they end in the same silence for opposite reasons, and
+// the narrator of each has a confident account of the other's motives.
+@consent("simulates relational distress, shame, and withdrawal")
+
+sim { duration: 60s  dt: 1s  cadence: true }
+
+scene "The plates"        from 0s  to 20s
+scene "What she asked"    from 20s to 40s
+scene "The long quiet"    from 40s to 60s
+
+// ---------------------------------------------------------------- ANA
+character Ana {
+  body flesh @cardiac {
+    intero heart      : BPM     baseline 74
+    intero gut        : Tension baseline 1
+    extero his_face   : Affect  baseline 5     // what she can see of Ivo: warm
+    proprio face      : Affect  baseline 5     // what her own face is doing
+  }
+
+  resource trust : Affine<Regard> = metabolic_reserve(100)
+
+  flow heart @cardiac { dynamics: -(heart - 74) / 6.0 }
+
+  // she reads his face with high sensory precision and holds no firm prior:
+  // she is a woman who will believe whatever your face just did
+  loop reading_him @neural {
+    prior:      predict(his_face)   // she expects the warm face she married
+    sense:      his_face
+    precision:  0.95
+    conviction: 0.25
+    act {
+      update -> he_is_pulling_away
+      move ! spend(trust, 12)
+      move ! set(face, 9)          // her alarm shows; he will read THIS
+      move ! set(heart, 104)
+      emit feel(dread)
+    }
+  }
+
+  // and her body reads the heart her own reading just drove
+  loop viscera @cardiac {
+    prior:      predict(74)
+    sense:      heart
+    precision:  0.9
+    conviction: 0.3
+    efference:  reading_him        // subtract the part she herself caused
+    act { emit feel(shame) }
+  }
+
+  mood weather : Affect @mood integrates { dread * 1.0, shame * 0.7 } decay 0.88
+
+  narrator self subscribes { reading_him } confabulates true
+    voice { dread: "He has already left. He is just sitting there to be polite." }
+}
+
+// ---------------------------------------------------------------- IVO
+character Ivo {
+  body flesh @cardiac {
+    intero heart     : BPM     baseline 68
+    extero her_face  : Affect  baseline 5      // what he can see of Ana
+    proprio face     : Affect  baseline 5
+  }
+
+  resource trust : Affine<Regard> = metabolic_reserve(100)
+
+  // he reads her face through a prior that experience keeps confirming.
+  // `learn` is the whole tragedy: each firing makes the next firing likelier,
+  // until conviction outranks his senses and he stops seeing her at all.
+  loop reading_her @neural {
+    prior:      predict(her_face)               // he expects the ordinary evening
+    sense:      her_face
+    precision:  0.55
+    conviction: 0.5
+    learn:      0.09                            // the prior hardens by use
+    act {
+      move ! spend(trust, 9)
+      move ! set(face, 0)                       // he goes flat. she reads THIS.
+      emit feel(shame)
+      ignore                                    // reachable once conviction wins
+    }
+  }
+
+  mood weather : Affect @mood integrates { shame * 1.0 } decay 0.9
+
+  narrator self subscribes { reading_her } confabulates true
+    voice { shame: "Anything I say will be the wrong thing. Better to say nothing." }
+}
+
+// ---------------------------------------------------------------- BETWEEN
+// The only channel between two minds: a surface, attenuated, and late.
+couple Ana.face -> Ivo.her_face { gain 0.9  lag 1s }
+couple Ivo.face -> Ana.his_face { gain 0.9  lag 1s }
+
+// She asks the question. Her face changes first. Everything after this is
+// the two of them reading surfaces.
+stimulus Ana.face { at 20s: 9 }
+
+query "each certain about the other" {
+  narrate ?who ?quote ?gap ?t
+  where ?gap >= 0.5
+  surface "{?who} is sure: {?quote}"
+}
+
+query "trust spent on a misreading" {
+  spend ?loop ?res ?t
+  where ?res == "Ana.trust"
+  surface "{?t}: Ana spent regard she will not get back"
+}

@@ -1,0 +1,27 @@
+// 03_opaque.soma -- why you CANNOT do arithmetic on a feeling.
+//
+// feel(x) produces a Qualia<x>: an opaque phenomenal value. You may emit it,
+// and that is all. Trying to add it, compare it, or feed it to a function is a
+// COMPILE ERROR -- the explanatory gap, enforced by the type system.
+//
+// This program is designed to FAIL the check. Uncomment the emit line and
+// comment the arithmetic line to make it pass.
+
+sim { duration: 3s  dt: 1s }
+
+body Body @cardiac {
+  intero gut : Tension  baseline 2
+}
+
+stimulus gut { at 1s: 9 }
+
+loop feeling @cardiac {
+  prior:      predict(2)
+  sense:      gut
+  precision:  0.9
+  conviction: 0.3
+  act {
+    move ! set(gut, feel(dread) + 1)   // ILLEGAL: arithmetic on a Qualia
+    // emit feel(dread)                  // LEGAL: emitting is the only use
+  }
+}

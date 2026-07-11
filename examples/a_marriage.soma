@@ -1,0 +1,122 @@
+// a_marriage.soma
+// Thirty years, on the biography clock.
+//
+// In `in_love.soma` a single character was rewarded for being wrong: low prior
+// conviction, `emit feel(delight_at_error)`. That example could not show what
+// happens NEXT, because conviction was a constant. Here it learns.
+//
+// Nothing is added to make the love die. The same loop that produced delight
+// produces contempt, because every confirmation makes the next prediction
+// easier, until the model of the other is so good that the other can no longer
+// surprise it. The `learn` rate IS the marriage.
+//
+//   scene 1: he keeps getting her wrong, and is glad
+//   scene 2: he gets her right more often. delight thins.
+//   scene 3: conviction outranks his senses. He `ignore`s her. He is certain
+//            he knows her, and he has stopped looking.
+//   scene 4: she dies. The prior does not.
+//
+// The final Winnow-S finding is the one a novelist wants: the man's body kept
+// predicting a woman who is not in the house.
+@consent("simulates grief and the erosion of intimacy")
+
+sim { duration: 30y  dt: 1y  cadence: true }
+
+scene "Being wrong, and glad"   from 0y  to 7y
+scene "Getting her right"       from 8y  to 15y
+scene "The certainty"           from 16y to 24y
+scene "After"                   from 25y to 30y
+
+character Mira {
+  body flesh @cardiac {
+    proprio face  : Expression baseline 5
+    intero  breath : Rate      baseline 12
+  }
+
+  // she keeps being a person: her face varies, unpredictably, for thirty years
+  // -- until year 25.
+  loop living @breath {
+    prior:      predict(5)
+    sense:      face
+    precision:  0.7
+    conviction: 0.4
+    act { update -> whatever_she_is_today }
+  }
+}
+
+// her face across the years. The last value is the one that matters.
+stimulus Mira.face {
+  at 1y: 9   at 3y: 2   at 5y: 8   at 7y: 3
+  at 9y: 7   at 11y: 4  at 13y: 6  at 15y: 5
+  at 17y: 6  at 19y: 5  at 21y: 5  at 23y: 5
+  at 25y: 0                       // she is gone; the chair is empty
+}
+
+character Soren {
+  body flesh @cardiac {
+    extero her_face : Expression baseline 5
+    intero chest    : Ache       baseline 0
+    proprio bed     : Side       baseline 0
+  }
+
+  // The courtship loop. `conviction` starts LOW -- he holds his picture of her
+  // loosely, on purpose, and is delighted to be corrected. `learn` is the slow
+  // poison: each firing hardens the prior a little. Nothing else changes.
+  loop courtship @breath {
+    prior:      predict(her_face)
+    sense:      her_face
+    precision:  0.75
+    conviction: 0.2
+    learn:      0.055
+    act {
+      update -> revise_my_picture_of_her
+      // A guard: you can only be delighted to be corrected by someone who is
+      // still there to correct you. Without this, the loop would greet her
+      // death as the most interesting surprise of his life -- which is what it
+      // did, before `when` existed.
+      emit feel(delight_at_error) when her_face > 1
+      ignore                     // unreachable until conviction wins. then it isn't.
+    }
+  }
+
+  // the somatic prior that no bereavement will update: the bed has two sides
+  loop reaching @cardiac {
+    prior:      predict(5)
+    sense:      bed
+    precision:  0.6
+    conviction: 0.95            // the body does not revise
+    act {
+      emit feel(reaching) when her_face < 1     // only once the bed has one side
+      move ! turn_toward(the_cold_half) when her_face < 1
+    }
+  }
+
+  // a somatic memory keyed to her absence, with no story to hang it on
+  memory somatic her_absence {
+    cue: her_face
+    when: her_face < 1
+    evoke: feel(grief)
+    strength: 1.0
+  }
+
+  mood weather : Affect @mood integrates { delight_at_error * 1.0, grief * 1.0,
+                                           reaching * 0.8 } decay 0.75
+
+  narrator self subscribes { courtship } confabulates true
+    voice { delight_at_error: "I keep getting you wrong, and I keep being glad of it."
+            grief: "I am managing. People say I am managing well." }
+}
+
+couple Mira.face -> Soren.her_face { gain 1.0  lag 1y }
+
+query "the year he stopped being surprised" {
+  ignore ?loop ?t
+  surface "{?t}: {?loop} suppressed her -- he was sure he knew who she was"
+}
+
+query "a body predicting a woman who is not in the house" {
+  feel ?loop ?q ?t
+  where ?q == "reaching"
+  where ?t > 780000000
+  surface "{?t}: {?loop} still turns toward the cold half of the bed"
+}

@@ -1,0 +1,53 @@
+// rebus.soma
+// REBUS: RElaxed Beliefs Under pSychedelics (Carhart-Harris & Friston, 2019).
+//
+// A single library call flattens the precision of every high-level prior at
+// once, "liberating bottom-up information flow." In SOMA this is a global
+// operator on `conviction`: the priors do not vanish, they merely stop
+// outranking the senses. What was `ignore`d becomes perceivable; what was
+// certain becomes negotiable; the loop that had been acting to make the world
+// match its model starts, instead, to update.
+//
+// Same character, same body, same evidence. One dial.
+@consent("simulates an altered state and the relaxation of entrenched belief")
+
+sim { duration: 60s  dt: 2s }
+
+body Iris @hormonal {
+  intero chest : Ache   baseline 2
+  extero world : Signal baseline 1
+}
+
+// the world has been quietly telling her she is safe, the whole time
+stimulus world { at 0s: 1 }
+
+// an entrenched prior with very high conviction: nothing gets in.
+// (the same shape as chronic_pain.soma -- a belief hardened into a body)
+loop conviction_of_harm @mood {
+  prior:      predict(9)
+  sense:      world
+  precision:  0.5
+  conviction: 0.95
+  act {
+    ignore                        // silenced -- while the prior still outranks
+    update -> the_world_is_safe   // reachable only once precision flips
+    emit feel(dread)
+  }
+}
+
+// at 30s the priors are relaxed. Nothing else changes.
+intervene rebus {
+  at: 30s
+  strength: 0.75
+}
+
+mood weather : Affect @mood integrates { dread * 1.0 } decay 0.9
+
+narrator self subscribes { conviction_of_harm } confabulates true
+  voice { dread: "It has always been like this. It will always be like this." }
+
+query "the belief that finally moved" {
+  feel ?loop ?q ?t
+  where ?t > 30
+  surface "{?t}: after the priors relaxed, {?loop} was still feeling {?q}"
+}

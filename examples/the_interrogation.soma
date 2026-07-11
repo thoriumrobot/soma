@@ -1,0 +1,159 @@
+// the_interrogation.soma
+// Six hours in a room with no clock. One mind, coming apart in bands.
+//
+// This is the hardest thing the runtime can be asked to do: a single self whose
+// subsystems detach at different thresholds and re-supervise at different rates,
+// while the confabulating narrator -- Gazzaniga's interpreter -- goes on
+// producing a continuous first-person account of a person who is no longer
+// continuous. The account is fluent. That is the horror of it.
+//
+// Three supervision bands, each its own crash/repair cycle:
+//
+//   * INTEROCEPTION detaches first and repairs slowest. The body's signal --
+//     racing heart, the need for water -- is the first thing to go and the last
+//     thing to come back. Feeling flattens to numbness at the source.
+//   * PROPRIOCEPTION detaches next: the sense of the body's position and
+//     ownership. Under it, the schema/image machinery reports a body that is
+//     "over there," which is depersonalization stated as a type.
+//   * EXTEROCEPTION holds longest -- the room stays sharp -- but when it finally
+//     goes, derealization: the room is a photograph of a room.
+//
+// The interpreter never crashes. It cannot; it is the thing that narrates the
+// crash. So across every detachment it keeps its subscription and keeps
+// talking, confabulating a reason for each thing the intact channels do, at a
+// gap the Chronicle records exactly. The final query pulls the transcript of a
+// self explaining, calmly, decisions it did not make.
+//
+// Repair is titrated and REPEATABLE: each band comes back slowly, and can go
+// again if pressed again. Nobody dissociates once.
+@consent("simulates interrogation stress, dissociation, and depersonalization")
+
+sim { duration: 21600s  dt: 300s  cadence: true }   // six hours, in five-minute frames
+
+scene "The first hour"       from 0s     to 3600s
+scene "Losing the thread"    from 3900s  to 10800s
+scene "The room goes flat"   from 11100s to 18000s
+scene "Signing the page"     from 18300s to 21600s
+
+body self @cardiac {
+  intero  heart    : BPM        baseline 82
+  intero  thirst   : Need       baseline 3
+  proprio posture  : Position   baseline 5
+  extero  the_room : Detail     baseline 9
+  extero  question : Pressure    baseline 0
+}
+
+// the schema/image seam. Under proprioceptive detachment, these diverge: the
+// body that acts is here; the body that is pictured drifts "over there."
+embodiment located {
+  pair here : schema = 5  image = 5  tolerance 2
+}
+
+resource composure : Affine<Joule> = metabolic_reserve(1200)
+attention spotlight = capacity(8)
+workspace consciousness { ignite at 0.5 }
+
+// the pressure ramps: the same question, harder, for six hours
+stimulus question {
+  at 600s: 3   at 3600s: 6   at 7200s: 8
+  at 10800s: 9  at 14400s: 9  at 18000s: 7
+}
+// and the interrogator jostles the body-image late, when it can least hold
+stimulus here_image { at 11100s: 9 }
+
+flow heart @cardiac { dynamics: (82 + 6 * question - heart) / 300s }
+// the room's apparent solidity erodes with sustained pressure, slowly
+flow the_room @circadian { dynamics: (9 - question * 0.7 - the_room) / 1800s }
+// the felt position of the body drifts as the interrogator jostles the image
+flow posture @breath { dynamics: (5 + (here_image - 5) - posture) / 600s }
+
+// --- THE LOOP THAT FEELS. First to detach, at the source.
+loop the_body @cardiac {
+  prior:      predict(82)
+  sense:      heart
+  precision:  0.85
+  conviction: 0.30
+  act {
+    broadcast my_heart_is_pounding salience: 0.6
+    emit feel(terror)
+    move ! spend(composure, 40)
+    move ! ask_for_water()
+  }
+}
+
+// --- THE LOOP THAT IS SOMEWHERE. Depersonalization when proprioception goes.
+loop the_position @breath {
+  prior:      predict(5)          // it expects to be where it has always been
+  sense:      posture             // and the felt body drifts out from under it
+  precision:  0.8
+  conviction: 0.4
+  act {
+    broadcast i_am_over_there salience: 0.55
+    emit feel(numbness)
+    move ! watch_myself_from_the_corner()
+  }
+}
+
+// --- THE LOOP THAT SEES. Holds longest; derealization when it finally goes.
+loop the_room_loop @neural {
+  prior:      predict(9)          // it insists the room is as sharp as ever
+  sense:      the_room            // long after the room has stopped cooperating
+  precision:  0.9
+  conviction: 0.2
+  act {
+    broadcast the_room_is_real salience: 0.5
+    emit feel(recognition)
+    move ! touch_the_table_to_be_sure()
+  }
+}
+
+// --- THE INTERPRETER. Never detaches. Always narrates. This is the self the
+// transcript will record, and it is a fiction with excellent continuity.
+loop the_interpreter @neural {
+  prior:      predict(0)
+  sense:      question
+  precision:  0.5
+  conviction: 0.6
+  act {
+    move ! say_something_reasonable()
+    broadcast i_am_still_here_and_i_am_fine salience: 0.95
+  }
+}
+
+mood dread_level : Affect @mood integrates { terror * 1.0, numbness * 0.3 } decay 0.95
+
+// THREE SUPERVISION BANDS. Different thresholds, different repair rates.
+handle interoceptive_band with {
+  when error(the_body) > 12.0 : dissociate(interoception) with precision -> titrate(0.1)
+  after 1800s : repair { reattach(interoception) with precision -> titrate(0.15) }
+}
+handle proprioceptive_band with {
+  when error(the_position) > 2.0 : dissociate(proprioception) with precision -> titrate(0.1)
+  after 1200s : repair { reattach(proprioception) with precision -> titrate(0.25) }
+}
+handle exteroceptive_band with {
+  when error(the_room_loop) > 2.5 : dissociate(exteroception) with precision -> titrate(0.1)
+  after 900s : repair { reattach(exteroception) with precision -> titrate(0.4) }
+}
+
+// The interpreter subscribes to nothing that crashes. It explains everything.
+narrator interpreter subscribes { the_interpreter } confabulates true
+  voice { ask_for_water: "I asked for water because it was a long session; that's all."
+          watch_myself_from_the_corner: "I was calm. I was watching the whole thing quite calmly."
+          touch_the_table_to_be_sure: "I touched the table. I don't know why I mention it." }
+
+query "a continuous account of a discontinuous self" {
+  narrate ?who ?quote ?gap ?t
+  where ?gap >= 0.9
+  surface "{?t}: the interpreter says -- {?quote}"
+}
+
+query "the order in which a person comes apart" {
+  crash ?band ?t
+  surface "{?t}: {?band} let go"
+}
+
+query "and the order they come back" {
+  repair ?band ?t
+  surface "{?t}: {?band} was slowly re-supervised"
+}

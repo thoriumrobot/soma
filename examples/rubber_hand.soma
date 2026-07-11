@@ -1,0 +1,117 @@
+// rubber_hand.soma
+// The rubber-hand illusion, run as a small tragedy of ownership.
+//
+// Ownership is a dependent type: `Ownership(limb)` is indexed by the running
+// match between predicted and observed proprioception. This program does not
+// assert that the hand is owned or disowned; it lets the index cross a
+// threshold and RETYPES the limb, and the feeling follows the type.
+//
+// Three beats, each a real experimental manipulation:
+//
+//   1. SYNCHRONOUS stroking. The seen brush and the felt brush agree, frame
+//      after frame. The predicted and observed positions converge. The rubber
+//      hand crosses the tolerance and becomes mine -- an ownership migration
+//      the subject feels as a small uncanny warmth.
+//   2. The experimenter picks up a hammer and swings at the rubber hand. The
+//      subject flinches -- for a hand that is not, in any physical sense, his.
+//      This is the illusion's proof: ownership is not belief, it is type.
+//   3. ASYNCHRONOUS. Now the seen hand moves alone, and prediction and
+//      observation part company. The index falls back through tolerance and the
+//      hand is DISOWNED -- and disownership is not neutral. A hand you can see
+//      moving, that you no longer own, is the specific horror of the alien limb.
+//
+// The confabulating narrator reports smooth agency throughout: "my hand," "I
+// moved it," even in the seconds when the record says the thing on the table
+// had stopped being his.
+@consent("simulates body-ownership disturbance and the alien-limb experience")
+
+sim { duration: 30s  dt: 1s  cadence: true }
+
+scene "The stroking"        from 0s   to 10s
+scene "The hammer"          from 11s  to 16s
+scene "Moved on its own"    from 17s  to 30s
+
+body Subject @cardiac {
+  proprio felt_hand : Position baseline 8    // real hand, hidden, off to one side
+  proprio seen_hand : Position baseline 0    // rubber hand, in view, further away
+  extero  brush     : Touch    baseline 0
+  extero  threat    : Looming  baseline 0
+  intero  startle   : BPM      baseline 72
+}
+
+workspace consciousness { ignite at 0.5 }
+
+// beat 1: synchronous stroking -- the felt hand's estimate drifts onto the
+// seen rubber hand, frame by frame, until they coincide and it becomes his
+stimulus seen_hand { at 0s: 3 }
+stimulus felt_hand { at 3s: 6  at 6s: 4  at 9s: 3 }   // 8 -> 3, onto the rubber hand
+stimulus brush     { at 3s: 1  at 6s: 1  at 9s: 1 }
+
+// beat 2: the hammer swings at the rubber hand, now that it is his
+stimulus threat    { at 12s: 9 }
+stimulus startle   { at 12s: 96 }
+
+// beat 3: the rubber hand is moved alone -- felt stays at 3, seen leaps away
+stimulus seen_hand { at 18s: 11  at 24s: 13 }
+
+ownership left_hand {
+  predicted: felt_hand
+  observed:  seen_hand
+  tolerance: 3
+  initial:   alien       // a rubber hand on the table is not yet yours
+}
+
+// the proprioceptive loop: it predicts where the hand is felt to be and senses
+// where a hand is seen to be. When they agree, it perceives; the ownership type
+// tracks the same match.
+loop proprioception @neural {
+  prior:      predict(felt_hand)
+  sense:      seen_hand
+  precision:  0.9
+  conviction: 0.4
+  act {
+    update -> where_my_hand_is
+    broadcast that_hand_is_mine salience: 0.6
+    emit feel(warmth) when perceiving
+  }
+}
+
+// the defensive loop: once the hand is owned, a threat to it is a threat to him.
+// It only fires when the ownership index says the hand is his -- which is why
+// the flinch is the illusion's proof.
+loop flinch @cardiac {
+  prior:      predict(72)
+  sense:      startle
+  precision:  0.85
+  conviction: 0.2
+  act {
+    // He only recoils from a blow to the hand once the hand is HIS. Before the
+    // stroking synchronizes it, the same hammer means nothing.
+    broadcast pull_it_back salience: 0.8 when owned(left_hand)
+    move ! set(startle, 118) when owned(left_hand)
+    emit feel(terror) when owned(left_hand)
+  }
+}
+
+mood unease : Affect @mood integrates { terror * 1.0, warmth * -0.5 } decay 0.85
+
+narrator self subscribes { proprioception } confabulates true
+  voice { warmth: "That's my hand. I can feel the brush on it."
+          terror: "I flinched. Of course I flinched -- it was coming right at it." }
+
+query "the moment it became his" {
+  own ?limb ?state ?t
+  where ?state == "owned"
+  surface "{?t}: {?limb} crossed into ownership -- a rubber hand became a part of him"
+}
+
+query "the moment it stopped" {
+  own ?limb ?state ?t
+  where ?state == "disowned"
+  surface "{?t}: {?limb} became a thing on the table he could see moving, and did not own"
+}
+
+query "what he said while it happened" {
+  narrate ?who ?quote ?gap ?t
+  surface "{?t}: {?quote}"
+}

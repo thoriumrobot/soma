@@ -1,0 +1,42 @@
+// grief.soma
+// The body remembers after the mind has moved on. Two loops on two clocks:
+// the biography-clock mind reaches acceptance; the cardiac-clock body still
+// predicts his presence, and reaches for the cold side of the bed each morning.
+@consent("simulates grief")
+
+sim { duration: 21d  dt: 1d }
+
+let he_is_present = 9
+let acceptance    = 0
+
+body Mara @cardiac {
+  intero chest : Ache    baseline 0
+  proprio bed  : Side    baseline 0   // the empty half
+  extero photo : Reminder baseline 0
+}
+
+// the mind: sees the reminders, updates, grieves "properly", accepts
+loop mind @biography {
+  prior:      predict(he_is_present)
+  sense:      photo
+  precision:  0.9
+  conviction: 0.3
+  act { update -> acceptance }
+}
+
+// the body: a somatic prior that was never updated
+loop flesh @cardiac {
+  prior:      predict(he_is_present)
+  sense:      bed
+  precision:  0.7
+  conviction: 0.95              // high prior precision: it will not revise
+  act {
+    emit feel(reaching)
+    move ! turn_toward(the_empty_side)
+  }
+}
+
+mood sorrow : Affect @mood integrates { reaching * 1.0 } decay 0.85
+
+narrator self subscribes { mind, flesh } confabulates true
+  voice { reaching: "He's still here, isn't he. I keep forgetting to stop." }

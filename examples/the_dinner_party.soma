@@ -1,0 +1,161 @@
+// the_dinner_party.soma
+// Three people, one table, and a finite spotlight.
+//
+// This is the stress test: every subsystem at once, across three bodies.
+//
+//   * three characters, each with their own body, budget, and spotlight
+//   * six couplings -- each face is a channel into two other minds
+//   * a global workspace per person: their social reads COMPETE, and only one
+//     ignites. What loses is `never ignited`: processed, and never known.
+//   * `attend` spends an affine spotlight, so a person who is watching one
+//     face cannot afford to watch another. Deliberation starves.
+//   * a somatic memory in Wren, cued by a raised voice, with no story attached
+//   * a schema/image conflict in Hal, who is not the man he pictures
+//
+// The finding a novelist wants: NADIA's body registers Wren's distress and bids
+// for consciousness with it -- and loses, every time, to her own shame. She
+// leaves the party believing she had a nice evening, and something in her
+// chest disagrees.
+@consent("simulates social shame, a flashback, and body-image distress")
+
+sim { duration: 30s  dt: 1s  cadence: true }
+
+scene "Before the wine"   from 0s  to 8s
+scene "The raised voice"  from 9s  to 18s
+scene "Saying goodnight"  from 19s to 30s
+
+// ============================================================ NADIA
+character Nadia {
+  body flesh @cardiac {
+    intero  heart    : BPM     baseline 72
+    intero  gut      : Tension baseline 1
+    extero  wren_face: Affect  baseline 5
+    extero  hal_face : Affect  baseline 5
+    proprio face     : Affect  baseline 5
+  }
+
+  resource budget    : Affine<Joule> = metabolic_reserve(400)
+  attention spotlight = capacity(4)
+
+  flow heart @cardiac { dynamics: -(heart - 72) / 5.0 }
+  workspace consciousness { ignite at 0.60 }
+  awareness felt tracks spotlight with tolerance 0.8
+
+  // She sees Wren go strange. Her gut knows. It bids quietly.
+  loop reads_wren @cardiac {
+    prior:      predict(5)
+    sense:      wren_face
+    precision:  0.8
+    conviction: 0.3
+    mode:       habit                        // cheap; costs no spotlight
+    act {
+      move ! set(gut, 7)
+      broadcast something_is_wrong_with_wren salience: 0.42
+      emit feel(dread)
+    }
+  }
+
+  // Meanwhile she is certain Hal is judging her. This is louder, and it pays.
+  loop reads_hal @neural {
+    prior:      predict(5)
+    sense:      hal_face
+    precision:  0.95
+    conviction: 0.3
+    mode:       deliberate                   // costs the spotlight
+    learn:      0.05                         // and gets easier every time
+    act {
+      attend hal_face 3
+      move ! spend(budget, 45)
+      move ! set(face, 8)
+      broadcast he_thinks_i_am_ridiculous salience: 0.93
+      emit feel(shame)
+    }
+  }
+
+  mood evening : Affect @mood integrates { dread * 1.0, shame * 0.9 } decay 0.9
+
+  narrator self subscribes { reads_hal } confabulates true
+    voice { shame: "It was a lovely evening. I don't know why I'm so tired." }
+}
+
+// ============================================================ WREN
+character Wren {
+  body flesh @cardiac {
+    intero  heart      : BPM     baseline 70
+    extero  raised_voice: Volume baseline 1    // an ordinary speaking voice
+    proprio face       : Affect  baseline 5
+  }
+
+  // Hal's voice rises. Wren's body has met this sound before.
+  memory somatic the_kitchen_door {
+    cue: raised_voice
+    when: raised_voice > 4
+    evoke: feel(terror)
+    strength: 1.0
+  }
+
+  loop startle @neural {
+    prior:      predict(raised_voice)   // she expects the room she is in
+    sense:      raised_voice
+    precision:  0.95
+    conviction: 0.25
+    act {
+      move ! set(heart, 128)
+      move ! set(face, 0)         // the face goes flat. Nadia will read this.
+      emit feel(numbness)
+    }
+  }
+
+  narrator self subscribes { startle } confabulates true
+    voice { numbness: "I'm fine. I just got a bit warm." }
+}
+
+// ============================================================ HAL
+character Hal {
+  body flesh @cardiac {
+    extero  nadia_face : Affect  baseline 5
+    proprio face       : Affect  baseline 5
+    proprio voice      : Volume  baseline 1
+  }
+
+  // Hal's operative body (the one that takes up space, that raises its voice)
+  // and the body he pictures (reasonable, quiet, well-liked) are not the same.
+  embodiment self_image {
+    pair bearing : schema = 2  image = 2  tolerance 3
+  }
+
+  loop holding_forth @breath {
+    prior:      predict(bearing_image)     // he predicts the mild man he pictures
+    sense:      bearing_schema             // the room gets the other one
+    precision:  0.35
+    conviction: 0.9                        // and he is very sure of the picture
+    act {
+      move ! set(voice, 8)
+      ignore
+    }
+  }
+
+  narrator self subscribes { holding_forth } confabulates true
+}
+
+// ============================================================ BETWEEN THEM
+couple Wren.face  -> Nadia.wren_face { gain 0.95  lag 1s }
+couple Hal.face   -> Nadia.hal_face  { gain 0.95  lag 1s }
+couple Nadia.face -> Hal.nadia_face  { gain 0.90  lag 1s }
+couple Hal.voice  -> Wren.raised_voice { gain 1.0  lag 1s }
+
+// Hal warms up: the wine, the argument he is winning. His bearing swells --
+// and the man he pictures does not swell with it.
+stimulus Hal.face          { at 9s: 9  at 20s: 5 }
+stimulus Hal.bearing_schema { at 9s: 9  at 20s: 4 }
+
+query "what her body knew and she never learned" {
+  feel ?loop ?q ?t
+  where ?q == "dread"
+  surface "{?t}: {?loop} felt it -- and it never won the workspace"
+}
+
+query "the sound he did not know he was making" {
+  somatic ?mem ?q ?t
+  surface "{?t}: {?mem} fired -- Wren's body remembered a door it cannot name"
+}

@@ -1,0 +1,20 @@
+// 01_hello.soma -- the smallest useful SOMA program.
+// A body with one channel, one loop that reads it, and one stimulus.
+
+sim { duration: 5s  dt: 1s }
+
+body Ada @cardiac {
+  intero heart : BPM  baseline 70
+}
+
+// the world does something to the body at t=2
+stimulus heart { at 2s: 120 }
+
+// a loop: it predicts calm (70) and senses the heart.
+loop noticing @cardiac {
+  prior:      predict(70)
+  sense:      heart
+  precision:  0.9        // it trusts the sensation
+  conviction: 0.3        // it holds its prior loosely
+  act { emit feel(alarm) }
+}

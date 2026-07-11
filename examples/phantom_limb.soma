@@ -1,0 +1,51 @@
+// phantom_limb.soma
+// Merleau-Ponty's distinction made mechanical. The body IMAGE knows the arm is
+// gone. The body SCHEMA -- the pre-reflective, operative "I can" -- still
+// reaches. Because they are distinct types, their disagreement is not a bug in
+// the character: it is a formal event the compiler and the Chronicle can see.
+@consent("simulates phantom limb pain")
+
+sim { duration: 30d  dt: 2d }
+
+// schema says the left arm is fully present (9); image says it is gone (0)
+embodiment Rasha {
+  pair left_arm : schema = 9  image = 0  tolerance 2
+}
+
+body Rasha_body @cardiac {
+  intero stump : Signal baseline 4
+  proprio reach : Intent baseline 0
+}
+
+// the schema keeps issuing the motor intention to reach. The image predicts an
+// absent arm (0); the schema reports a present one (9). The error is the
+// phantom itself -- and the loop resolves it by acting, not by believing.
+loop reaching @neural {
+  prior:      predict(left_arm_image)
+  sense:      left_arm_schema
+  precision:  0.4
+  conviction: 0.9
+  act {
+    move ! reach_for_the_cup
+    emit feel(reaching)
+  }
+}
+
+// the stump reports pain located in a hand that is not there (Melzack's
+// neuromatrix: pain is an output of the network, not an input from tissue)
+loop neuromatrix @cardiac {
+  prior:      predict(0)
+  sense:      stump
+  precision:  0.85
+  conviction: 0.3
+  act { emit feel(pain) }
+}
+
+narrator self subscribes { neuromatrix } confabulates true
+  voice { pain: "My hand is clenched and I cannot open it." }
+
+query "the hand that is not there" {
+  feel ?loop ?q ?t
+  where ?q == "reaching"
+  surface "{?t}: {?loop} still reaches with a limb the picture has buried"
+}

@@ -1,0 +1,91 @@
+// workspace.soma
+// Everything at once, on the smallest possible stage. A man walks into a room
+// and something is wrong; he does not know it yet.
+//
+//  * `flow` gives him a continuous heart, integrated by Heun's method
+//  * `allostat` regulates it *predictively*, spending budget in advance
+//  * three loops compete to `broadcast` into the global `workspace`
+//  * `attention` is an affine spotlight; `deliberate` loops must pay for it
+//  * `awareness` is Graziano's schema: a lagged, transparent model of attention
+//
+// The dramatic payoff: the interoceptive bid loses the competition to the
+// social one. He never learns what his body was trying to tell him -- that
+// content is `never ignited`, and the Chronicle records exactly that.
+@consent("simulates unease and social dread")
+
+sim { duration: 12s  dt: 0.5s  cadence: true }
+
+body Ivo @cardiac {
+  intero heart : BPM     baseline 72
+  intero gut   : Tension baseline 1
+  extero room  : Faces   baseline 0
+}
+
+resource budget    : Affine<Joule> = metabolic_reserve(600)
+attention spotlight = capacity(6)
+
+// a heart that decays back toward rest, continuously
+flow heart @cardiac { dynamics: -(heart - 72) / 4.0 }
+
+// but allostasis reaches ahead of the decay and pushes it up before it needs to
+allostat forecast {
+  regulate: heart
+  setpoint: 96
+  gain: 0.35
+  spend: budget
+}
+
+stimulus room { at 3s: 7 }
+stimulus gut  { at 3s: 6 }
+
+workspace consciousness { ignite at 0.55 }
+awareness felt_awareness tracks spotlight with tolerance 0.6
+
+// the gut bids quietly -- and is a habit, so it is cheap
+loop viscera @cardiac {
+  prior:      predict(1)
+  sense:      gut
+  precision:  0.8
+  conviction: 0.3
+  mode:       habit
+  act {
+    broadcast something_is_wrong salience: 0.45
+    emit feel(dread)
+  }
+}
+
+// the social read bids loudly, and pays attention to do it
+loop social @neural {
+  prior:      predict(0)
+  sense:      room
+  precision:  0.95
+  conviction: 0.3
+  mode:       deliberate
+  act {
+    attend the_room 2
+    broadcast they_are_watching_me salience: 0.95
+    emit feel(shame)
+  }
+}
+
+// the cardiac loop reads a heart it partly caused: subtract the reafference
+loop pulse @cardiac {
+  prior:      predict(72)
+  sense:      heart
+  precision:  0.7
+  conviction: 0.4
+  efference:  viscera
+  mode:       habit
+  act { broadcast my_heart_is_fast salience: 0.3 }
+}
+
+mood unease : Affect @mood integrates { dread * 1.0, shame * 0.8 } decay 0.9
+
+narrator self subscribes { social } confabulates true
+  voice { shame: "They can tell. I should say something normal." }
+
+query "the bid that never surfaced" {
+  feel ?loop ?q ?t
+  where ?q == "dread"
+  surface "{?loop} felt {?q} at {?t} -- and it never reached the workspace"
+}

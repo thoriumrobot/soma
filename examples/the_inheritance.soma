@@ -1,0 +1,181 @@
+// the_inheritance.soma
+// Forty years, on the lineage clock.
+//
+// A child does not learn that the world is dangerous by being hurt. She learns
+// it by watching the person who holds her flinch at a sound that never hurt
+// either of them. She acquires the prior before she has any evidence for it,
+// and then she spends her life gathering evidence, because a prior with high
+// conviction routes to `act`: it goes out and makes the world confirm it.
+//
+// The language forbids the shortcut. IRENE cannot sense HANNAH's fear -- the
+// other-minds rule is a compile error. All Irene ever gets is a face and a
+// stillness: two exteroceptive surfaces, coupled with a lag. From those, her
+// own loop must guess, and her guess becomes her nervous system.
+//
+// Three mechanisms do all the work, and none of them mentions inheritance:
+//
+//   1. `couple Hannah.stillness -> Irene.mother_still`  -- the only channel
+//   2. `learn: 0.14` on Irene's vigilance -- a prior hardened by mere repetition
+//   3. `precision: clamp(0.9 - 0.8 * vigilance, ...)` on her capacity for rest
+//
+// The result is a woman who is safe, who has always been safe, and whose body
+// has never once believed it. Her mother dies in year 24. Nothing changes.
+//
+// Then: `soma perturb --set vigilance.learn=0.0` -- the same childhood, the
+// same mother, the same flinches, and a completely different adult. That is
+// the whole argument of the program: it is not the event, it is the learning
+// rate on the prior the event installs.
+@consent("simulates childhood fear, hypervigilance, and inherited anxiety")
+
+sim { duration: 40y  dt: 1y  cadence: true }
+
+scene "The house on Ash Street"  from 0y  to 9y
+scene "What she took with her"   from 10y to 23y
+scene "After the funeral"        from 24y to 33y
+scene "Her own kitchen"          from 34y to 40y
+
+// ============================================================ HANNAH
+// The mother. Something happened to her before this program begins, and the
+// program does not say what, because Irene never knew either.
+character Hannah {
+  body flesh @cardiac {
+    intero  fear      : Dread   baseline 6   // hers. unreachable to anyone.
+    extero  door      : Sound   baseline 0
+    proprio face      : Affect  baseline 4
+    proprio stillness : Posture baseline 0   // the flinch, and the freeze after
+  }
+
+  // She goes very still when the door goes. She does not know she does this.
+  loop vigilance @neural {
+    prior:      predict(0)
+    sense:      door
+    precision:  0.9
+    conviction: 0.85
+    act {
+      move ! set(stillness, 9)
+      move ! set(face, 1)
+      emit feel(dread)
+      ignore
+    }
+  }
+
+  narrator self subscribes { vigilance } confabulates true
+    voice { dread: "It's nothing. Finish your supper." }
+}
+
+// a door, banging, for twenty-four years. It never once precedes any harm.
+stimulus Hannah.door {
+  at 2y: 8   at 4y: 8   at 6y: 8   at 8y: 8
+  at 11y: 8  at 14y: 8  at 17y: 8  at 21y: 8
+  at 24y: 0                       // the house goes quiet
+}
+
+// ============================================================ IRENE
+character Irene {
+  body flesh @cardiac {
+    intero  heart        : BPM      baseline 70
+    intero  chest        : Tension  baseline 1
+    extero  mother_still : Posture  baseline 0   // ALL she has of her mother
+    extero  mother_face  : Affect   baseline 4
+    extero  room         : Safety   baseline 9   // the room is, in fact, safe
+    proprio vigilance    : Posture  baseline 0
+  }
+
+  resource reserve : Affine<Joule> = metabolic_reserve(2000)
+  attention spotlight = capacity(6)
+  workspace consciousness { ignite at 0.5 }
+
+  // With a sim stepping in years, the heart is at equilibrium within any frame,
+  // so its "flow" is really just its setpoint. The tau is one frame, not one
+  // heartbeat -- matching the clock you actually integrate on.
+  flow heart @cardiac { dynamics: (70 + 22 * vigilance - heart) / 1y }
+
+  // Vigilance decays. Bodies are not built to hold a posture for forty years.
+  // Something has to keep choosing it -- and something does: the two loops below
+  // both re-set it whenever their prior outranks their evidence. Take away the
+  // learning rate and this flow wins, and she is fine.
+  flow vigilance @biography { dynamics: (0 - vigilance) / 6y }
+
+  // THE LOOP THAT INHERITS.
+  // She predicts an untroubled mother and observes a still one. `learn` means
+  // that each time she is right to be worried -- and she is always right, the
+  // stillness is really there -- her conviction climbs. By adulthood the prior
+  // outranks any evidence, and routes to `act`.
+  loop watching_her @cardiac {
+    prior:      predict(0)
+    sense:      mother_still
+    precision:  0.75
+    conviction: 0.20
+    learn:      0.14
+    act {
+      move ! set(vigilance, 1.0) when acting
+      broadcast something_is_about_to_happen salience: 0.72
+      emit feel(dread)
+      move ! spend(reserve, 30)
+    }
+  }
+
+  // THE LOOP THAT CANNOT WIN.
+  // The room is safe. It is measurably, unambiguously safe: `room` reads 9 for
+  // forty years. But the precision she can bring to that evidence is a function
+  // of her vigilance, and her vigilance is a function of a woman who has been
+  // dead for sixteen years.
+  loop resting @breath {
+    prior:      predict(0)          // her prior is that something is coming
+    sense:      room                // the evidence is that nothing is
+    precision:  clamp(0.9 - 0.8 * vigilance, 0.04, 1.0)
+    conviction: 0.30
+    mode:       deliberate
+    act {
+      attend room 1
+      broadcast the_room_is_safe salience: clamp(0.8 - 0.7 * vigilance, 0.02, 1.0)
+      emit feel(calm) when perceiving
+      // Here is why her mother's death changes nothing. Once the prior outranks
+      // the room, this loop routes to `act` -- and an active-inference loop that
+      // acts does not update its belief, it changes the world to match it. She
+      // maintains the posture that maintains the precision that maintains the
+      // posture. By now the stillness is coming from inside the house.
+      move ! set(vigilance, 1.0) when acting
+      ignore
+    }
+  }
+
+  // She has no story about a door. She has a body that knows the sound.
+  memory somatic the_sound_of_it {
+    cue: mother_still
+    when: mother_still > 4
+    evoke: feel(terror)
+    strength: 1.0
+  }
+
+  mood weather : Affect @mood integrates { dread * 1.0, calm * 0.6 } decay 0.9
+
+  narrator self subscribes { resting } confabulates true
+    voice { dread: "I've always been a worrier. It's just how I'm made." }
+}
+
+// The only channel between a mother and a daughter: two surfaces, and a year.
+couple Hannah.stillness -> Irene.mother_still { gain 1.0  lag 1y }
+couple Hannah.face      -> Irene.mother_face  { gain 1.0  lag 1y }
+
+// Year 24: the stillness stops, because the woman stops.
+stimulus Hannah.stillness { at 25y: 0 }
+stimulus Hannah.face      { at 25y: 0 }
+
+query "the prior she was given" {
+  learn ?loop ?delta ?t
+  where ?loop == "Irene.watching_her"
+  surface "{?t}: the prior hardened -- and nothing had happened to her"
+}
+
+query "the safe room she could not perceive" {
+  ignore ?loop ?t
+  where ?loop == "Irene.resting"
+  surface "{?t}: the room read 9 out of 9, and she overrode it"
+}
+
+query "what her mother said about it" {
+  narrate ?who ?quote ?gap ?t
+  where ?who == "Hannah.self"
+  surface "{?t}: {?quote}"
+}

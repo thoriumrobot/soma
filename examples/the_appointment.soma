@@ -1,0 +1,179 @@
+// the_appointment.soma
+// Vera has been in pain for two years. Dr. Rees has eleven minutes.
+//
+// This is the simulation SOMA's other-minds rule was waiting for. The compiler
+// FORBIDS Rees from sensing `Vera.pain`. He is not being callous; he is being
+// a person. Nobody can sense another's interoception. All he gets is her face,
+// her posture, and a chart -- surfaces -- and from those he must run his own
+// loop and guess. His prior has a name in the notes: `anxiety`.
+//
+// The novelistic move is what happens NEXT, and it needs dynamic precision:
+//
+//     precision: clamp(0.95 - 0.85 * deference, 0.06, 1.0)
+//
+// Vera's confidence in her own body is not a constant. It is a FUNCTION of how
+// much authority she has ceded. Every time Rees's verdict lands, `deference`
+// rises; every time deference rises, the precision on her own interoception
+// falls; and when interoceptive precision falls below her conviction, the
+// arbitration flips from `perceive` to `act` -- and her `ignore` fires.
+//
+// She stops feeling her own body, because she was told what it meant.
+//
+// The pain never stops. It goes on firing somatically, all the way to the end,
+// with nothing to receive it. Her narrator, subscribing only to the loop that
+// agrees with the doctor, reports that she is doing much better.
+//
+// Then: `soma perturb --set believing_her.conviction=0.05` -- what if he had
+// held his diagnosis loosely? Run it. It is a different woman.
+@consent("simulates chronic pain, medical dismissal, and self-doubt")
+
+sim { duration: 540d  dt: 30d  cadence: true }
+
+scene "The first appointment"  from 0d   to 60d
+scene "The tests come back"    from 90d  to 180d
+scene "Learning to be good"    from 210d to 300d
+scene "Doing much better"      from 420d to 540d
+
+// ============================================================ VERA
+character Vera {
+  body flesh @cardiac {
+    intero  pain       : Nociception baseline 7
+    intero  gut        : Tension     baseline 2
+    extero  his_verdict: Authority   baseline 0   // what the doctor says
+    proprio face       : Affect      baseline 6   // what she lets him see
+    proprio deference  : Regard      baseline 0   // how much she has ceded
+  }
+
+  resource stamina : Affine<Joule> = metabolic_reserve(500)
+  attention spotlight = capacity(12)
+  workspace consciousness { ignite at 0.55 }
+
+  // Deference is not a mood. It is a posture, and it decays slowly, and it is
+  // driven by being told, kindly, that you are mistaken about yourself.
+  // A posture, not a mood: it builds over months and does not decay in a week.
+  // `60d` is a duration literal used as a time constant -- SOMA integrates in
+  // seconds, so a `dt` of 30 days needs a tau to match.
+  flow deference @circadian { dynamics: (his_verdict * 0.115 - deference) / 60d }
+
+  // THE LOOP THAT SHOULD HAVE WON.
+  // Her nociception is excellent. Her prior is that she is well. So long as she
+  // trusts her senses, she perceives -- she updates toward the pain, feels it,
+  // and it bids for consciousness. But her sensory precision is a function of
+  // her deference, and her deference is a function of him.
+  loop knowing_my_body @cardiac {
+    prior:      predict(0)
+    sense:      pain
+    precision:  clamp(0.95 - 0.85 * deference, 0.06, 1.0)
+    conviction: 0.45
+    mode:       habit
+    act {
+      // No `update`. Chronic pain is not a belief that settles; it is a
+      // prediction error that never resolves. Her prior stays `I am well`,
+      // and the error is renewed every day for two years.
+      // Access to consciousness is precision-weighted. A signal you have been
+      // taught to distrust does not merely get overruled in the workspace --
+      // it arrives with a weaker claim on it. Her pain bids less loudly every
+      // month, in exact proportion to how much authority she has ceded.
+      broadcast something_is_actually_wrong salience: clamp(0.62 - 0.55 * deference, 0.02, 1.0)
+      emit feel(pain)
+      move ! set(gut, 8)
+      ignore                    // dead code, until the day it isn't
+    }
+  }
+
+  // The loop that learns to agree. It reads his verdict, and `learn` hardens it
+  // every time. This is the loop her narrator subscribes to.
+  loop being_a_good_patient @circadian {
+    prior:      predict(0)
+    sense:      his_verdict
+    precision:  0.85
+    conviction: 0.25
+    learn:      0.10
+    mode:       deliberate
+    act {
+      attend his_verdict 2
+      update -> he_has_seen_this_before
+      move ! spend(stamina, 60)
+      move ! set(face, 8)                        // she brightens. He reads this.
+      broadcast i_am_probably_fine salience: 0.88
+      emit feel(shame) when pain > 5             // to be in pain and be wrong
+    }
+  }
+
+  // The body files it anyway, in the register that needs no permission.
+  memory somatic the_body_kept_asking {
+    cue: pain
+    when: pain > 6
+    evoke: feel(anguish)
+    strength: 1.0
+  }
+
+  mood self_trust : Affect @mood integrates { pain * 0.4, shame * 1.0 } decay 0.93
+
+  narrator self subscribes { being_a_good_patient } confabulates true
+    voice { shame: "I think I've just been very stressed. He was so patient with me."
+            pain:  "It's manageable. Honestly, it's manageable." }
+}
+
+// ============================================================ DR. REES
+character Rees {
+  body flesh @cardiac {
+    extero her_face : Affect    baseline 6   // ALL he can have of her
+    extero chart    : Data      baseline 0   // and the tests, which are normal
+    proprio verdict : Authority baseline 0
+  }
+
+  attention spotlight = capacity(2)          // eleven minutes
+
+  // He is not sensing her pain. He CANNOT. He is sensing her face, and running
+  // a prior with a long professional history of being right.
+  //
+  // Note what `learn` does to a clinician: every patient who was in fact anxious
+  // makes the next patient likelier to be anxious. Expertise and foreclosure are
+  // the same mechanism, viewed at different speeds.
+  loop believing_her @circadian {
+    prior:      predict(9)                  // "people who are ill look ill"
+    sense:      her_face
+    precision:  0.40
+    conviction: 0.62
+    learn:      0.09
+    mode:       deliberate
+    act {
+      attend her_face 2
+      // He pronounces only when his prior has outranked her face. A clinician
+      // who is still PERCEIVING asks another question; one who has flipped to
+      // ACTING writes the diagnosis down. Same man, same minutes, one dial.
+      move ! set(verdict, 9) when acting    // "The tests are all normal."
+      move ! ask_another_question() when perceiving
+      ignore                                // he stops taking new evidence
+    }
+  }
+
+  narrator self subscribes { believing_her } confabulates true
+    voice { }
+}
+
+// ============================================================ BETWEEN THEM
+// A face, and a verdict. Nothing else crosses. The lag is the week she waits.
+couple Vera.face   -> Rees.her_face   { gain 0.95  lag 30d }
+couple Rees.verdict -> Vera.his_verdict { gain 1.0   lag 30d }
+
+// the tests come back clean, which is the worst possible news
+stimulus Rees.chart { at 90d: 0 }
+
+query "the loop that stopped listening to her body" {
+  ignore ?loop ?t
+  where ?loop == "Vera.knowing_my_body"
+  surface "{?t}: she overrode her own nociception -- and did not experience it as overriding"
+}
+
+query "what her body went on saying to no one" {
+  somatic ?mem ?q ?t
+  surface "{?t}: {?mem} -- filed in the register that needs no permission"
+}
+
+query "she is doing much better" {
+  narrate ?who ?quote ?gap ?t
+  where ?gap >= 0.5
+  surface "{?who}: {?quote}"
+}

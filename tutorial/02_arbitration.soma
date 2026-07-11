@@ -1,0 +1,37 @@
+// 02_arbitration.soma -- the one rule at the heart of SOMA.
+//
+// A loop compares two confidences every moment:
+//   pi_s  (precision)  = how much it trusts the senses
+//   pi_p  (conviction) = how much it trusts its own prior
+//
+// If pi_s >= pi_p it PERCEIVES: it updates its belief toward the world.
+// If pi_s <  pi_p it ACTS:      it changes the world to match its belief.
+//
+// Here the SAME stimulus hits two loops that differ only in conviction.
+
+sim { duration: 4s  dt: 1s }
+
+body Body @cardiac {
+  extero light : Lumens  baseline 0
+  proprio hand : Position baseline 0
+}
+
+stimulus light { at 1s: 8 }
+
+// LOW conviction: it believes the world. It perceives.
+loop open_minded @neural {
+  prior:      predict(0)
+  sense:      light
+  precision:  0.9
+  conviction: 0.2
+  act { update -> the_light_is_on }
+}
+
+// HIGH conviction: it trusts its prior over the world. It acts to restore it.
+loop stubborn @neural {
+  prior:      predict(0)
+  sense:      light
+  precision:  0.9
+  conviction: 0.99
+  act { move ! set(hand, 5) }   // it reaches to turn the light back off
+}

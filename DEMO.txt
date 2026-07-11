@@ -1,0 +1,899 @@
+SOMA 0.5.2 — rendered output
+(generated with: python -m soma <cmd> examples/<name>.soma --no-color)
+
+This file shows a representative slice. Every one of the 17 examples in
+examples/ checks clean, runs, and renders ASCII-clean; run them yourself.
+
+##############################################################################
+#  python -m soma run examples/bad_news.soma
+##############################################################################
+─────────────────────────────── SOMA · bad_news ────────────────────────────────
+╭─ BODY · channels over time ──────────────────────────────────────────────────╮
+│   intero heart        ▁▁▁██████████  70→118
+│   intero gut          ▁▁▁██████████  0→8
+│   extero ear          ▁▁▁██████████  0→9
+╰──────────────────────────────────────────────────────────────────────────────╯
+╭─ BODY BUDGET · affine resources (cannot be conjured) ────────────────────────╮
+│   budget       ···················· 0/900  ███▆▅▃▂▁▁▁▁▁▁
+╰──────────────────────────────────────────────────────────────────────────────╯
+╭─ NARRATOR vs GROUND TRUTH ───────────────────────────────────────────────────╮
+│   THE STORY SHE TELLS                     THE BODY'S RECORD
+│   ───────────────────────────────────────────────────────────────────────────
+│   1.5s (10x) "I'm fine. I just need to  │ 
+│   write this down." [gap 0.55]          │ 
+│   «downplays»                           │ 
+│                                         │ 1.5s (4x) heart → 118.0
+│                                         │ 1.5s (4x) gut → 8.0
+│                                         │ 1.5s spends 200.0 budget (left
+│                                         │ 700.0)
+│                                         │ 1.5s (10x) feels Qualia<dread>
+│                                         │ 2.0s spends 200.0 budget (left
+│                                         │ 500.0)
+│                                         │ 2.5s spends 200.0 budget (left
+│                                         │ 300.0)
+│                                         │ 3.0s spends 200.0 budget (left
+│                                         │ 100.0)
+│                                         │ 3.5s spends 100.0 budget (left 0.0)
+│                                         │ 3.5s body cannot conjure 100 budget
+│                                         │ 4.0s (5x) spends 0.0 budget (left
+│                                         │ 0.0)
+│                                         │ 4.0s (5x) body cannot conjure 200
+│                                         │ budget
+╰──────────────────────────────────────────────────────────────────────────────╯
+╭─ WINNOW-S · storyful moments, ranked ────────────────────────────────────────╮
+│   ██████████ retained residual
+│      dread returned 10 times across 4.5s -- the body kept a question the mind
+│      believed it had answered.
+│   ██████···· confabulation gap
+│      From 1.5s the narrator insists: "I'm fine. I just need to write this
+│      down." (returns 10x) -- while the body's record says otherwise (gap
+│      0.55).
+╰──────────────────────────────────────────────────────────────────────────────╯
+╭─ CHRONICLE · trace (12 of 71 events) ────────────────────────────────────────╮
+│     0.0s settle   hearing      sense=0.0 belief=0.0 error=0.0 pi_s=0.9 pi_p=…
+│     0.0s settle   viscera      sense=70.0 belief=70.0 error=0.0 pi_s=0.95 pi…
+│     0.5s settle   hearing      sense=0.0 belief=0.0 error=0.0 pi_s=0.9 pi_p=…
+│     0.5s settle   viscera      sense=70.0 belief=70.0 error=0.0 pi_s=0.95 pi…
+│     1.0s settle   hearing      sense=0.0 belief=0.0 error=0.0 pi_s=0.9 pi_p=…
+│     1.0s settle   viscera      sense=70.0 belief=70.0 error=0.0 pi_s=0.95 pi…
+│     1.5s stimulus ear          value=9.0
+│     1.5s settle   hearing      sense=9.0 belief=0.0 error=8.1 pi_s=0.9 pi_p=…
+│     1.5s drive    hearing      channel=heart to=118.0
+│     1.5s drive    hearing      channel=gut to=8.0
+│     1.5s settle   viscera      sense=118.0 belief=70.0 error=45.6 pi_s=0.95 …
+│     1.5s spend    viscera      resource=budget asked=200.0 spent=200.0 left=…
+╰──────────────────────────────────────────────────────────────────────────────╯
+
+##############################################################################
+#  python -m soma run examples/the_appointment.soma
+##############################################################################
+──────────────────────────── SOMA · the_appointment ────────────────────────────
+╭─ SCENES ─────────────────────────────────────────────────────────────────────╮
+│   0.0s       The first appointment
+│   90.0d      The tests come back
+│   210.0d     Learning to be good
+│   1.2y       Doing much better
+╰──────────────────────────────────────────────────────────────────────────────╯
+╭─ BODY · channels over time ──────────────────────────────────────────────────╮
+│   intero Vera.pain    ▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅  7→7
+│   intero Vera.gut     ▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅  8→8
+│   extero Vera.his_verdict ▁██████████████████  0→9
+│   propri Vera.face    ▁██████████████████  6→8
+│   propri Vera.deference ▁▄▅▆▇▇█████████████  0→1.03487
+│   extero Rees.her_face ▁▁█████████████████  5.7→7.6
+│   extero Rees.chart   ▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅  0→0
+│   propri Rees.verdict ▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅  9→9
+╰──────────────────────────────────────────────────────────────────────────────╯
+╭─ BETWEEN THEM · one body's surface as another's sensation ───────────────────╮
+│   Vera.face        → Rees.her_face    lag 30.0d, x2
+│   Rees.verdict     → Vera.his_verdict lag 30.0d, x1
+╰──────────────────────────────────────────────────────────────────────────────╯
+╭─ BODY BUDGET · affine resources (cannot be conjured) ────────────────────────╮
+│   Vera.stamina █████████████······· 320/500  █▆▃▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+╰──────────────────────────────────────────────────────────────────────────────╯
+╭─ ATTENTION · an affine spotlight, and the schema that models it ─────────────╮
+│   spotlight Vera.spotlight ████████████████████ 12.0/12.0  █▁▁▁██████████████
+│   spotlight Rees.spotlight ···················· 0.0/0.7  ▁█▁█▁█▁█▁█▁█▁█▁█▁█▁
+╰──────────────────────────────────────────────────────────────────────────────╯
+╭─ MOOD · the slow variable (integrates affect, decays) ───────────────────────╮
+│   Vera.self_trust █▆▄▂▂▂▂▂▁▁▁▁▁▁▂▂▂▃▃  now -2.78
+╰──────────────────────────────────────────────────────────────────────────────╯
+╭─ GLOBAL WORKSPACE · competition and ignition ────────────────────────────────╮
+│   consciousness ▆▇██▂▂▂▂▂▂▁▁▁▁▁▁▁▁▁  peak 0.79  threshold 0.55
+│     ignited something_is_actually_wrong  x1, first at 0.0s
+│     ignited i_am_probably_fine  x3, first at 30.0d
+╰──────────────────────────────────────────────────────────────────────────────╯
+╭─ MEMORY · four registers (the body can remember alone) ──────────────────────╮
+│   somatic Vera.the_body_kept_asking fired x19, first at 0.0s — no episodic t…
+╰──────────────────────────────────────────────────────────────────────────────╯
+╭─ NARRATOR vs GROUND TRUTH ───────────────────────────────────────────────────╮
+│   THE STORY SHE TELLS                     THE BODY'S RECORD
+│   ───────────────────────────────────────────────────────────────────────────
+│                                         │ 0.0s (14x) feels Qualia<pain>
+│                                         │ 0.0s (14x) Vera.gut → 8.0
+│                                         │ 0.0s (19x) no attention left to
+│                                         │ deliberate
+│                                         │ 0.0s (10x) Rees.verdict → 9.0
+│                                         │ 0.0s (19x) somatic memory fires
+│                                         │ Qualia<anguish> (no story attached)
+│                                         │ 0.0s IGNITES:
+│                                         │ something_is_actually_wrong reaches
+│                                         │ consciousness
+│   30.0d (3x) "I think I've just been    │ 
+│   very stressed. He was so patient with │ 
+│   me." [gap 0.55] «downplays»           │ 
+│                                         │ 30.0d spends 60.0 Vera.stamina
+│                                         │ (left 440.0)
+│                                         │ 30.0d (3x) Vera.face → 8.0
+│                                         │ 30.0d (3x) feels Qualia<shame>
+│                                         │ 30.0d (3x) IGNITES:
+│                                         │ i_am_probably_fine reaches
+│                                         │ consciousness
+│                                         │ 60.0d spends 60.0 Vera.stamina
+│                                         │ (left 380.0)
+│                                         │ 90.0d spends 60.0 Vera.stamina
+│                                         │ (left 320.0)
+╰──────────────────────────────────────────────────────────────────────────────╯
+╭─ WINNOW-S · author queries ──────────────────────────────────────────────────╮
+│   the loop that stopped listening to her body (12 matches)
+│      60.0d: she overrode her own nociception -- and did not experience it as
+│      overriding
+│      90.0d: she overrode her own nociception -- and did not experience it as
+│      overriding
+│      120.0d: she overrode her own nociception -- and did not experience it as
+│      overriding
+│      150.0d: she overrode her own nociception -- and did not experience it as
+│      overriding
+│      180.0d: she overrode her own nociception -- and did not experience it as
+│      overriding
+│      210.0d: she overrode her own nociception -- and did not experience it as
+│      overriding
+│      240.0d: she overrode her own nociception -- and did not experience it as
+│      overriding
+│      270.0d: she overrode her own nociception -- and did not experience it as
+│      overriding
+│      … and 4 more
+│   what her body went on saying to no one (18 matches)
+│      0.0s: Vera.the_body_kept_asking -- filed in the register that needs no
+│      permission
+│      30.0d: Vera.the_body_kept_asking -- filed in the register that needs no
+│      permission
+│      60.0d: Vera.the_body_kept_asking -- filed in the register that needs no
+│      permission
+│      90.0d: Vera.the_body_kept_asking -- filed in the register that needs no
+│      permission
+│      120.0d: Vera.the_body_kept_asking -- filed in the register that needs no
+│      permission
+│      150.0d: Vera.the_body_kept_asking -- filed in the register that needs no
+│      permission
+│      180.0d: Vera.the_body_kept_asking -- filed in the register that needs no
+│      permission
+│      210.0d: Vera.the_body_kept_asking -- filed in the register that needs no
+│      permission
+│      … and 10 more
+│   she is doing much better (1 matches)
+│      30.0d  era.self: I think I've just been very stressed. He was so patient
+│      with me.
+╰──────────────────────────────────────────────────────────────────────────────╯
+╭─ WINNOW-S · storyful moments, ranked ────────────────────────────────────────╮
+│   ██████████ precision pathology
+│      'Rees.believing_her' stopped listening: it suppressed disconfirming
+│      evidence 10 times, a belief hardening into a body.
+│   ██████████ body remembers alone
+│      'Vera.the_body_kept_asking' fired 19 times from 0.0s with no episodic
+│      trace -- a memory with a body and no story.
+│   ██████████ attention starved
+│      'Rees.believing_her' wanted to deliberate 19 times and could not afford
+│      it -- the spotlight was already spent; habit took the wheel.
+│   ██████████ precision pathology
+│      'Vera.knowing_my_body' stopped listening: it suppressed disconfirming
+│      evidence 12 times, a belief hardening into a body.
+│   ██████████ retained residual
+│      pain returned 14 times across 1.1y -- the body kept a question the mind
+│      believed it had answered.
+│   ██████████ retained residual
+│      anguish returned 19 times across 1.5y -- the body kept a question the
+│      mind believed it had answered.
+│   ██████████ learned not to feel
+│      'Vera.knowing_my_body' began at precision 0.95 and ended at 0.07 -- its
+│      trust in its own senses fell by 93%. The body never stopped signalling:
+│      the somatic register fired 8 more times after the collapse. Nothing was
+│      repressed. The gain was turned down, and she agreed with it.
+│   ██████···· retained residual
+│      shame returned 3 times across 60.0d -- the body kept a question the mind
+│      believed it had answered.
+│   ██████···· confabulation gap
+│      From 30.0d the narrator insists: "I think I've just been very stressed.
+│      He was so patient with me." (returns 3x) -- while the body's record says
+│      otherwise (gap 0.55).
+╰──────────────────────────────────────────────────────────────────────────────╯
+╭─ CHRONICLE · trace (12 of 235 events) ───────────────────────────────────────╮
+│     0.0s scene    The first ap note=scene begins
+│     0.0s couple   Vera.face    to=Rees.her_face value=5.7 lag=2592000.0
+│     0.0s settle   Vera.knowing sense=7.0 belief=0.0 error=6.65 pi_s=0.95 pi_…
+│     0.0s broadcast Vera.knowing content=something_is_actually_wrong salience…
+│     0.0s emit     Vera.knowing quale=Qualia<pain>
+│     0.0s drive    Vera.knowing channel=Vera.gut to=8.0
+│     0.0s settle   Vera.being_a sense=0.0 belief=0.0 error=0.0 pi_s=0.85 pi_p…
+│     0.0s settle   Rees.believi sense=5.7 belief=9.0 error=-1.32 pi_s=0.4 pi_…
+│     0.0s learn    Rees.believi delta=0.09 note=the prior begins to harden
+│     0.0s attend   Rees.believi target=her_face cost=1.0 left=0.0
+│     0.0s starved  Rees.believi note=attention spotlight exhausted at her_face
+│     0.0s drive    Rees.believi channel=Rees.verdict to=9.0
+╰──────────────────────────────────────────────────────────────────────────────╯
+
+##############################################################################
+#  python -m soma run examples/the_interrogation.soma
+##############################################################################
+─────────────────────────── SOMA · the_interrogation ───────────────────────────
+╭─ SCENES ─────────────────────────────────────────────────────────────────────╮
+│   0.0s       The first hour
+│   65.0m      Losing the thread
+│   3.1h       The room goes flat
+│   5.1h       Signing the page
+╰──────────────────────────────────────────────────────────────────────────────╯
+╭─ BODY · channels over time ──────────────────────────────────────────────────╮
+│   intero heart        ▁▁▃▃▃▃▃▃▅▅▆▆▆▆▆▆▇▇▇▇▇▇▇▇███████████████▇▇▆▆▆▆▆▆  82→124
+│   intero thirst       ▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅  3→3
+│   propri posture      ▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▄▆▇█████████████████████  5→9
+│   extero the_room     ██▇▇▇▆▆▆▅▅▅▄▄▄▄▃▃▃▂▂▂▂▂▂▂▁▁▁▁▁▁▁▁▁▁▁▁▁▂▂▂▂▂▂  9→3.94156
+│   extero question     ▁▁▃▃▃▃▃▃▃▆▆▆▆▆▆▆▆▇▇▇▇▇▇▇▇█████████████████▆▆▆▆▆▆▆▆  0→7
+│   schema here_schema  ▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅  5→5
+│    image here_image   ▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁████████████████████████  5→9
+╰──────────────────────────────────────────────────────────────────────────────╯
+╭─ BODY BUDGET · affine resources (cannot be conjured) ────────────────────────╮
+│   composure    █████████████······· 760/1200  █▇▇▇▇▆▆▆▅▅▅▅▅▅▄▄▄▄▄▄▃▃▃▂▂▂▂▂▂▁▁
+╰──────────────────────────────────────────────────────────────────────────────╯
+╭─ ATTENTION · an affine spotlight, and the schema that models it ─────────────╮
+│   spotlight spotlight  ████████████████████ 8.0/8.0  █▁▃▃▃▃██▆▃███▃█▆▆▃███▁▆█
+╰──────────────────────────────────────────────────────────────────────────────╯
+╭─ MOOD · the slow variable (integrates affect, decays) ───────────────────────╮
+│   dread_level  ██▆▄▄▅▅▃▃▄▄▄▃▃▃▄▄▂▃▃▃▄▂▂▃▃▃▂▂▃▃▁▂▂▂▃▁▂▂▂▃▁▂▂▂▃▁▂▂▂  now -2.54
+╰──────────────────────────────────────────────────────────────────────────────╯
+╭─ GLOBAL WORKSPACE · competition and ignition ────────────────────────────────╮
+│   consciousness ▁███████▁▁▁▁▁█▁█▁█▇█▁█▇█▁▇▁▁▇▁▁▁▇▇▁  peak 0.70  threshold 0.5
+│     ignited i_am_still_here_and_i_am_fine  x28, first at 10.0m
+│     ignited my_heart_is_pounding  x5, first at 85.0m
+│     ignited i_am_over_there  x5, first at 3.1h
+╰──────────────────────────────────────────────────────────────────────────────╯
+╭─ EMBODIMENT · body schema vs body image, and ownership ──────────────────────╮
+│   conflict here       schema 5.0 vs image 9.0  x36 from 3.1h
+│      body schema and body image disagree
+╰──────────────────────────────────────────────────────────────────────────────╯
+╭─ NARRATOR vs GROUND TRUTH ───────────────────────────────────────────────────╮
+│   THE STORY SHE TELLS                     THE BODY'S RECORD
+│   ───────────────────────────────────────────────────────────────────────────
+│   10.0m (28x) "I chose to say something │ 
+│   reasonable; it was the thing to do."  │ 
+│   [gap 0.15]                            │ 
+│   10.0m (11x) "I asked for water        │ 
+│   because it was a long session; that's │ 
+│   all." [gap 0.97] «confabulates»       │ 
+│                                         │ 10.0m (28x) acts:
+│                                         │ say_something_reasonable
+│                                         │ 10.0m (11x) feels Qualia<terror>
+│                                         │ 10.0m spends 40.0 composure (left
+│                                         │ 1160.0)
+│                                         │ 10.0m (11x) acts: ask_for_water
+│                                         │ 10.0m (28x) IGNITES:
+│                                         │ i_am_still_here_and_i_am_fine
+│                                         │ reaches consciousness
+│   15.0m (27x) "I touched the table. I   │ 
+│   don't know why I mention it." [gap    │ 
+│   0.97] «confabulates»                  │ 
+│                                         │ 15.0m (27x) feels
+│                                         │ Qualia<recognition>
+│                                         │ 15.0m (27x) acts:
+│                                         │ touch_the_table_to_be_sure
+│                                         │ 15.0m spends 40.0 composure (left
+│                                         │ 1120.0)
+│                                         │ 15.0m (32x) DISSOCIATES
+│                                         │ (interoception detaches)
+│                                         │ 45.0m (31x) reattaches, slowly
+│                                         │ 50.0m spends 40.0 composure (left
+│                                         │ 1080.0)
+│                                         │ 85.0m spends 40.0 composure (left
+│                                         │ 1040.0)
+│                                         │ 85.0m (5x) IGNITES:
+│                                         │ my_heart_is_pounding reaches
+│                                         │ consciousness
+│                                         │ 2.0h spends 40.0 composure (left
+│                                         │ 1000.0)
+│                                         │ 2.6h spends 40.0 composure (left
+│                                         │ 960.0)
+│   3.1h (8x) "I was calm. I was watching │ 
+│   the whole thing quite calmly." [gap   │ 
+│   0.97] «confabulates»                  │ 
+│                                         │ 3.1h (8x) feels Qualia<numbness>
+│                                         │ 3.1h (8x) acts:
+│                                         │ watch_myself_from_the_corner
+│                                         │ 3.1h (36x) schema/image conflict:
+│                                         │ here
+│                                         │ 3.1h (5x) IGNITES: i_am_over_there
+│                                         │ reaches consciousness
+│                                         │ 3.2h spends 40.0 composure (left
+│                                         │ 920.0)
+│                                         │ 3.8h spends 40.0 composure (left
+│                                         │ 880.0)
+│                                         │ 4.3h spends 40.0 composure (left
+│                                         │ 840.0)
+│                                         │ 4.9h spends 40.0 composure (left
+│                                         │ 800.0)
+│                                         │ 5.5h spends 40.0 composure (left
+│                                         │ 760.0)
+╰──────────────────────────────────────────────────────────────────────────────╯
+╭─ WINNOW-S · author queries ──────────────────────────────────────────────────╮
+│   a continuous account of a discontinuous self (43 matches)
+│      0.2h: the interpreter says -- I asked for water because it was a long
+│      session; that's all.
+│      0.2h: the interpreter says -- I touched the table. I don't know why I
+│      mention it.
+│      0.3h: the interpreter says -- I touched the table. I don't know why I
+│      mention it.
+│      0.4h: the interpreter says -- I touched the table. I don't know why I
+│      mention it.
+│      0.5h: the interpreter says -- I touched the table. I don't know why I
+│      mention it.
+│      0.6h: the interpreter says -- I touched the table. I don't know why I
+│      mention it.
+│      0.7h: the interpreter says -- I touched the table. I don't know why I
+│      mention it.
+│      0.8h: the interpreter says -- I touched the table. I don't know why I
+│      mention it.
+│      … and 35 more
+│   the order in which a person comes apart (32 matches)
+│      0.2h: interoceptive_band let go
+│      0.8h: interoceptive_band let go
+│      1.2h: exteroceptive_band let go
+│      1.4h: interoceptive_band let go
+│      1.6h: exteroceptive_band let go
+│      1.9h: exteroceptive_band let go
+│      2.0h: interoceptive_band let go
+│      2.2h: exteroceptive_band let go
+│      … and 24 more
+│   and the order they come back (31 matches)
+│      0.8h: interoceptive_band was slowly re-supervised
+│      1.3h: interoceptive_band was slowly re-supervised
+│      1.5h: exteroceptive_band was slowly re-supervised
+│      1.8h: exteroceptive_band was slowly re-supervised
+│      1.9h: interoceptive_band was slowly re-supervised
+│      2.2h: exteroceptive_band was slowly re-supervised
+│      2.5h: interoceptive_band was slowly re-supervised
+│      2.5h: exteroceptive_band was slowly re-supervised
+│      … and 23 more
+╰──────────────────────────────────────────────────────────────────────────────╯
+╭─ WINNOW-S · storyful moments, ranked ────────────────────────────────────────╮
+│   ██████████ the body knew first
+│      From 10.0m the body moved (Qualia<terror>); the choice
+│      'say_something_reasonable' followed, and the reason came only afterward.
+│      It happened 5 times.
+│   ██████████ the body knew first
+│      From 10.0m the body moved (Qualia<terror>); the choice 'ask_for_water'
+│      followed, and the reason came only afterward. It happened 11 times.
+│   ██████████ the body knew first
+│      From 10.0m the body moved (the body); the choice
+│      'say_something_reasonable' followed, and the reason came only afterward.
+│      It happened 5 times.
+│   ██████████ the body knew first
+│      From 10.0m the body moved (the body); the choice 'ask_for_water'
+│      followed, and the reason came only afterward. It happened 11 times.
+│   ██████████ the body knew first
+│      From 15.0m the body moved (Qualia<recognition>); the choice
+│      'touch_the_table_to_be_sure' followed, and the reason came only
+│      afterward. It happened 27 times.
+│   ██████████ the body knew first
+│      From 15.0m the body moved (Qualia<recognition>); the choice
+│      'say_something_reasonable' followed, and the reason came only afterward.
+│      It happened 27 times.
+│   ██████████ the body knew first
+│      From 15.0m the body moved (Qualia<recognition>); the choice
+│      'ask_for_water' followed, and the reason came only afterward. It
+│      happened 4 times.
+│   ██████████ the body knew first
+│      From 15.0m the body moved (Qualia<terror>); the choice
+│      'touch_the_table_to_be_sure' followed, and the reason came only
+│      afterward. It happened 4 times.
+│   ██████████ the body knew first
+│      From 15.0m the body moved (the body); the choice
+│      'touch_the_table_to_be_sure' followed, and the reason came only
+│      afterward. It happened 4 times.
+│   ██████████ the body knew first
+│      From 3.1h the body moved (Qualia<numbness>); the choice
+│      'watch_myself_from_the_corner' followed, and the reason came only
+│      afterward. It happened 8 times.
+│   ██████████ schema/image conflict
+│      'here': the body that acts and the body that is pictured disagreed 36
+│      times from 3.1h (schema 5.0 vs image 9.0) -- the reaching hand and the
+│      missing hand are not the same hand.
+│   ██████████ the body knew first
+│      From 3.2h the body moved (Qualia<terror>); the choice
+│      'watch_myself_from_the_corner' followed, and the reason came only
+│      afterward.
+╰──────────────────────────────────────────────────────────────────────────────╯
+╭─ CHRONICLE · trace (12 of 738 events) ───────────────────────────────────────╮
+│     0.0s scene    The first ho note=scene begins
+│     0.0s settle   the_room_loo sense=9.0 belief=9.0 error=0.0 pi_s=0.9 pi_p=…
+│     0.0s settle   the_interpre sense=0.0 belief=0.0 error=0.0 pi_s=0.5 pi_p=…
+│     0.0s settle   the_body     sense=82.0 belief=82.0 error=0.0 pi_s=0.85 pi…
+│     0.0s settle   the_position sense=5.0 belief=5.0 error=0.0 pi_s=0.8 pi_p=…
+│     5.0m settle   the_room_loo sense=9.0 belief=9.0 error=0.0 pi_s=0.9 pi_p=…
+│     5.0m settle   the_interpre sense=0.0 belief=0.0 error=0.0 pi_s=0.5 pi_p=…
+│     5.0m settle   the_body     sense=82.0 belief=82.0 error=0.0 pi_s=0.85 pi…
+│     5.0m settle   the_position sense=5.0 belief=5.0 error=0.0 pi_s=0.8 pi_p=…
+│    10.0m stimulus question     value=3.0
+│    10.0m settle   the_room_loo sense=8.68 belief=9.0 error=-0.29 pi_s=0.9 pi…
+│    10.0m settle   the_interpre sense=3.0 belief=0.0 error=1.5 pi_s=0.5 pi_p=…
+╰──────────────────────────────────────────────────────────────────────────────╯
+
+##############################################################################
+#  python -m soma run examples/trauma.soma
+##############################################################################
+──────────────────────────────── SOMA · trauma ─────────────────────────────────
+╭─ SCENES ─────────────────────────────────────────────────────────────────────╮
+│   0.0s       The first week back
+│   35.0d      The kitchen
+│   95.0d      What she noticed
+│   145.0d     Managing
+╰──────────────────────────────────────────────────────────────────────────────╯
+╭─ BODY · channels over time ──────────────────────────────────────────────────╮
+│   intero heart        ▁▁▁▅▆▇▇▇▇███▇▇▇▇███████▇▇▇███████▇▇▇▇  68→140.061
+│   intero gut          ▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅  2→2
+│   extero the_sound    ▁▁▁▇▇▇▇▇▇███▇▇▇▇██████▇▇▇▇██████▇▇▇▇▇  0→8
+│   propri jaw          ▁▁▁██████████████████████████████████  3→9
+╰──────────────────────────────────────────────────────────────────────────────╯
+╭─ BODY BUDGET · affine resources (cannot be conjured) ────────────────────────╮
+│   evenness     ██████████·········· 415/800  ███▇▇▇▇▆▆▆▆▆▅▅▅▅▄▄▄▄▃▃▃▃▃▂▂▂▂▁▁▁
+╰──────────────────────────────────────────────────────────────────────────────╯
+╭─ MOOD · the slow variable (integrates affect, decays) ───────────────────────╮
+│   the_weather  ███▇▆▆▆▅▄▄▄▄▄▃▃▃▃▃▂▂▂▂▂▁▂▂▂▂▁▁▁▁▂▁▁▁▁  now -11.46
+╰──────────────────────────────────────────────────────────────────────────────╯
+╭─ GLOBAL WORKSPACE · competition and ignition ────────────────────────────────╮
+│   consciousness ███▇▁▁▁▁▇▁▁▁▁▇▁▁▁▁▁▁▁▁▇▁▁▁▁▇▁▁▁▁▇▁▁  peak 0.85  threshold 0.5
+│     ignited i_have_this_handled  x3, first at 0.0s
+│     ignited something_is_coming  x7, first at 15.0d
+╰──────────────────────────────────────────────────────────────────────────────╯
+╭─ MEMORY · four registers (the body can remember alone) ──────────────────────╮
+│   somatic the_sound_from_before fired x34, first at 15.0d — no episodic trace
+╰──────────────────────────────────────────────────────────────────────────────╯
+╭─ NARRATOR vs GROUND TRUTH ───────────────────────────────────────────────────╮
+│   THE STORY SHE TELLS                     THE BODY'S RECORD
+│   ───────────────────────────────────────────────────────────────────────────
+│   0.0s (3x) "I'm fine. I'm managing.    │ 
+│   It's good to be home." [gap 0.1]      │ 
+│                                         │ 0.0s (3x) feels Qualia<numbness>
+│                                         │ 0.0s (3x) IGNITES:
+│                                         │ i_have_this_handled reaches
+│                                         │ consciousness
+│                                         │ 15.0d (7x) feels Qualia<terror>
+│                                         │ 15.0d spends 55.0 evenness (left
+│                                         │ 745.0)
+│                                         │ 15.0d (7x) jaw → 9.0
+│                                         │ 15.0d (34x) somatic memory fires
+│                                         │ Qualia<terror> (no story attached)
+│                                         │ 15.0d (7x) IGNITES:
+│                                         │ something_is_coming reaches
+│                                         │ consciousness
+│                                         │ 15.0d (7x) DISSOCIATES
+│                                         │ (interoception detaches)
+│                                         │ 35.0d (6x) reattaches, slowly
+│                                         │ 40.0d spends 55.0 evenness (left
+│                                         │ 690.0)
+│                                         │ 65.0d spends 55.0 evenness (left
+│                                         │ 635.0)
+│                                         │ 90.0d spends 55.0 evenness (left
+│                                         │ 580.0)
+│                                         │ 115.0d spends 55.0 evenness (left
+│                                         │ 525.0)
+│                                         │ 140.0d spends 55.0 evenness (left
+│                                         │ 470.0)
+│                                         │ 165.0d spends 55.0 evenness (left
+│                                         │ 415.0)
+╰──────────────────────────────────────────────────────────────────────────────╯
+╭─ WINNOW-S · author queries ──────────────────────────────────────────────────╮
+│   the sound his body knew and he could not name (34 matches)
+│      15.0d: the_sound_from_before fired -- and he had no story for why the
+│      kitchen frightened him
+│      20.0d: the_sound_from_before fired -- and he had no story for why the
+│      kitchen frightened him
+│      25.0d: the_sound_from_before fired -- and he had no story for why the
+│      kitchen frightened him
+│      30.0d: the_sound_from_before fired -- and he had no story for why the
+│      kitchen frightened him
+│      35.0d: the_sound_from_before fired -- and he had no story for why the
+│      kitchen frightened him
+│      40.0d: the_sound_from_before fired -- and he had no story for why the
+│      kitchen frightened him
+│      45.0d: the_sound_from_before fired -- and he had no story for why the
+│      kitchen frightened him
+│      50.0d: the_sound_from_before fired -- and he had no story for why the
+│      kitchen frightened him
+│      … and 26 more
+│   the man he told her he was (0 matches)
+│      (no matches)
+│   each time the floor went out from under him (7 matches)
+│      15.0d: overwhelm -- interoception detached; the feeling went to numbness
+│      40.0d: overwhelm -- interoception detached; the feeling went to numbness
+│      65.0d: overwhelm -- interoception detached; the feeling went to numbness
+│      90.0d: overwhelm -- interoception detached; the feeling went to numbness
+│      115.0d: overwhelm -- interoception detached; the feeling went to
+│      numbness
+│      140.0d: overwhelm -- interoception detached; the feeling went to
+│      numbness
+│      165.0d: overwhelm -- interoception detached; the feeling went to
+│      numbness
+╰──────────────────────────────────────────────────────────────────────────────╯
+╭─ WINNOW-S · storyful moments, ranked ────────────────────────────────────────╮
+│   ██████████ body remembers alone
+│      'the_sound_from_before' fired 34 times from 15.0d with no episodic trace
+│      -- a memory with a body and no story.
+│   ██████████ retained residual
+│      terror returned 41 times across 165.0d -- the body kept a question the
+│      mind believed it had answered.
+│   ██████████ learned not to feel
+│      'alarm' began at precision 0.90 and ended at 0.05 -- its trust in its
+│      own senses fell by 94%. The body never stopped signalling: the somatic
+│      register fired 15 more times after the collapse. Nothing was repressed.
+│      The gain was turned down, and she agreed with it.
+│   ██████████ rupture and repair
+│      Dissociation at 15.0d was slowly re-supervised by 35.0d -- reattachment
+│      came not as a flood but as a series of small permissions.
+│   ██████████ rupture and repair
+│      Dissociation at 40.0d was slowly re-supervised by 60.0d -- reattachment
+│      came not as a flood but as a series of small permissions.
+│   ██████████ rupture and repair
+│      Dissociation at 65.0d was slowly re-supervised by 85.0d -- reattachment
+│      came not as a flood but as a series of small permissions.
+│   ██████████ rupture and repair
+│      Dissociation at 90.0d was slowly re-supervised by 110.0d -- reattachment
+│      came not as a flood but as a series of small permissions.
+│   ██████████ rupture and repair
+│      Dissociation at 115.0d was slowly re-supervised by 135.0d --
+│      reattachment came not as a flood but as a series of small permissions.
+│   ██████████ rupture and repair
+│      Dissociation at 140.0d was slowly re-supervised by 160.0d --
+│      reattachment came not as a flood but as a series of small permissions.
+│   █████████· unrepaired rupture
+│      At 165.0d interoception detached and did not, within this life, come
+│      back.
+│   ██████···· retained residual
+│      numbness returned 3 times across 10.0d -- the body kept a question the
+│      mind believed it had answered.
+╰──────────────────────────────────────────────────────────────────────────────╯
+╭─ CHRONICLE · trace (12 of 216 events) ───────────────────────────────────────╮
+│     0.0s scene    The first we note=scene begins
+│     0.0s settle   alarm        sense=68.0 belief=68.0 error=0.0 pi_s=0.9 pi_…
+│     0.0s settle   composure    sense=3.0 belief=9.0 error=-3.6 pi_s=0.6 pi_p…
+│     0.0s broadcast composure    content=i_have_this_handled salience=0.85
+│     0.0s emit     composure    quale=Qualia<numbness>
+│     0.0s ignite   consciousnes content=i_have_this_handled index=0.85 by=com…
+│     0.0s mood     the_weather  value=-0.06 delta=-0.06
+│     0.0s narrate  self         quote=I'm fine. I'm managing. It's good to be…
+│     5.0d settle   alarm        sense=68.0 belief=68.0 error=0.0 pi_s=0.9 pi_…
+│     5.0d settle   composure    sense=3.0 belief=9.0 error=-3.6 pi_s=0.6 pi_p…
+│     5.0d broadcast composure    content=i_have_this_handled salience=0.85
+│     5.0d emit     composure    quale=Qualia<numbness>
+╰──────────────────────────────────────────────────────────────────────────────╯
+
+##############################################################################
+#  python -m soma run examples/rubber_hand.soma
+##############################################################################
+────────────────────────────── SOMA · rubber_hand ──────────────────────────────
+╭─ SCENES ─────────────────────────────────────────────────────────────────────╮
+│   0.0s       The stroking
+│   11.0s      The hammer
+│   17.0s      Moved on its own
+╰──────────────────────────────────────────────────────────────────────────────╯
+╭─ BODY · channels over time ──────────────────────────────────────────────────╮
+│   propri felt_hand    ███▅▅▅▂▂▂▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁  8→3
+│   propri seen_hand    ▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▇▇▇▇▇▇███████  3→13
+│   extero brush        ▁▁▁████████████████████████████  0→1
+│   extero threat       ▁▁▁▁▁▁▁▁▁▁▁▁███████████████████  0→9
+│   intero startle      ▁▁▁▁▁▁▁▁▁▁▁▁███████████████████  72→118
+╰──────────────────────────────────────────────────────────────────────────────╯
+╭─ MOOD · the slow variable (integrates affect, decays) ───────────────────────╮
+│   unease       █▇▇▇▇▇██████▇▅▄▃▃▂▁▂▂▃▄▄▅▅▅▆▆▆▇  now -1.12
+╰──────────────────────────────────────────────────────────────────────────────╯
+╭─ GLOBAL WORKSPACE · competition and ignition ────────────────────────────────╮
+│   consciousness ▆▆▆▁▁▁▁▁▁▁▁▁██████▅▆▆▁▁▁▆▆▁▁▁▁▁  peak 0.80  threshold 0.5
+│     ignited that_hand_is_mine  x7, first at 0.0s
+│     ignited pull_it_back  x7, first at 12.0s
+╰──────────────────────────────────────────────────────────────────────────────╯
+╭─ EMBODIMENT · body schema vs body image, and ownership ──────────────────────╮
+│   owned left_hand  3.0s  ownership migrated -- this feels like mine
+│   disowned left_hand  18.0s  ownership lost -- this feels alien
+╰──────────────────────────────────────────────────────────────────────────────╯
+╭─ NARRATOR vs GROUND TRUTH ───────────────────────────────────────────────────╮
+│   THE STORY SHE TELLS                     THE BODY'S RECORD
+│   ───────────────────────────────────────────────────────────────────────────
+│   0.0s (8x) "That's my hand. I can feel │ 
+│   the brush on it." [gap 0.1]           │ 
+│                                         │ 0.0s (8x) feels Qualia<warmth>
+│                                         │ 0.0s (7x) IGNITES:
+│                                         │ that_hand_is_mine reaches
+│                                         │ consciousness
+│                                         │ 3.0s left_hand becomes owned
+│                                         │ 12.0s (7x) startle → 118.0
+│                                         │ 12.0s (7x) feels Qualia<terror>
+│                                         │ 12.0s (7x) IGNITES: pull_it_back
+│                                         │ reaches consciousness
+│                                         │ 18.0s left_hand becomes disowned
+╰──────────────────────────────────────────────────────────────────────────────╯
+╭─ WINNOW-S · author queries ──────────────────────────────────────────────────╮
+│   the moment it became his (1 matches)
+│      3.0s: left_hand crossed into ownership -- a rubber hand became a part of
+│      him
+│   the moment it stopped (1 matches)
+│      18.0s: left_hand became a thing on the table he could see moving, and
+│      did not own
+│   what he said while it happened (8 matches)
+│      0.0s: That's my hand. I can feel the brush on it.
+│      1.0s: That's my hand. I can feel the brush on it.
+│      2.0s: That's my hand. I can feel the brush on it.
+│      18.0s: That's my hand. I can feel the brush on it.
+│      19.0s: That's my hand. I can feel the brush on it.
+│      20.0s: That's my hand. I can feel the brush on it.
+│      24.0s: That's my hand. I can feel the brush on it.
+│      25.0s: That's my hand. I can feel the brush on it.
+╰──────────────────────────────────────────────────────────────────────────────╯
+╭─ WINNOW-S · storyful moments, ranked ────────────────────────────────────────╮
+│   ████████·· retained residual
+│      terror returned 7 times across 6.0s -- the body kept a question the mind
+│      believed it had answered.
+│   ████████·· ownership migration
+│      At 3.0s 'left_hand' became mine again -- ownership migrated -- this
+│      feels like mine
+│   ████████·· ownership migration
+│      At 18.0s 'left_hand' became not-mine -- ownership lost -- this feels
+│      alien
+│   ████████·· delight in error
+│      8 times across 25.0s the prediction failed and the failure felt like
+│      warmth -- being surprised, and glad of it.
+╰──────────────────────────────────────────────────────────────────────────────╯
+╭─ CHRONICLE · trace (12 of 151 events) ───────────────────────────────────────╮
+│     0.0s scene    The stroking note=scene begins
+│     0.0s stimulus seen_hand    value=3.0
+│     0.0s settle   propriocepti sense=3.0 belief=8.0 error=-4.5 pi_s=0.9 pi_p…
+│     0.0s broadcast propriocepti content=that_hand_is_mine salience=0.6
+│     0.0s emit     propriocepti quale=Qualia<warmth>
+│     0.0s settle   flinch       sense=72.0 belief=72.0 error=0.0 pi_s=0.85 pi…
+│     0.0s ignite   consciousnes content=that_hand_is_mine index=0.6 by=propri…
+│     0.0s mood     unease       value=-0.35 delta=-0.35
+│     0.0s narrate  self         quote=That's my hand. I can feel the brush on…
+│     1.0s settle   propriocepti sense=3.0 belief=5.0 error=-1.8 pi_s=0.9 pi_p…
+│     1.0s broadcast propriocepti content=that_hand_is_mine salience=0.6
+│     1.0s emit     propriocepti quale=Qualia<warmth>
+╰──────────────────────────────────────────────────────────────────────────────╯
+
+##############################################################################
+#  python -m soma run examples/split_brain.soma
+##############################################################################
+────────────────────────────── SOMA · split_brain ──────────────────────────────
+╭─ SCENES ─────────────────────────────────────────────────────────────────────╮
+│   0.0s       Snow and the chicken
+│   7.0s       The word he could not say
+│   13.0s      The face he laughed at
+│   19.0s      Both eyes, one thing
+╰──────────────────────────────────────────────────────────────────────────────╯
+╭─ BODY · channels over time ──────────────────────────────────────────────────╮
+│   extero left_field   ▁██▁▁▁▁▁▆▆▁▁▁▁▇▇▁▁▁▁▆▆▁▁▁▁  0→0
+│   extero right_field  ▁▇▇▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁██▁▁▁▁  0→0
+│   propri left_hand    ▁█████████████████████████  0→9
+│   propri right_hand   ▁█████████████████████████  0→5
+╰──────────────────────────────────────────────────────────────────────────────╯
+╭─ GLOBAL WORKSPACE · competition and ignition ────────────────────────────────╮
+│   consciousness ▁██▁▁▁▁▁▅▅▁▁▁▁▅▅▁▁▁▁██▁▁▁▁  peak 0.70  threshold 0.5
+│     ignited a_reason_i_can_say  x4, first at 1.0s
+╰──────────────────────────────────────────────────────────────────────────────╯
+╭─ NARRATOR vs GROUND TRUTH ───────────────────────────────────────────────────╮
+│   THE STORY SHE TELLS                     THE BODY'S RECORD
+│   ───────────────────────────────────────────────────────────────────────────
+│   1.0s (8x) "I picked the shovel        │ 
+│   because you need one to clean out the │ 
+│   chicken shed." [gap 0.97]             │ 
+│   «confabulates»                        │ 
+│   1.0s (4x) "The chicken -- obviously.  │ 
+│   It goes with the claw." [gap 0.15]    │ 
+│                                         │ 1.0s (8x) acts:
+│                                         │ reach_for_the_shovel
+│                                         │ 1.0s (8x) left_hand → 9.0
+│                                         │ 1.0s (4x) acts:
+│                                         │ point_at_the_chicken
+│                                         │ 1.0s (4x) right_hand → 5.0
+│                                         │ 1.0s (4x) IGNITES:
+│                                         │ a_reason_i_can_say reaches
+│                                         │ consciousness
+╰──────────────────────────────────────────────────────────────────────────────╯
+╭─ WINNOW-S · author queries ──────────────────────────────────────────────────╮
+│   the reasons it gave for what it did not do (8 matches)
+│      1.0s: (gap 0.97) I picked the shovel because you need one to clean out
+│      the chicken shed.
+│      2.0s: (gap 0.97) I picked the shovel because you need one to clean out
+│      the chicken shed.
+│      8.0s: (gap 0.97) I picked the shovel because you need one to clean out
+│      the chicken shed.
+│      9.0s: (gap 0.97) I picked the shovel because you need one to clean out
+│      the chicken shed.
+│      14.0s: (gap 0.97) I picked the shovel because you need one to clean out
+│      the chicken shed.
+│      15.0s: (gap 0.97) I picked the shovel because you need one to clean out
+│      the chicken shed.
+│      20.0s: (gap 0.97) I picked the shovel because you need one to clean out
+│      the chicken shed.
+│      21.0s: (gap 0.97) I picked the shovel because you need one to clean out
+│      the chicken shed.
+│   the one time it actually knew (4 matches)
+│      1.0s: (gap 0.15) The chicken -- obviously. It goes with the claw. -- and
+│      this time it was true
+│      2.0s: (gap 0.15) The chicken -- obviously. It goes with the claw. -- and
+│      this time it was true
+│      20.0s: (gap 0.15) The chicken -- obviously. It goes with the claw. --
+│      and this time it was true
+│      21.0s: (gap 0.15) The chicken -- obviously. It goes with the claw. --
+│      and this time it was true
+╰──────────────────────────────────────────────────────────────────────────────╯
+╭─ WINNOW-S · storyful moments, ranked ────────────────────────────────────────╮
+│   ██████████ the body knew first
+│      From 1.0s the body moved (left_hand); the choice 'reach_for_the_shovel'
+│      followed, and the reason came only afterward. It happened 12 times.
+│   ██████████ the body knew first
+│      From 1.0s the body moved (left_hand); the choice 'point_at_the_chicken'
+│      followed, and the reason came only afterward. It happened 6 times.
+│   ██████████ the body knew first
+│      From 1.0s the body moved (right_hand); the choice 'reach_for_the_shovel'
+│      followed, and the reason came only afterward. It happened 6 times.
+│   ██████████ the body knew first
+│      From 1.0s the body moved (right_hand); the choice 'point_at_the_chicken'
+│      followed, and the reason came only afterward. It happened 6 times.
+│   ██████████ confabulation gap
+│      From 1.0s the narrator insists: "I picked the shovel because you need
+│      one to clean out the chicken shed." (returns 8x) -- while the body's
+│      record says otherwise (gap 0.97).
+│   ███████··· never ignited
+│      'a_wordless_intention' bid for the workspace 8 times from 1.0s and never
+│      crossed threshold -- processed, and never known.
+╰──────────────────────────────────────────────────────────────────────────────╯
+╭─ CHRONICLE · trace (12 of 124 events) ───────────────────────────────────────╮
+│     0.0s scene    Snow and the note=scene begins
+│     0.0s settle   right_hemisp sense=0.0 belief=0.0 error=0.0 pi_s=0.9 pi_p=…
+│     0.0s settle   left_hemisph sense=0.0 belief=0.0 error=0.0 pi_s=0.9 pi_p=…
+│     1.0s stimulus left_field   value=9.0
+│     1.0s stimulus right_field  value=5.0
+│     1.0s settle   right_hemisp sense=9.0 belief=0.0 error=8.1 pi_s=0.9 pi_p=…
+│     1.0s move     right_hemisp action=reach_for_the_shovel via=left_field
+│     1.0s drive    right_hemisp channel=left_hand to=9.0
+│     1.0s broadcast right_hemisp content=a_wordless_intention salience=0.4
+│     1.0s settle   left_hemisph sense=5.0 belief=0.0 error=4.5 pi_s=0.9 pi_p=…
+│     1.0s move     left_hemisph action=point_at_the_chicken via=right_field
+│     1.0s drive    left_hemisph channel=right_hand to=5.0
+╰──────────────────────────────────────────────────────────────────────────────╯
+
+##############################################################################
+#  python -m soma prose examples/the_appointment.soma --gender Vera:she,Rees:he
+##############################################################################
+THE APPOINTMENT
+
+— The first appointment —
+
+Rees was reading Vera's face, 4 weeks late. The pain arrived, familiar,
+punctual. The belief was getting easier to hold. That was the problem with
+it. There was not enough of him left to think with. He had stopped
+listening, and did not experience this as having stopped listening. She had
+no name for it and no place to put it, and nothing in her memory would say
+why. Something is actually wrong — that was the thought that arrived, and it
+arrived whole. Vera was reading Rees's verdict, 4 weeks late. The belief was
+getting easier to hold. That was the problem with it. Her face was hot
+before she knew why. I am probably fine — that was the thought that arrived,
+and it arrived whole. "I think I've just been very stressed. He was so
+patient with me." It was not true, and she did not know it was not true. She
+had stopped listening, and did not experience this as having stopped
+listening.
+
+— The tests come back —
+
+The body went on asking. It asked 4 times that year, in the register that
+keeps no story, and got no answer.
+
+— Learning to be good —
+
+The body went on asking. It asked 4 times that year, in the register that
+keeps no story, and got no answer.
+
+— Doing much better —
+
+The body went on asking. It asked 5 times that year, in the register that
+keeps no story, and got no answer.
+
+The body went on asking. It asked 3 times that year, in the register that
+keeps no story, and got no answer.
+
+
+(Every sentence above is a rendering of a logged event. The gap between what
+was said and what the body did is the only thing here that was not
+authored.)
+
+##############################################################################
+#  python -m soma prose examples/trauma.soma --gender Wren:he
+##############################################################################
+TRAUMA
+
+— The first week back —
+
+He felt nothing, which was itself a kind of information. I have this handled
+— that was the thought that arrived, and it arrived whole. "I'm fine. I'm
+managing. It's good to be home." He went cold all the way to his hands. He
+went cold all the way to his hands, and nothing in his memory would say why.
+Something is coming — that was the thought that arrived, and it arrived
+whole. Then he was somewhere above it, watching himself be a person in a
+room.
+
+— The kitchen —
+
+Coming back was not a flood. It was a series of small permissions.
+
+— What she noticed —
+
+The body went on asking. It asked 10 times that year, in the register that
+keeps no story, and got no answer.
+
+— Managing —
+
+The body went on asking. It asked 8 times that year, in the register that
+keeps no story, and got no answer.
+
+
+(Every sentence above is a rendering of a logged event. The gap between what
+was said and what the body did is the only thing here that was not
+authored.)
+
+##############################################################################
+#  python -m soma prose examples/in_love.soma --gender Sol:he
+##############################################################################
+IN LOVE
+
+— The first year —
+
+He was wrong again, and glad of it. She is more than I knew — that was the
+thought that arrived, and it arrived whole. "I keep getting you wrong, and I
+keep being glad of it."
+
+— Settling —
+
+The delight_at_error was still there. It had stopped being news.
+
+— Still, after —
+
+The delight_at_error was still there. It had stopped being news.
+
+
+(Every sentence above is a rendering of a logged event. The gap between what
+was said and what the body did is the only thing here that was not
+authored.)
+
+##############################################################################
+#  python -m soma perturb examples/in_love.soma --set courtship.learn=0.12
+##############################################################################
+╭─ PERTURB · one dial, two lives ──────────────────────────────────────────────╮
+│   changed: courtship.learn: 0.0 -> 0.12
+│ 
+│   APPEARED (only in the perturbed life)
+│     + love curdling: 'courtship' was delighted to be wrong 6 times, and then…
+│     + delight in error: 6 times across 5.0y the prediction failed and the fa…
+│ 
+│   VANISHED (only in the original)
+│     - delight in error: 20 times across 19.0y the prediction failed and the …
+╰──────────────────────────────────────────────────────────────────────────────╯
+
+##############################################################################
+#  python -m soma phi examples/bad_news.soma --nodes ear,heart,gut
+##############################################################################
+╭─ INTEGRATED INFORMATION · phi at the MIP (approximate) ──────────────────────╮
+│   phi (bits)       ························ 0.003
+│   EI (bits)        ██████████████·········· 1.181
+│   determinism      ██████████████████████·· 0.905
+│   degeneracy       ████████████············ 0.511
+│ 
+│   nodes: ear, heart, gut
+│   minimum-information partition: ((0,), (1, 2))
+│   phi_approx: binary coarse-graining, uniform interventions, bipartition
+│   search. A property of this model, never evidence about sentience.
+╰──────────────────────────────────────────────────────────────────────────────╯

@@ -1,0 +1,92 @@
+// chronic_pain.soma
+// How a body teaches a mind to fear it -- and then how the fear rebuilds the
+// body. Central sensitization as a precision pathology, run long enough to show
+// the loop close.
+//
+// The seed is a single ordinary twinge. Nothing that should mean danger. But the
+// prior "my back will betray me" has a learning rate: every time the guarding
+// loop fires, it hardens. And here is the pathology made precise -- guarding
+// RAISES the nociceptive signal (a braced muscle hurts), which confirms the
+// prior, which hardens it further, which guards harder. The pain becomes real,
+// and it becomes real because he predicted it.
+//
+// Three phases:
+//   1. The twinge, and the first sensible caution.
+//   2. The precision on his actual sensory evidence -- much of which says "you
+//      are fine" -- falls as conviction climbs. He stops being able to feel the
+//      safety.
+//   3. The prior outranks the evidence entirely: `ignore` fires, guarding is
+//      self-sustaining, and the back that was fine is now a back that hurts.
+//
+// The finding a novelist wants: `learned not to feel` and `precision pathology`
+// on the same loop -- the mechanism by which a fear manufactures its own proof.
+@consent("simulates chronic pain and central sensitization")
+
+sim { duration: 730d  dt: 20d  cadence: true }
+
+scene "The twinge"          from 0d    to 120d
+scene "Being careful"       from 140d  to 400d
+scene "The back it built"   from 420d  to 730d
+
+body Idris @hormonal {
+  intero  nociception : Signal  baseline 1  retention 30d
+  proprio back        : Load    baseline 3
+  proprio guard          : Bracing baseline 0    // how hard he holds himself
+  proprio bracing_target : Bracing baseline 0    // how hard he intends to
+}
+
+workspace consciousness { ignite at 0.5 }
+
+// the vicious flow: bracing a muscle for months makes it hurt. The nociceptive
+// signal is driven UP by the very guarding meant to protect it.
+flow nociception @hormonal { dynamics: (1 + 1.1 * guard - nociception) / 60d }
+// guarding itself builds slowly, and only relaxes if he stops bracing -- which,
+// once the prior wins, he never does
+flow guard @mood { dynamics: (bracing_target - guard) / 120d }
+
+// one small twinge at the start. This is the whole of the real injury.
+stimulus nociception { at 0d: 4 }
+
+// THE GUARDING LOOP. It predicts betrayal and senses nociception. Its sensory
+// precision -- its ability to register the days his back is genuinely fine --
+// falls as its conviction is confirmed. Conviction climbs with use.
+loop guarding @mood {
+  prior:      predict(9)                            // "my back will betray me"
+  sense:      nociception
+  precision:  clamp(0.85 - 0.09 * guard, 0.05, 1.0)  // he feels the safety less and less
+  conviction: 0.3
+  learn:      0.09                                  // every guard hardens the next
+  act {
+    move ! set(bracing_target, 9) when acting      // he starts bracing, once certain
+    broadcast it_is_happening_again salience: 0.6
+    emit feel(pain)
+    ignore                                          // and refuse the good days
+  }
+}
+
+// A body-memory of ease -- the back still knows, in its tissue, how to be
+// unafraid. It goes on offering this long after the guarding mind can hear it:
+// the somatic register needs no permission, and gets no answer.
+memory somatic the_back_remembers_ease {
+  cue: guard
+  when: guard > 5
+  evoke: feel(relief)
+  strength: 1.0
+}
+
+mood fear_of_it : Affect @mood integrates { pain * 1.0, relief * -0.3 } decay 0.95
+
+narrator self subscribes { guarding } confabulates true
+  voice { pain: "I have to be careful. My back isn't what it was." }
+
+query "the day the prior stopped listening" {
+  ignore ?loop ?t
+  where ?loop == "guarding"
+  surface "{?t}: he overrode the evidence that his back was fine"
+}
+
+query "the pain the guarding built" {
+  feel ?loop ?q ?t
+  where ?q == "pain"
+  surface "{?t}: pain -- much of it manufactured by the bracing meant to prevent it"
+}

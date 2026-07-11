@@ -1,0 +1,121 @@
+// trauma.soma
+// A man comes home from a war, or a ward, or a bad year. The event is over.
+// His body has not been told.
+//
+// This is dissociation as a supervision-tree crash -- but where the old version
+// showed the mechanism once, this shows the LIFE the mechanism makes. Three
+// things run at once, and the tragedy is in how they interact:
+//
+//   1. A somatic memory keyed to an ordinary domestic sound -- a door, a
+//      dropped pan -- that his body files as the sound from before. It carries
+//      no episodic trace: he cannot say why the kitchen frightens him.
+//   2. A supervisor that DETACHES interoception when the alarm exceeds
+//      tolerance. Feeling flattens to numbness at the source. Repair is slow and
+//      titrated, and -- crucially -- REPEATABLE: he does not dissociate once and
+//      recover. He cycles.
+//   3. A confabulating narrator who, subscribing only to the loop that stays
+//      online, produces a calm first-person account of a man who is fine. The
+//      gap between that account and the record is the whole subject.
+//
+// The novelistic finding: `learned not to feel` and `body remembers alone`
+// surface together. He is not repressing the fear. The gain on his own interior
+// has been turned down, and his story has quietly agreed.
+@consent("simulates post-traumatic stress, dissociation, and numbing")
+
+sim { duration: 180d  dt: 5d  cadence: true }
+
+scene "The first week back"    from 0d    to 30d
+scene "The kitchen"            from 35d   to 90d
+scene "What she noticed"       from 95d   to 140d
+scene "Managing"               from 145d  to 180d
+
+body Wren @cardiac {
+  intero heart      : BPM      baseline 68
+  intero gut        : Tension  baseline 2
+  extero the_sound  : Volume   baseline 0    // a door, a dropped pan
+  proprio jaw       : Set      baseline 3    // where he holds it
+}
+
+resource evenness : Affine<Joule> = metabolic_reserve(800)
+workspace consciousness { ignite at 0.5 }
+
+// his heart tracks a target set by how loud the ordinary world just got
+flow heart @cardiac { dynamics: (68 + 9 * the_sound - heart) / 5d }
+
+// the domestic soundtrack of a life: nothing here has ever hurt him
+stimulus the_sound {
+  at 15d: 8   at 45d: 9   at 60d: 8   at 80d: 9
+  at 110d: 8  at 130d: 9  at 160d: 8
+}
+
+// THE BODY THAT REMEMBERS. A somatic memory with no story attached: the sound
+// arrives, and the terror arrives with it, and he has no episode to explain it.
+memory somatic the_sound_from_before {
+  cue: the_sound
+  when: the_sound > 5
+  evoke: feel(terror)
+  strength: 1.0
+}
+
+// THE ALARM. It reads his own racing heart and calls it danger. Its precision
+// is high -- the interoceptive signal is genuine -- but each time it fires it
+// spends his evenness, and there is only so much of that.
+loop alarm @cardiac {
+  prior:      predict(68)
+  sense:      heart
+  precision:  0.9
+  conviction: 0.25
+  act {
+    broadcast something_is_coming salience: 0.7
+    emit feel(terror)
+    move ! spend(evenness, 55)
+    move ! set(jaw, 9)
+  }
+}
+
+// THE LOOP THAT STAYS ONLINE. The one his narrator can hear. It watches his
+// jaw -- a proprioceptive surface -- and reports composure, because a clenched
+// jaw held on purpose feels, from the inside, like control.
+loop composure @breath {
+  prior:      predict(9)
+  sense:      jaw
+  precision:  0.6
+  conviction: 0.5
+  act {
+    broadcast i_have_this_handled salience: 0.85
+    emit feel(numbness)
+  }
+}
+
+mood the_weather : Affect @mood integrates { terror * 1.0, numbness * 0.4 } decay 0.9
+
+// THE SUPERVISOR. When the alarm's error exceeds tolerance, interoception
+// detaches -- and now feeling flattens to numbness at the source. Repair is
+// titrated and re-arms, so each new sound can crash him again.
+handle overwhelm with {
+  when error(alarm) > 5.0 :
+    dissociate(interoception) with precision -> titrate(0.05)
+  after 20d :
+    repair { reattach(interoception) with precision -> titrate(0.1) }
+}
+
+// THE ACCOUNT. He subscribes only to composure. He explains the numbness as
+// calm, and cannot see the alarm at all.
+narrator self subscribes { composure } confabulates true
+  voice { numbness: "I'm fine. I'm managing. It's good to be home." }
+
+query "the sound his body knew and he could not name" {
+  somatic ?mem ?q ?t
+  surface "{?t}: {?mem} fired -- and he had no story for why the kitchen frightened him"
+}
+
+query "the man he told her he was" {
+  narrate ?who ?quote ?gap ?t
+  where ?gap >= 0.5
+  surface "{?t}: {?quote}"
+}
+
+query "each time the floor went out from under him" {
+  crash ?band ?t
+  surface "{?t}: {?band} -- interoception detached; the feeling went to numbness"
+}

@@ -1,0 +1,48 @@
+// bad_news.soma
+// A character receives bad news, traced from the ear through the viscera into
+// feeling -- and into a lie she tells before she knows she is lying.
+@consent("simulates acute distress")
+
+sim { duration: 6s  dt: 0.5s }
+
+let ordinary_call = 0     // what she expects to hear: nothing much
+let calm_heart    = 70
+
+body Nadia @cardiac {
+  intero heart : BPM     baseline 70  retention 10s protention 2s
+  intero gut   : Tension baseline 0
+  extero ear   : Speech  baseline 0
+}
+
+resource budget : Affine<Joule> = metabolic_reserve(900)
+
+// the sentence lands at t = 1.5s
+stimulus ear { at 1.5s: 9 }
+
+// appraisal: a huge prediction error, and it drives the body
+loop hearing @neural {
+  prior:      predict(ordinary_call)
+  sense:      ear
+  precision:  0.9
+  act {
+    update -> "the test results"
+    move ! set(heart, 118)     // appraisal reaches down into physiology
+    move ! set(gut, 8)
+  }
+}
+
+// the body reads its own state and produces dread
+loop viscera @cardiac {
+  prior:      predict(calm_heart)
+  sense:      heart
+  precision:  0.95
+  conviction: 0.3
+  act {
+    move ! spend(budget, 200)
+    emit feel(dread)
+  }
+}
+
+// the interpreter narrates -- and downplays what the body already knows
+narrator interpreter subscribes { hearing, viscera } confabulates true
+  voice { dread: "I'm fine. I just need to write this down." }

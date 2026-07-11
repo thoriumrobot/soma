@@ -1,0 +1,78 @@
+// in_love.soma
+// Most loops treat prediction error as a cost to be minimized. Love inverts the
+// sign: a well-calibrated surprise -- the beloved exceeding the model -- is
+// rewarded rather than penalized. This is the one place in SOMA where being
+// wrong feels good, and the language lets you say so directly.
+//
+// But a single rewarded surprise is not yet a story. What makes love legible is
+// what it does to precision over time, and here the model shows both roads:
+//
+//   * SOL holds his model of her loosely, on purpose. Low conviction, no
+//     learning. Every time she exceeds it he is delighted, and -- crucially --
+//     he does NOT harden. Twenty years on he is still being surprised. This is
+//     the rare good outcome: a prior kept deliberately soft.
+//   * The contrast is drawn by a single perturbation. Run:
+//         soma perturb examples/in_love.soma --set courtship.learn=0.12
+//     and the same woman, doing the same surprising things, stops surprising
+//     him -- because his model of her has hardened into a thing he defends
+//     instead of a thing he updates. The delight becomes contempt. The dial
+//     that separates the two is `learn`, and nothing else.
+//
+// (No @consent: delight is not distress. The perturbation is where it curdles,
+// and that is the author's choice to run.)
+
+sim { duration: 20y  dt: 1y  cadence: true }
+
+scene "The first year"      from 0y   to 4y
+scene "Settling"            from 5y   to 12y
+scene "Still, after"        from 13y  to 20y
+
+body Sol @breath {
+  extero face  : Expression baseline 5   // her face, which keeps changing
+  intero chest : Warmth     baseline 2
+}
+
+workspace consciousness { ignite at 0.5 }
+
+// she keeps exceeding whatever model he has built of her -- a real person, never
+// finished, offering something new across two decades
+stimulus face {
+  at 1y: 9   at 3y: 2   at 5y: 8   at 7y: 4
+  at 9y: 9   at 11y: 3  at 13y: 7  at 15y: 2
+  at 17y: 9  at 19y: 5
+}
+
+// THE LOVE LOOP. Low prior conviction: he holds his picture of her loosely, on
+// purpose, so that she can surprise him -- and when she does, the error is not a
+// cost but a gift. `learn: 0` is the whole ethic of it: he refuses to let his
+// model of her calcify. (Perturb this to see the other road.)
+loop courtship @breath {
+  prior:      predict(face)
+  sense:      face
+  precision:  0.85
+  conviction: 0.2
+  learn:      0.0
+  act {
+    // Delight is only available while he is still PERCEIVING -- still letting
+    // her update his model. The moment his conviction outranks her face and he
+    // flips to ACTING -- defending the model instead of revising it -- the same
+    // surprise that was a gift becomes an irritation. One loop, two feelings,
+    // and the arbitration outcome decides which.
+    update -> revise_my_picture_of_her when perceiving
+    broadcast she_is_more_than_i_knew salience: 0.7 when perceiving
+    emit feel(delight_at_error) when perceiving
+    move ! set(chest, 8) when perceiving
+    emit feel(contempt) when acting
+  }
+}
+
+mood tenderness : Affect @mood integrates { delight_at_error * 1.0, contempt * -1.0 } decay 0.8
+
+narrator self subscribes { courtship } confabulates true
+  voice { delight_at_error: "I keep getting you wrong, and I keep being glad of it." }
+
+query "twenty years of being gladly wrong" {
+  feel ?loop ?q ?t
+  where ?q == "delight_at_error"
+  surface "{?t}: she exceeded the model again, and he was glad of it"
+}

@@ -1,0 +1,99 @@
+// split_brain.soma
+// Gazzaniga's experiment, and the theory of self it forced.
+//
+// A commissurotomy patient has two hemispheres that no longer talk. Each acts on
+// what only it can see. But only the LEFT hemisphere speaks -- and it will not
+// say "I don't know." Shown a reason-shaped hole, it produces a reason. The
+// interpreter is not lying; it has no access to the truth and no tolerance for a
+// gap. This is Gazzaniga's claim about ALL of us: the narrating self is a press
+// secretary, not a president.
+//
+// The original demo showed one such confabulation. This runs the full battery,
+// so the pattern becomes undeniable: four trials, four left-hand actions the
+// verbal hemisphere did not initiate, four fluent explanations, each logged at a
+// confabulation gap near 1.0. Then a fifth trial where the two hemispheres are
+// shown the SAME thing -- and the gap collapses, because now the interpreter
+// actually knows. The contrast is the proof.
+@consent("simulates a clinical split-brain study")
+
+sim { duration: 25s  dt: 1s  cadence: true }
+
+scene "Snow and the chicken"   from 0s   to 6s
+scene "The word he could not say" from 7s to 12s
+scene "The face he laughed at"  from 13s to 18s
+scene "Both eyes, one thing"    from 19s to 25s
+
+body Patient @neural {
+  extero left_field  : Image  baseline 0   // -> RIGHT hemisphere (mute)
+  extero right_field : Image  baseline 0   // -> LEFT hemisphere (verbal)
+  proprio left_hand  : Action baseline 0   // driven by the right hemisphere
+  proprio right_hand : Action baseline 0   // driven by the left hemisphere
+}
+
+workspace consciousness { ignite at 0.5 }
+
+// TRIAL 1: snow scene to the mute hemisphere, chicken claw to the verbal one.
+// The left hand (mute) picks the shovel; the mouth (verbal) explains the chicken.
+// TRIAL 1 (t1): snow left / chicken right   -> hands disagree, big gap
+// TRIAL 2 (t8): word left / nothing right    -> mute hand writes; verbal can't say
+// TRIAL 3 (t14): face left / nothing right    -> mute hand; verbal laughs, invents why
+// TRIAL 5 (t20): SAME image to both fields     -> hands agree; the gap collapses
+stimulus left_field {
+  at 1s: 9   at 3s: 0
+  at 8s: 7   at 10s: 0
+  at 14s: 8  at 16s: 0
+  at 20s: 6  at 22s: 0
+}
+stimulus right_field {
+  at 1s: 5   at 3s: 0
+  at 20s: 6  at 22s: 0     // trial 5 only: the verbal hemisphere sees it too
+}
+
+// THE MUTE HEMISPHERE. It sees, it acts, it cannot speak. Its actions are real
+// and reason-driven -- but the reasons live where no words reach.
+loop right_hemisphere @neural {
+  prior:     predict(0)
+  sense:     left_field
+  precision: 0.9
+  conviction: 0.2
+  act {
+    move ! reach_for_the_shovel
+    move ! set(left_hand, 9)
+    broadcast a_wordless_intention salience: 0.4
+  }
+}
+
+// THE VERBAL HEMISPHERE. It sees only the right field, acts with the right hand,
+// and -- crucially -- it is the only one the narrator can hear.
+loop left_hemisphere @neural {
+  prior:     predict(0)
+  sense:     right_field
+  precision: 0.9
+  conviction: 0.2
+  act {
+    move ! point_at_the_chicken
+    move ! set(right_hand, 5)
+    broadcast a_reason_i_can_say salience: 0.9
+  }
+}
+
+// THE INTERPRETER. Subscribes only to the left hemisphere. When the left HAND
+// does something (driven by the mute hemisphere), the interpreter did not
+// initiate it and cannot see why -- so it confabulates, fluently, at a high gap.
+// On trial 5 both fields match, the left hand does what the interpreter expects,
+// and the same machinery produces a LOW gap. Same interpreter, two gaps.
+narrator interpreter subscribes { left_hemisphere } confabulates true
+  voice { reach_for_the_shovel: "I picked the shovel because you need one to clean out the chicken shed."
+          point_at_the_chicken: "The chicken -- obviously. It goes with the claw." }
+
+query "the reasons it gave for what it did not do" {
+  narrate ?who ?quote ?gap ?t
+  where ?gap >= 0.9
+  surface "{?t}: (gap {?gap}) {?quote}"
+}
+
+query "the one time it actually knew" {
+  narrate ?who ?quote ?gap ?t
+  where ?gap < 0.3
+  surface "{?t}: (gap {?gap}) {?quote} -- and this time it was true"
+}

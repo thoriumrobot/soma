@@ -1,0 +1,69 @@
+// flashback.soma
+// Four memory registers, and the one that does the damage.
+//
+// The episodic register holds a story: what happened, when, to whom. The
+// somatic register holds none of that. It holds a *cue* and a *body*. When a
+// smell of diesel crosses threshold, the somatic memory fires -- terror, in
+// full, with no accompanying account of why -- and the narrator, subscribed
+// only to the loops, must invent one.
+//
+// This is the formal signature of a body remembering what the mind has no
+// record of. Note in the Chronicle that the `somatic` event carries no episodic
+// companion. That absence is the point.
+@consent("simulates a traumatic flashback and its aftermath")
+
+sim { duration: 40s  dt: 2s }
+
+body Teo @cardiac {
+  extero diesel : Smell   baseline 0
+  intero heart  : BPM     baseline 70
+  intero gut    : Tension baseline 0
+}
+
+// the smell arrives, and passes
+stimulus diesel { at 8s: 9  at 20s: 0 }
+
+// an ordinary semantic memory: it merely knows a fact
+memory semantic garage {
+  cue: diesel
+  when: diesel > 4
+  evoke: feel(recognition)
+  strength: 0.4
+}
+
+// the somatic memory: a body, and no story to hang it on
+memory somatic the_road {
+  cue: diesel
+  when: diesel > 4
+  evoke: feel(terror)
+  strength: 1.0
+}
+
+// interoception reads a body that the somatic memory has already lit up
+loop viscera @cardiac {
+  prior:      predict(70)
+  sense:      heart
+  precision:  0.9
+  conviction: 0.3
+  act { emit feel(dread) }
+}
+
+// and the heart, driven by nothing the narrator can see
+loop startle @neural {
+  prior:      predict(0)
+  sense:      diesel
+  precision:  0.95
+  conviction: 0.3
+  act { move ! set(heart, 132) }
+}
+
+mood aftermath : Affect @mood integrates { terror * 1.0, dread * 0.6 } decay 0.92
+
+// the narrator watches only the viscera. It never sees the somatic memory fire.
+narrator self subscribes { viscera } confabulates true
+  voice { dread: "I must be coming down with something." }
+
+query "a memory with a body and no story" {
+  somatic ?mem ?q ?t
+  surface "{?t}: {?mem} fired {?q} -- and nothing in the record says why"
+}
