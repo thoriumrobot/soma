@@ -69,11 +69,63 @@ def build():
     return story
 
 
+def predict_study():
+    """The two-hander, predicted: what size of slight tips Cleo's grace into a
+    lie, and the tragic gap between what Cleo shows and what Immy reads."""
+    from soma import run_source
+    print("=" * 74)
+    print("TWO SISTERS, PREDICTED")
+    print("=" * 74)
+
+    # I. the tipping number: the least inequality at which Cleo's composure
+    # crosses the line and betrays her stated fairness.
+    print("\nI. THE TIPPING NUMBER — how unequal before grace becomes a lie")
+    tip = None
+    for n in range(1, 10):
+        s = build()
+        src = s.source()
+        kept = [ln for ln in src.splitlines()
+                if not ln.lstrip().startswith("stimulus ")]
+        probe = ("stimulus Cleo.the_number { " +
+                 "  ".join(f"at {t}s: {n}" for t in range(2, 12)) + " }")
+        r = run_source("\n".join(kept + ["", probe]) + "\n", title="sisters__tip")
+        betrayed = any(e.kind == "emit"
+                       and "self_betrayal" in str(e.detail.get("quale", ""))
+                       for e in r.chronicle)
+        if betrayed and tip is None:
+            tip = n
+    print(f"   Cleo's fairness survives a gap up to {tip - 1}; at {tip}, her")
+    print(f"   composure crosses the line and the value breaks. Her grace has a")
+    print(f"   number, and below it she means it — above it she is performing.")
+
+    # II. preregistered: what Cleo shows is not what Immy reads
+    print("\nII. THE MISREAD — a preregistered gap between sisters")
+    s = build()
+    audit = s.preregister()
+    audit.expect_feeling("Cleo", "self_betrayal")     # Cleo betrays fairness
+    audit.expect_gap("Cleo", at_least=0.4)            # and narrates it away
+    audit.expect("Immy never sees the resentment (reads composure as calm)",
+                 lambda r: (not any(e.kind == "emit"
+                                    and "suspicion" in str(e.detail.get("quale", "")).lower()
+                                    and e.who.startswith("Immy.")
+                                    for e in r.chronicle),
+                            "Immy's read of the composed face carries no alarm"))
+    print()
+    print(audit.check().render())
+    print("\n   Cleo composes herself, betrays her own fairness, and narrates it")
+    print("   away as grace; Immy, reading the composed face, sees calm where")
+    print("   there is a broken value. The couple carries the surface, never the")
+    print("   truth beneath it — the sisters are in the same room and different")
+    print("   worlds, and the gap was staked before the run.")
+
+
 if __name__ == "__main__":
     story = build()
     if "--source" in sys.argv:
         print(story.source())
     elif "--character" in sys.argv:
         print(story.characterize(width=84))
+    elif "--predict" in sys.argv:
+        predict_study()
     else:
         print(story.run(width=90))

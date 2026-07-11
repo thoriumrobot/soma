@@ -172,6 +172,36 @@ def _check_wellformed(prog: A.Program):
                 f"loop {lp.name!r}: mode must be 'habit' or 'deliberate', "
                 f"not {lp.mode!r} (dual-process control).")
 
+    # A loop's `sense` must name a channel that exists, or the loop silently
+    # never fires -- the single most confusing failure mode, since nothing is
+    # reported and the story just comes out empty. Build the full set of
+    # channels the runtime knows about (declared, flow-driven, schema/image,
+    # and stimulus targets), then flag any sense that resolves to none of them.
+    # Cross-character exteroceptive senses (Alice reading `Bob.face`) are fine
+    # as long as the channel is declared on the owner's body.
+    known = set(chans)
+    known |= {s.channel for s in getattr(prog, "stimuli", [])}
+    # channels a couple writes into come into being at runtime too
+    known |= {cp.dst for cp in prog.couples}
+    known |= {cp.src for cp in prog.couples}
+    for lp in prog.loops:
+        if not lp.sense:
+            continue
+        sense = lp.sense
+        # a bare name owned implicitly by the loop's character may appear either
+        # bare or as "<owner>.<name>"; accept either spelling
+        candidates = {sense}
+        if lp.owner and "." not in sense:
+            candidates.add(f"{lp.owner}.{sense}")
+        if "." in sense:
+            candidates.add(sense.split(".", 1)[1])
+        if not (candidates & known):
+            raise SomaTypeError(
+                f"loop {lp.name!r} senses {sense!r}, which is not a declared "
+                f"channel (nor a stimulus target or coupled channel). This "
+                f"would leave the loop silently inert. Check for a typo, or "
+                f"declare the channel on a body.")
+
     # Clock names are drawn from a fixed set; an unrecognized one is almost
     # always a typo (`@carfiac`), and would silently tick at the wrong rate.
     CLOCKS = {"neural", "cardiac", "breath", "mood", "hormonal",

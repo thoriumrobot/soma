@@ -149,9 +149,14 @@ class Preregistration:
         desc = f"{who} {word} (>= {at_least})"
 
         def fn(r):
+            # narrate events are logged by the narrator, whose name is
+            # "self_<Character>" (or bare in a single-character story), so match
+            # that convention rather than the "<who>." loop prefix.
+            single = len(self.story.characters) == 1
+            def mine(w):
+                return (single or w == f"self_{who}" or w.startswith(f"{who}."))
             hits = [e for e in r.chronicle
-                    if e.kind == "narrate"
-                    and (e.who.startswith(f"{who}.") or len(self.story.characters) == 1)
+                    if e.kind == "narrate" and mine(e.who)
                     and e.detail.get("gap", 0) >= at_least]
             if present:
                 return (bool(hits),

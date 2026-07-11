@@ -62,6 +62,21 @@ def the_verdict():
     print()
     print(audit.check().render())
 
+    # construct validity: the forward map (appraisal->emotion) is only a real
+    # prediction if it is IDENTIFIABLE -- if the inverse (emotion->appraisal)
+    # recovers the same emotion for every one in the vocabulary. The same
+    # blind-recovery standard the Strange Situation meets.
+    from soma.narrative import check_identifiability, explain_emotion
+    v = check_identifiability()
+    print(f"\n  construct validity — forward and inverse mappings consistent "
+          f"for all\n  {v['n']} emotions: {v['recovered']} "
+          f"({v['n_correct']}/{v['n']} round-trip). The map is identifiable,")
+    print("  so the forecast is a prediction, not a label. And it runs "
+          "backward —")
+    print("  from the feeling observed to the reading of the world behind it:")
+    for emo in ("resentment", "grief", "relief"):
+        print(f"    {explain_emotion(emo)}")
+
 
 def the_negotiation():
     """Two cold, dominant people: perfect correspondence on warmth, collision

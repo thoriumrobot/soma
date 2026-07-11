@@ -313,23 +313,23 @@ The dashboard's chronicle is curated; when you want *every* event, `trace` print
 the lot. Here is Mara's complete log — nineteen events, nothing elided:
 
 ```text
-  0.0 settle   appraising_phone sense=0.0 belief=6.0 error=-3.3 pi_s=0.55 pi_p=0.7 route=act
+  0.0 settle   appraising_phone sense=0.0 belief=6.0 error=-3.3 pi_s=0.55 pi_p=0.7 route=act debt=0.0 bound=None
   0.0 learn    appraising_phone delta=0.03 note=the prior begins to harden
-  1.0 settle   appraising_phone sense=0.0 belief=6.0 error=-3.3 pi_s=0.55 pi_p=0.73 route=act
+  1.0 settle   appraising_phone sense=0.0 belief=6.0 error=-3.3 pi_s=0.55 pi_p=0.73 route=act debt=0.0 bound=None
   2.0 stimulus phone            value=9.0
-  2.0 settle   appraising_phone sense=9.0 belief=6.0 error=1.65 pi_s=0.55 pi_p=0.76 route=act
+  2.0 settle   appraising_phone sense=9.0 belief=6.0 error=1.65 pi_s=0.55 pi_p=0.76 route=act debt=0.0 bound=None
   2.0 emit     appraising_phone quale=Qualia<dread>
   2.0 narrate  self             quote=It's nothing. It's probably nothing. about=dread gap=0.55
-  3.0 settle   appraising_phone sense=9.0 belief=6.0 error=1.65 pi_s=0.55 pi_p=0.79 route=act
+  3.0 settle   appraising_phone sense=9.0 belief=6.0 error=1.65 pi_s=0.55 pi_p=0.79 route=act debt=0.0 bound=None
   3.0 emit     appraising_phone quale=Qualia<dread>
   3.0 narrate  self             quote=It's nothing. It's probably nothing. about=dread gap=0.55
-  4.0 settle   appraising_phone sense=9.0 belief=6.0 error=1.65 pi_s=0.55 pi_p=0.82 route=act
+  4.0 settle   appraising_phone sense=9.0 belief=6.0 error=1.65 pi_s=0.55 pi_p=0.82 route=act debt=0.0 bound=None
   4.0 emit     appraising_phone quale=Qualia<dread>
   4.0 narrate  self             quote=It's nothing. It's probably nothing. about=dread gap=0.55
-  5.0 settle   appraising_phone sense=9.0 belief=6.0 error=1.65 pi_s=0.55 pi_p=0.85 route=act
+  5.0 settle   appraising_phone sense=9.0 belief=6.0 error=1.65 pi_s=0.55 pi_p=0.85 route=act debt=0.0 bound=None
   5.0 emit     appraising_phone quale=Qualia<dread>
   5.0 narrate  self             quote=It's nothing. It's probably nothing. about=dread gap=0.55
-  6.0 settle   appraising_phone sense=9.0 belief=6.0 error=1.65 pi_s=0.55 pi_p=0.88 route=act
+  6.0 settle   appraising_phone sense=9.0 belief=6.0 error=1.65 pi_s=0.55 pi_p=0.88 route=act debt=0.0 bound=None
   6.0 emit     appraising_phone quale=Qualia<dread>
   6.0 narrate  self             quote=It's nothing. It's probably nothing. about=dread gap=0.55
 ```

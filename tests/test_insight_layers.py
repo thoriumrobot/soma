@@ -125,6 +125,23 @@ class TestSensitivity:
         assert all(v == 0.0 for v in rep.total_order.values())
         assert "constant" in " ".join(rep.notes) or rep.base_variance < 1e-9
 
+    def test_sobol_indices_are_bounded(self):
+        """Sobol indices are variance fractions and must lie in [0, 1]; the
+        Jansen estimator can overshoot on interaction-heavy outcomes with small
+        samples, so the module clamps. A total-order > 1 would be meaningless."""
+        s = kept_man()
+        rep = s.sensitivity(
+            params={f"{LIE}.conviction": (0.3, 0.99),
+                    f"{LIE}.learn": (0.0, 0.3),
+                    f"{LIE}.precision": (0.2, 0.9)},
+            outcome_name="break_time", character="Ink", n_base=16, seed=1)
+        for p, v in rep.total_order.items():
+            assert 0.0 <= v <= 1.0, (p, v)
+        for p, v in rep.first_order.items():
+            assert 0.0 <= v <= 1.0, (p, v)
+            # first-order never exceeds total-order
+            assert v <= rep.total_order[p] + 1e-9, (p, v, rep.total_order[p])
+
     def test_report_renders(self):
         s = kept_man()
         rep = s.sensitivity(params={f"{LIE}.conviction": (0.3, 0.99)},

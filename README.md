@@ -1,4 +1,4 @@
-# SOMA 0.7.0 — a compiler & runtime for the simulation of embodied consciousness
+# SOMA 0.14.2 — a compiler & runtime for the simulation of embodied consciousness
 
 SOMA is a domain-specific language for novelists. You describe a character as a
 set of **loops** — prediction ⇄ error ⇄ action circuits — running on many
@@ -19,7 +19,7 @@ python -m soma query   examples/a_marriage.soma
 python -m soma run     examples/bad_news.soma --phi
 python -m soma run     examples/the_appointment.soma      # medical dismissal
 python -m soma run     examples/the_interrogation.soma    # dissociation in bands
-python -m pytest -q            # 148 tests
+python -m pytest -q            # 281 tests
 ```
 
 ### Run it in a browser — no install
@@ -27,10 +27,30 @@ python -m pytest -q            # 148 tests
 `soma_playground.html` is a single self-contained file that runs the **real**
 interpreter in the browser (via Pyodide — the same Python, compiled to
 WebAssembly). Open it, pick an example from the left, and hit **Run**; edit the
-code or write your own and run that. Every toolchain command is a button
-(`run`, `check`, `sift`, `prose`, `trace`, `query`, and `perturb`), and the
-output is the identical colored dashboard you get on the command line. Rebuild it
-after any change with `python build_html.py`.
+code or write your own and run that.
+
+The playground has **two modes**, switched from the header:
+
+* **SOMA** — the base language. Every toolchain command is a button (`run`,
+  `check`, `sift`, `prose`, `trace`, `query`, and `perturb`), and the output is
+  the identical colored dashboard you get on the command line.
+* **Library** — the high-level `soma.narrative` API, run as Python. Write a
+  character in feelings and beliefs, install an attachment style, marry two
+  people, condition a subject, or run a drift-diffusion decision — then call the
+  **predictive** methods (`predict_separation`, `strange_situation`,
+  `gottman_assess`, `predict_conditioning`, `predict_helplessness`,
+  `predict_decision`, `tipping_point`, `predict_break_onset`) and the
+  **insight** methods (`sensitivity`, `minimal_intervention`, `preregister`,
+  `speed_accuracy`). Fourteen worked examples ship in the drawer, from
+  `hello · a character` to the Strange Situation and the Gottman thin-slice
+  divorce forecast.
+
+The two modes meet: Library code can call `run_source(...)` on **hand-written
+SOMA text** and run it through the library on the same page, and — conversely —
+anything you build with the library prints the ordinary SOMA it compiled to via
+`story.source()`, which you can copy straight into SOMA mode. Write SOMA, drive
+it from Python; build in Python, read the SOMA. Rebuild the page after any change
+with `python build_html.py`.
 
 The same file is committed at the repository root as **`index.html`**, so the
 playground is served directly by **GitHub Pages**: enable Pages for the repo
@@ -194,6 +214,41 @@ say something you did not put in. Three tools cross that line (see `PREDICTION.m
 
 `python3 examples/narrative/the_unmooring.py predictions` collects the forecasts;
 `CHARACTER_DEPTH.md` and `PREDICTION.md` document the research and the mechanisms.
+**`TUTORIAL_PREDICTIVE.md`** is a self-contained, browser-runnable walkthrough of
+every predictive simulation — from a first character to the Strange Situation and
+the Gottman thin-slice forecast — with complete code, real output, and an
+explanation of how each leads to a novelistic insight.
+
+**The full predictive suite (0.8–0.14).** What began as three tools is now a
+library of documented psychological models, each rebuilt in SOMA and each making
+a falsifiable, signature prediction a weaker account could not:
+
+- **Appraisal** (`predict_feeling`, `explain_emotion`, `check_identifiability`) —
+  the discrete emotion and its action tendency, derived from the appraisal
+  dimensions; all 14 emotions round-trip forward↔inverse (construct validity).
+- **Attachment** (`attaches`, `predict_separation`) and the full **Strange
+  Situation** (`strange_situation`, `validate_instrument`) — a style installed,
+  then recovered *blind* from behavior alone, for all four classifications.
+- **The Gottman marriage model** (`marry`, `gottman_assess`) — five couple types
+  and the thin-slice divorce forecast called from the first quarter of one
+  conversation.
+- **Conditioning** (`conditions`, `predict_conditioning`) — the reward-prediction-
+  error account, with **spontaneous recovery** the single-trace model cannot make.
+- **Learned helplessness** (`learns_control`, `triadic_design`) — the transfer
+  asymmetry: a global explanatory style generalizes the deficit, a specific one
+  does not.
+- **Drift-diffusion decisions** (`decides`, `predict_decision`, `speed_accuracy`)
+  — reaction-time distributions and error rates, and the speed-accuracy tradeoff
+  from one dial. (SOMA's one seeded, reproducible source of noise.)
+- **Dynamical early warning** (`predict_break_onset`) — forecasting a belief's
+  break *before* it happens, from critical-slowing-down statistics.
+- **Insight tools** — **preregistration** (`preregister`: stake claims before the
+  run, checked after and sealed), variance-based **sensitivity** (`sensitivity`:
+  which dial writes the ending), and the **counterfactual** (`minimal_intervention`:
+  the smallest single change that flips the outcome).
+
+All of these run in the browser playground's **Library** mode and are walked
+through in `TUTORIAL_PREDICTIVE.md`.
 
 
 
@@ -566,7 +621,7 @@ soma/
   narrative/      high-level authoring library (Story, Character, temperaments,
                   arcs) that compiles narrative intent to ordinary SOMA
 examples/         17 worked programs (+ examples/narrative/ library scripts)
-tests/            148 tests (pytest; 87 core + 61 narrative)
+tests/            281 tests (pytest; 91 core + 190 narrative, prediction & web)
 ```
 
 ## Invariants the implementation guarantees
@@ -614,10 +669,15 @@ SOMA models the phenomena they describe because fiction may honour lived
 experience even where a mechanism is disputed, and never presents them as
 consensus.
 
-The 0.7 prediction layer is a claim about a *model*, not about a person. `predict`,
-`tipping_point`, and `predict_lie` forecast what the specified character would do;
-they are falsifiable against the model (run it, the effect must appear) and against
-a reader's sense of the character, but the schema-therapy mapping is a typology of
-useful defaults, not a law — a real person may always be the exception the type
-does not cover, which is exactly why every prediction can be overridden.
+The prediction layer is a claim about a *model*, not about a person. Every
+forecast — from `predict` / `tipping_point` / `predict_lie` through the full
+suite (appraisal, attachment and the Strange Situation, Gottman, conditioning,
+learned helplessness, drift-diffusion decisions, early warning) and the insight
+tools (preregistration, sensitivity, counterfactual) — describes what the
+specified *character model* would do. Each is falsifiable against the model (run
+it, the effect must appear) and against a reader's sense of the character, but
+the underlying psychology (schema therapy, attachment types, couple types, and
+so on) is a typology of useful defaults, not a law. A real person may always be
+the exception the type does not cover, which is exactly why every prediction can
+be overridden — and why the reports print that caveat themselves.
 

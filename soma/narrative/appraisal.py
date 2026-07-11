@@ -160,3 +160,107 @@ def predict_feeling(*, congruence: float, agency: str = "circumstance",
 # know about the ones the base checker does not already list.
 PREDICTABLE_DISTRESS = {"fear", "anger", "resentment", "grief", "dread",
                         "shame", "guilt", "regret", "frustration"}
+
+
+# ---------------------------------------------------------------------------
+# inverse inference: from an observed emotion, recover the appraisal
+# ---------------------------------------------------------------------------
+#
+# Appraisal theory's central claim is bidirectional (Smith & Ellsworth 1985:
+# emotions and appraisals map onto each other). The forward direction --
+# appraisal -> emotion -- is predict_feeling above. The inverse -- emotion ->
+# the appraisal that must have produced it -- is the stronger, more falsifiable
+# claim, because it is what lets an observer reason from behaviour back to the
+# construal, and because it is only well-posed if the forward mapping is
+# IDENTIFIABLE (distinct emotions come from distinct appraisal regions). This
+# section provides the inverse and a construct-validity check that the two
+# directions are mutually consistent across the whole emotion vocabulary.
+
+# the canonical appraisal signature behind each emotion: the region of appraisal
+# space that predict_feeling maps to it. Written as human-readable constraints;
+# `explain_emotion` returns them, and `recover_appraisal` returns a concrete
+# representative that predict_feeling round-trips back to the same emotion.
+_SIGNATURES = {
+    "anger":       dict(congruence=-0.8, agency="other", certainty=0.9, coping=0.8),
+    "resentment":  dict(congruence=-0.8, agency="other", certainty=0.9, coping=0.2),
+    "fear":        dict(congruence=-0.8, agency="other", certainty=0.3, coping=0.5),
+    "dread":       dict(congruence=-0.7, agency="circumstance", certainty=0.2, coping=0.3),
+    "grief":       dict(congruence=-0.9, agency="circumstance", certainty=0.95, coping=0.1),
+    "frustration": dict(congruence=-0.7, agency="circumstance", certainty=0.9, coping=0.8),
+    "guilt":       dict(congruence=-0.7, agency="self", certainty=0.9, coping=0.5,
+                        norm_compatible=False, norm_focus="act"),
+    "shame":       dict(congruence=-0.7, agency="self", certainty=0.9, coping=0.5,
+                        norm_compatible=False, norm_focus="self"),
+    "regret":      dict(congruence=-0.7, agency="self", certainty=0.9, coping=0.5,
+                        norm_compatible=True),
+    "hope":        dict(congruence=0.6, agency="circumstance", certainty=0.3),
+    "relief":      dict(congruence=0.7, agency="circumstance", certainty=0.9,
+                        was_feared=True),
+    "pride":       dict(congruence=0.7, agency="self", certainty=0.9),
+    "gratitude":   dict(congruence=0.7, agency="other", certainty=0.9),
+    "joy":         dict(congruence=0.7, agency="circumstance", certainty=0.9),
+}
+
+# the plain-language reading of each appraisal dimension, for explanations.
+_DIMENSION_GLOSS = {
+    "congruence": lambda v: ("good for what they wanted" if v > 0
+                             else "bad for what they wanted"),
+    "agency":     lambda v: {"self": "they caused it",
+                             "other": "someone else caused it",
+                             "circumstance": "no one caused it"}[v],
+    "certainty":  lambda v: "it is settled" if v >= 0.5 else "it is still uncertain",
+    "coping":     lambda v: "something can be done" if v >= 0.5 else "nothing can be done",
+    "norm_compatible": lambda v: "no standard was broken" if v else "a standard was broken",
+    "norm_focus": lambda v: {"act": "the act was wrong", "self": "the self is wrong"}[v],
+    "was_feared": lambda v: "the bad outcome had been braced for" if v else "",
+}
+
+
+def recover_appraisal(emotion: str) -> dict:
+    """Inverse inference: given an observed emotion, return an appraisal pattern
+    that produces it. Raises if the emotion is outside the vocabulary. The
+    returned pattern is guaranteed to round-trip (predict_feeling of it yields
+    the same emotion) -- see check_identifiability."""
+    if emotion not in _SIGNATURES:
+        raise ValueError(f"{emotion!r} is not in the appraisal vocabulary: "
+                         f"{sorted(_SIGNATURES)}")
+    return dict(_SIGNATURES[emotion])
+
+
+def explain_emotion(emotion: str) -> str:
+    """A plain-language account of the appraisal behind an emotion -- what a
+    character must have construed for this feeling to be the one that fired.
+    This is the observer's inference: feeling -> the reading of the world that
+    produced it, with its Frijda action tendency."""
+    sig = recover_appraisal(emotion)
+    parts = []
+    for dim, val in sig.items():
+        g = _DIMENSION_GLOSS.get(dim)
+        if g:
+            phrase = g(val)
+            if phrase:
+                parts.append(phrase)
+    tendency = TENDENCIES.get(emotion, "")
+    return (f"{emotion}: they construed that " + ", ".join(parts)
+            + f" — and so are moved to {tendency}")
+
+
+def check_identifiability() -> dict:
+    """Construct validity, the same standard the Strange Situation meets: the
+    forward and inverse mappings must be mutually consistent. For every emotion
+    the module can predict, recover its appraisal and run it forward again; the
+    result must be the same emotion. A failure means the emotion is not
+    identifiable from appraisal -- two feelings share a region -- which would
+    make the prediction ill-posed. Returns the per-emotion round-trip result and
+    whether all recovered.
+    """
+    rows = {}
+    for emotion in _SIGNATURES:
+        recovered = recover_appraisal(emotion)
+        pf = predict_feeling(**recovered)
+        rows[emotion] = (pf.quale if pf else None)
+    ok = all(v == k for k, v in rows.items())
+    return dict(rows=rows,
+                recovered=ok,
+                n=len(rows),
+                n_correct=sum(1 for k, v in rows.items() if v == k))

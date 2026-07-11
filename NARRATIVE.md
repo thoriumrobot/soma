@@ -43,6 +43,16 @@ heart rising when the words land and settling once they pass.
   situation never scripted (suppress / take-in / break); `.tipping_point(who,
   channel)` gives the least evidence that turns their lie. Positive, falsifiable
   predictions, not replays of the timeline (see *Predicting the character*)
+- **Predictive simulations** (see *The predictive simulations* below):
+  `.predict_separation(who)`, `.predict_conditioning(who, …)`,
+  `.predict_helplessness(who, …)`, `.predict_decision(who, …)`,
+  `.speed_accuracy(who, …)`, `.predict_break_onset(who, …)`, `.meet(a, b)` /
+  `.predict_dyad(a, b)` (circumplex), and the character-side installers
+  `.conditions(subject, …)`, `.learns_control(subject, …)`, `.decides(who, …)`
+- **Insight tools**: `.preregister()` (sealed forecasts, checked after),
+  `.sensitivity(params=, outcome_name=, character=)` (which dial writes the
+  ending), `.minimal_intervention(target=, dials=, character=)` (the smallest
+  flip)
 - `.characterize()` — a synthesized **portrait**: not what happened, but *who this
   person is* — disposition, what they want and fear, the wound, the lie (and whether
   it is a moral or psychological weakness), which way the arc runs, the need (and
@@ -114,6 +124,10 @@ heart rising when the words land and settling once they pass.
   stating the lie, **predict it from the wound**: an unmet core need plus a coping
   style (`surrender` / `avoidance` / `overcompensation`) forecasts the belief and
   installs it (schema therapy; see *Predicting the character* below)
+- `.attaches(style, to=)` — install an **attachment style** (`secure` / `anxious`
+  / `avoidant` / `disorganized`) toward a figure, so `story.predict_separation`
+  and the Strange Situation protocol can forecast and read the character's
+  response to separation (see *The predictive simulations*)
 - `.narrates(voice={...})` or `narrates(downplaying={...})` — a confabulating self that speaks for the loops
 
 ## Temperaments set the dials for you
@@ -422,4 +436,75 @@ forecasts.
 Run any of them with `python examples/narrative/<name>.py`, or add `--source` to
 see the SOMA it generated (`--prose` on the saga for free-indirect prose,
 `--character` on the studies for the portrait, `predictions` for the forecasts).
+
+## The predictive simulations
+
+Beyond the wound→lie forecast, `soma.narrative` implements a suite of documented
+psychological models, each rebuilt on the loop and each staking a *falsifiable*
+signature prediction. `TUTORIAL_PREDICTIVE.md` walks through all of them with
+complete code, real output, and interpretation; this is the quick index.
+
+**Appraisal — the feeling from the situation.** `predict_feeling(congruence=,
+agency=, certainty=, coping=)` returns the discrete emotion and its action
+tendency; `explain_emotion(name)` runs the inverse (emotion → the appraisal
+behind it); `check_identifiability()` confirms all 14 emotions round-trip
+forward↔inverse, the construct-validity test that makes the map a prediction
+rather than a labeling.
+
+```python
+from soma.narrative import predict_feeling, explain_emotion
+predict_feeling(congruence=-0.8, agency="other", certainty=0.9, coping=0.8).quale  # "anger"
+predict_feeling(congruence=-0.8, agency="other", certainty=0.9, coping=0.2).quale  # "resentment"
+```
+
+**Attachment and the Strange Situation.** `character.attaches(style, to=…)`
+installs one of `secure` / `anxious` / `avoidant` / `disorganized`;
+`story.predict_separation(who)` stakes a style-specific forecast and checks it
+against an unscripted separation. `strange_situation(story, child)` runs
+Ainsworth's full protocol and codes it *blind* from the behavior stream;
+`validate_instrument(build_fn)` confirms all four installed styles are recovered
+— construct validity as parameter recovery.
+
+**The Gottman marriage model.** `marry(story, a, b, couple_type)` builds one of
+five types (`validating`, `volatile`, `avoider`, `hostile`, `hostile_detached`);
+`gottman_assess(story)` reports the positive-to-negative ratio, negative-affect
+reciprocity, and the thin-slice divorce forecast made from the first quarter of
+one conversation.
+
+**Conditioning.** `story.conditions(subject, cs=, us=)` then
+`story.predict_conditioning(who, acquire=, extinguish=, rest=, reacquire=)`
+runs acquisition → extinction → rest → reacquisition and confirms the
+reward-prediction-error signatures, including **spontaneous recovery** after
+rest — the prediction a single learning trace cannot make.
+
+**Learned helplessness.** `story.learns_control(subject, style="global"|"specific")`
+then `triadic_design(build_fn)` runs the full 2×3×2 design and confirms the
+**transfer asymmetry**: the uncontrollable-pretreatment deficit generalizes to a
+dissimilar task only for a global explanatory style.
+
+**Drift-diffusion decisions.** `story.decides(who, style=…)` (or explicit DDM
+parameters) then `story.predict_decision(who, trials=, seed=)` predicts accuracy,
+reaction-time distributions, and error RTs; `story.speed_accuracy(who,
+boundaries=…)` traces the speed-accuracy tradeoff from the boundary alone. This
+is SOMA's one seeded, reproducible source of stochasticity, isolated from the
+deterministic core.
+
+**Dynamical early warning.** `story.predict_break_onset(who, window=…)` forecasts
+whether a defended belief is about to break, reading only the pre-transition
+dynamics (accumulating overwhelm-debt plus rising fluctuation variance and
+autocorrelation — the fingerprints of critical slowing down).
+
+**Insight tools.** These interrogate a prediction rather than make one:
+
+- `story.preregister()` opens a sealed set of forecasts (`expect_feeling`,
+  `expect_gap`, `expect_peak`, `expect_break`, …), staked before the run and
+  checked after; adding a claim post-check is refused as a postdiction.
+- `story.sensitivity(params=, outcome_name=, character=)` runs variance-based
+  (Sobol) sensitivity: which dial actually writes the outcome, alone or through
+  interaction. Indices are bounded to [0, 1].
+- `story.minimal_intervention(target=, dials=, character=)` finds the smallest
+  single-dial change that flips the outcome — the margin the ending turned on.
+
+Every prediction is a claim about the *model* of a character, never about a real
+person; the reports print that caveat themselves.
 

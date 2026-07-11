@@ -40,6 +40,7 @@ VALENCE = {
     "anguish": -1.0, "numbness": -0.15, "calm": 0.3, "relief": 0.6,
     "delight": 1.0, "delight_at_error": 1.0, "love": 1.0, "joy": 1.0,
     "warmth": 0.7, "hope": 0.6, "contempt": -0.7, "recognition": 0.1,
+    "belonging": 0.7,
     # subtler affects a novel turns on -- the weather between the storms
     "unease": -0.5, "disquiet": -0.55, "foreboding": -0.7, "longing": -0.5,
     "tenderness": 0.8, "apprehension": -0.6, "desolation": -0.95,
@@ -50,7 +51,8 @@ VALENCE = {
     # circumplex dyad qualia (soma.narrative.circumplex)
     "fear": -0.9, "resentment": -0.65, "frustration": -0.55, "guilt": -0.7,
     "regret": -0.6, "gratitude": 0.8, "ease": 0.5, "friction": -0.6,
-    "loneliness": -0.7,
+    "loneliness": -0.7, "anticipation": 0.6, "reaching_out": 0.4,
+    "terror": -0.95,
     "worthlessness": -0.85, "pride": 0.7, "grief": -0.9,
 }
 

@@ -1,4 +1,4 @@
-# SOMA 0.7.0 — Grammar Reference
+# SOMA 0.14.2 — Grammar Reference
 
 The canonical surface syntax is ASCII. The spec's Unicode forms are accepted as
 aliases: `◜`→`{`, `◞`→`}`, `⤋`→`->`, `⤊`→`^`.
@@ -221,6 +221,8 @@ because `loop` fields are keyword-led.
 | **Register discipline** | `memory <register>` outside {episodic, semantic, procedural, somatic} |
 | **Dual-process** | `mode` outside {habit, deliberate} |
 | **Name resolution** | `awareness … tracks` an undeclared attention; `ownership` or `memory` referencing an undeclared channel |
+| **Sense resolution** | a loop whose `sense:` names a channel that is not declared, stimulus-targeted, or coupled (a typo that would leave the loop silently inert) |
+| **Clock names** | a `loop`, `body`, `flow`, or `mood` on a clock outside the eight (`neural`, `cardiac`, `breath`, `mood`, `hormonal`, `circadian`, `biography`, `lineage`) — almost always a typo like `@carfiac` |
 | **Other minds** | a loop owned by Bob that `sense`s an `intero` channel of Alice's |
 | **Other minds** | a `couple` whose source is an `intero` channel of another character |
 | **Precision opacity** | a `Qualia` (`feel(x)`) used inside a dynamic `precision:` expression |

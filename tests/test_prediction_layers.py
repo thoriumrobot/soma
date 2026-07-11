@@ -99,6 +99,35 @@ class TestAppraisalTheory:
         s.at("2s", v.hears("news", 9))
         s.result()   # would raise ConsentError if the gate were not satisfied
 
+    def test_mapping_is_identifiable(self):
+        """Construct validity, the standard the Strange Situation meets: the
+        forward and inverse mappings are mutually consistent for every emotion
+        -- so the forecast is a prediction, not a label."""
+        from soma.narrative import check_identifiability
+        v = check_identifiability()
+        assert v["recovered"], v["rows"]
+        assert v["n_correct"] == v["n"] == 14
+
+    def test_inverse_inference_round_trips(self):
+        """recover_appraisal(emotion) must, run forward, yield that emotion."""
+        from soma.narrative import recover_appraisal, predict_feeling
+        for emotion in ("anger", "grief", "shame", "relief", "gratitude",
+                        "hope", "pride", "fear", "dread", "regret"):
+            appr = recover_appraisal(emotion)
+            assert predict_feeling(**appr).quale == emotion
+
+    def test_explain_emotion_reads_the_appraisal_back(self):
+        from soma.narrative import explain_emotion
+        txt = explain_emotion("anger")
+        assert "someone else caused it" in txt and "move against" in txt
+        txt2 = explain_emotion("grief")
+        assert "no one caused it" in txt2 and "nothing can be done" in txt2
+
+    def test_recover_appraisal_rejects_unknown(self):
+        from soma.narrative import recover_appraisal
+        with pytest.raises(ValueError):
+            recover_appraisal("nostalgia")
+
 
 # ---------------------------------------------------------------------------
 # attachment: four styles, four distinguishable separations
@@ -312,7 +341,29 @@ class TestPreregistration:
         rep = audit.check()
         assert rep.all_confirmed, rep.render()
 
-    def test_accommodations_are_disclosed(self):
+    def test_multi_character_gap_matches_the_self_narrator(self):
+        """Regression: in a multi-character story the narrator is logged as
+        'self_<Name>', so expect_gap must match that convention -- not just the
+        '<Name>.' loop prefix. Before the fix this silently falsified every
+        multi-character gap claim."""
+        s = Story("t_multi_gap", span="10s", step="1s",
+                  about="a composed face")
+        a = s.character("Cleo", temperament=guarded)
+        b = s.character("Immy", temperament=tender)
+        a.senses("the_number")
+        a.has_body_signal("composure", baseline=2)
+        a.appraises("the_number", as_threat=True, drives="composure", to=8,
+                    feeling="apprehension", when="the_number > 5", fades_to=2)
+        a.values("fairness", says="I never cared about the money.",
+                 betrayed_when="composure > 6", on_channel="composure")
+        a.narrates(voice={"self_betrayal": "I'm not angry. Why would I be?"})
+        b.senses("x")
+        for t in range(3, 9):
+            s.at(f"{t}s", a.hears("the_number", 9))
+        audit = s.preregister()
+        audit.expect_gap("Cleo", at_least=0.4)
+        rep = audit.check()
+        assert rep.all_confirmed, rep.render()
         s = Story("t_prereg_acc", span="10s", step="1s",
                   about="a defended belief")
         c = s.character("Coat", temperament=stoic)

@@ -141,7 +141,11 @@ def sensitivity(story, *, outcome_name: str = "break_time", params: dict,
             s_i += yB[j] * (yABi[j] - yA[j])
             t_i += (yA[j] - yABi[j]) ** 2
         first[key] = max(0.0, (s_i / n) / varY)
-        total[key] = max(0.0, (t_i / (2 * n)) / varY)
+        # total-order is a fraction of variance and is bounded in [0, 1] by
+        # definition; the Jansen estimator can overshoot with small samples or
+        # strong interactions, so clamp to 1 (a value > 1 is not meaningful and
+        # only confuses the reading).
+        total[key] = min(1.0, max(0.0, (t_i / (2 * n)) / varY))
 
     # clamp first-order to total (estimator noise can invert them slightly)
     for key in keys:

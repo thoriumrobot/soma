@@ -65,6 +65,10 @@ def test_functional_only_bypasses_consent():
            'loop l @neural { prior: 0 sense: h precision: 0.9 '
            'act { emit feel(dread) } }')
     check(parse(src), functional_only=True)   # must not raise
+    # and prove the flag is doing the work: the SAME program is rejected for
+    # missing consent when the flag is off
+    with pytest.raises(ConsentError):
+        check(parse(src), functional_only=False)
 
 def test_affine_rebind_rejected():
     src = ('resource budget : Affine<Joule> = metabolic_reserve(100)\n'
@@ -175,6 +179,30 @@ def test_loop_mode_must_be_habit_or_deliberate():
            'act { ignore } }')
     with pytest.raises(SomaTypeError):
         check(_parse(src))
+
+
+def test_loop_sense_must_be_a_declared_channel():
+    """A sense typo used to leave the loop silently inert (the story just came
+    out empty). It must now be caught."""
+    src = ('body B @cardiac { intero heart : BPM baseline 70 }\n'
+           'loop l @cardiac { prior: predict(0) sense: hart precision: 0.9 '
+           'conviction: 0.2 act { emit feel(x) } }')
+    with pytest.raises(SomaTypeError):
+        check(_parse(src))
+
+
+def test_loop_sense_accepts_stimulus_and_declared_channels():
+    """The valid cases must still pass: a declared channel, and a channel that
+    only a stimulus targets."""
+    ok1 = ('body B @cardiac { intero heart : BPM baseline 70 }\n'
+           'loop l @cardiac { prior: predict(0) sense: heart precision: 0.9 '
+           'conviction: 0.2 act { emit feel(x) } }')
+    check(_parse(ok1))   # declared channel -- must not raise
+    ok2 = ('body B @cardiac { extero face : Signal baseline 0 }\n'
+           'stimulus face { at 1s: 5 }\n'
+           'loop l @cardiac { prior: predict(0) sense: face precision: 0.9 '
+           'conviction: 0.2 act { emit feel(x) } }')
+    check(_parse(ok2))   # declared + stimulus -- must not raise
 
 
 def test_somatic_distress_memory_requires_consent():

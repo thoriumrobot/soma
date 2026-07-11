@@ -1291,6 +1291,82 @@ class Story:
                                     character=character, channel=channel,
                                     mood=mood, quale=quale, steps=steps)
 
+    # ---- conditioning: the reward prediction error, run as learning --------
+    def conditions(self, who, *, cs: str, us: str, salience: float = 0.9,
+                   rate: float = 0.4):
+        """Make a character a conditioning subject learning a CS->US
+        association (see soma.narrative.conditioning)."""
+        from . import conditioning as cnd
+        ch = who if isinstance(who, Character) else next(
+            c for c in self.characters if c.name == who)
+        return cnd.install(ch, cs=cs, us=us, salience=salience, rate=rate)
+
+    def predict_conditioning(self, who, *, acquire: int = 10,
+                             extinguish: int = 12, rest: int = 8,
+                             reacquire: int = 0, us_magnitude: float = 8.0):
+        """Run acquisition/extinction/rest/reacquisition and check the RPE
+        model's predictions, including spontaneous recovery (see
+        soma.narrative.conditioning)."""
+        from . import conditioning as cnd
+        return cnd.predict_conditioning(self, who, acquire=acquire,
+                                        extinguish=extinguish, rest=rest,
+                                        reacquire=reacquire,
+                                        us_magnitude=us_magnitude)
+
+    # ---- learned helplessness: controllability and attributional transfer --
+    def learns_control(self, who, *, style: str = "global"):
+        """Make a character a helplessness subject who learns a belief about
+        control, globally or specifically (see soma.narrative.helplessness)."""
+        from . import helplessness as hlp
+        ch = who if isinstance(who, Character) else next(
+            c for c in self.characters if c.name == who)
+        return hlp.install(ch, style=style)
+
+    def predict_helplessness(self, who, *, pretreatment: str = "uncontrollable",
+                             novel_task_similar: bool = False,
+                             pre_beats: int = 10, test_beats: int = 8):
+        """Run the triadic-design experiment and check the reformulated
+        learned-helplessness predictions (see soma.narrative.helplessness)."""
+        from . import helplessness as hlp
+        return hlp.predict_helplessness(self, who, pretreatment=pretreatment,
+                                        novel_task_similar=novel_task_similar,
+                                        pre_beats=pre_beats, test_beats=test_beats)
+
+    # ---- decision: how long a choice takes, and how often it errs ----------
+    def decides(self, who, *, drift: float = 0.15, boundary: float = 1.0,
+                start_bias: float = 0.5, nondecision: float = 0.2,
+                noise: float = 0.35, style: str = None):
+        """Give a character a drift-diffusion decision temperament -- either a
+        named `style` or the four DDM parameters (see soma.narrative.decision).
+        This is SOMA's one stochastic faculty: the accumulation is noisy but
+        seeded, so runs are reproducible and the deterministic core is
+        untouched."""
+        from . import decision as dec
+        ch = who if isinstance(who, Character) else next(
+            c for c in self.characters if c.name == who)
+        return dec.install(ch, drift=drift, boundary=boundary,
+                           start_bias=start_bias, nondecision=nondecision,
+                           noise=noise, style=style)
+
+    def predict_decision(self, who, *, trials: int = 2000, seed: int = 0):
+        """Run many noisy decisions and summarize the RT distribution and
+        accuracy (see soma.narrative.decision)."""
+        from . import decision as dec
+        ch = who if isinstance(who, Character) else next(
+            c for c in self.characters if c.name == who)
+        return dec.predict_decision(ch, trials=trials, seed=seed)
+
+    def speed_accuracy(self, who, *, boundaries=(0.6, 1.0, 1.6),
+                       trials: int = 2000, seed: int = 0):
+        """Trace the speed-accuracy tradeoff by sweeping the decision boundary
+        alone -- the DDM's most famous prediction (see
+        soma.narrative.decision)."""
+        from . import decision as dec
+        ch = who if isinstance(who, Character) else next(
+            c for c in self.characters if c.name == who)
+        return dec.speed_accuracy(ch, boundaries=boundaries, trials=trials,
+                                  seed=seed)
+
     def characterize(self, width: int = 88) -> str:
         """Synthesize a *portrait* -- not a log of what happened, but a reading
         of who each character is, drawn from the run. It gathers the drives that

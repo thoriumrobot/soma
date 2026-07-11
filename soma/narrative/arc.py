@@ -9,11 +9,14 @@ a signal that fades) and expands into the individual timed events.
     from soma.narrative import arc
 
     # a face that varies unpredictably for thirty years, then goes still
-    story.at_arc(mira.face_events(
-        arc.wobble(around=5, span="24y", every="2y") + arc.hold(0, at="25y")))
+    story.over(
+        arc.wobble(around=5, span="24y", every="2y") + arc.hold(0, at="25y"),
+        lambda v: mira.hears("her_face", v))
 
 Arcs are plain lists of (time, value) pairs under the hood, so they compose with
-`+` and can be mixed with hand-written beats.
+`+` and can be mixed with hand-written beats. `Story.over(arc, event_fn)` lays
+the arc out across the timeline, mapping each value through `event_fn` (usually
+`character.hears`).
 """
 from __future__ import annotations
 

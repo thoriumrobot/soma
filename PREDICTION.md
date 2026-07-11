@@ -2,8 +2,8 @@
 
 *The ask was pointed: engineer the library to make **positive predictions**, not
 just mathematically model characters. This note records what the science says the
-difference is, and the three capabilities added to close it — all implemented and
-tested (162 passing).*
+difference is, and the capabilities added to close it — all implemented and
+tested. Per-section version footers below record the state at each release.*
 
 ---
 
@@ -255,6 +255,233 @@ python3 examples/narrative/the_anatomy_of_a_breaking.py      # all six studies, 
 python3 examples/narrative/the_marriage_that_could_have_held.py
 ```
 
-*Version: SOMA 0.9.0. Tests: 221 passing. New: insight substrate, sensitivity,
-discrimination, early warning, counterfactual; `perceive_frac` outcome; the
-interpreter logs overwhelm debt and bound.*
+## 7. The 0.10 protocols: the canonical experiments, run whole
+
+The most complex predictive character simulations in the literature are not
+models but PROTOCOLS — standardized situations with staked, coded, falsifiable
+predictions. Version 0.10 implements the two most consequential:
+
+**The Strange Situation** (`soma.narrative.strange_situation`). Ainsworth's
+eight episodes — play, a stranger, two separations, two reunions — compiled onto
+the attachment machinery, with the four interactive scales (proximity seeking,
+contact maintaining, avoidance, resistance) coded from the two reunion windows
+the way an observer codes the tape: from behavior alone. The attachment styles
+gained two theory-staked expressive parameters (`seeks_contact` — deactivation
+is precisely the inhibition of the proximity bid; `resists_soothing` — protest
+continuing INTO contact, Ainsworth's C signature), and the reunion wiring is
+identical for every child, so pattern differences are generated, not scripted.
+The instrument's central claim is then testable as PARAMETER RECOVERY:
+`validate_instrument()` installs each style, runs the protocol, classifies
+blind — and recovers all four. A hand-built child with no style label
+classifies honestly from tape, which is what the instrument is for.
+
+**The Gottman-Murray marriage model** (`soma.narrative.gottman`). The most
+famous predictive character simulation there is, rebuilt from SOMA's own parts:
+influence functions are couple/lag readings; the NEGATIVE THRESHOLD (lower in
+divorcing couples) is a guard level; emotional inertia is conviction; repair is
+an interoceptive bid (my own distress climbing triggers a warm reach through
+the relationship — which is why stonewalling reads on the heart record). The
+five couple types are staked as parameter bundles; `assess()` runs one
+contentious conversation (the grievance arrives on its own channel, through one
+partner) and checks each type's forecast: the regulated types hold, the hostile
+types cascade, negative-affect reciprocity separates them 96% to 0%, and the
+THIN SLICE — the first quarter of the conversation alone — calls every ending,
+with the mechanism visible: the slice carries the couple's thresholds, and the
+thresholds are the ending.
+
+And a third canonical simulation composed from nothing but existing verbs and
+the insight substrate — **Clark's panic spiral** (`examples/narrative/
+the_spiral.py`): one appraisal that reads the heart and drives the heart. From
+that single circle fall four predictions, each checked by sweep: the
+all-or-nothing tipping flutter (two attractors, not a dial), HYSTERESIS (the
+attack outlives its trigger and yields only to a down-driver the spiral cannot
+supply — Cramer & Borsboom's path-out-longer-than-path-in), and a computable
+exposure margin: the tolerance that prevents the attack is exactly the
+trigger's peak, a quantitative, per-person therapy target.
+
+```bash
+python3 examples/narrative/the_strange_situation.py
+python3 examples/narrative/five_marriages.py
+python3 examples/narrative/the_spiral.py
+```
+
+## 8. The 0.11 learning layer: prediction error, run as learning
+
+SOMA's loop is a prediction-error engine — its settle event's `error` term is
+literally a prediction error — so the two most quantitatively validated
+predictive models of learning fall straight out of it, each staked with the
+signature prediction a simpler account cannot make.
+
+**Reward prediction error / conditioning** (`soma.narrative.conditioning`,
+`story.conditions()` + `story.predict_conditioning()`). A value loop whose
+belief IS the value estimate and whose error IS the RPE. Acquisition climbs;
+the RPE is largest at the first unpredicted reward and falls toward zero as the
+reward becomes predicted (Schultz's dopamine signature); extinction lowers the
+value. The honest complication the literature insists on: plain Rescorla-Wagner
+treats extinction as unlearning, but animals show SPONTANEOUS RECOVERY, proving
+extinction is new learning over an intact trace, not erasure. So each
+association gets two traces — a slow acquired value and a fast context
+correction that decays back during rest — and recovery becomes a prediction the
+single-trace model cannot make. Reacquisition then shows savings (a running
+start from the trace that was never erased).
+
+**Reformulated learned helplessness** (`soma.narrative.helplessness`,
+`story.learns_control()` + `story.predict_helplessness()` +
+`triadic_design()`). The classic triadic design built from SOMA: controllability
+is mechanized as whether an escape action's efference actually cancels the
+aversive signal, and the subject learns a control-belief. The reformulation's
+three dimensions enter as the SCOPE of that belief: a GLOBAL style is one
+control-belief shared across every situation, a SPECIFIC style keeps a separate
+belief per situation. From that single design choice falls the full,
+theory-exact pattern — deficit only after uncontrollable pretreatment
+(controllable and none immunize), and the transfer asymmetry that is the
+reformulation's sharpest claim: global style carries the helplessness into a
+dissimilar task, specific style confines it to similar ones (Abramson, Seligman
+& Teasdale 1978; Alloy et al. 1984).
+
+```bash
+python3 examples/narrative/what_the_body_learns.py   # both, end to end
+```
+
+## 9. The 0.12 decision layer: how long a choice takes, and how often it errs
+
+Every layer so far predicts what a character feels or becomes. This one predicts
+something orthogonal, and in the lab more precisely measured than any of them:
+the TIME a decision takes and the RATE at which it is wrong. The drift-diffusion
+model (Ratcliff 1978; Ratcliff & McKoon 2008; Gold & Shadlen) is the dominant
+account of speeded two-choice decisions — a noisy accumulation of evidence to a
+boundary — and it makes DISTRIBUTIONAL predictions no deterministic or
+single-number model can: right-skewed reaction-time distributions, error
+responses shaped differently from correct ones, and the speed-accuracy tradeoff
+traced from one dial.
+
+`soma.narrative.decision` (`story.decides()`, `story.predict_decision()`,
+`story.speed_accuracy()`) gives a character a decision temperament from the four
+DDM parameters — drift (evidence quality), boundary (the caution / speed-accuracy
+dial), start bias (prior lean), non-decision time — or a named style (impulsive,
+deliberate, keen, muddled, prejudiced). Each style makes a checkable claim: the
+deliberate juror is slow and accurate where the impulsive one is fast and
+error-prone (same drift, opposite boundary — caution, not ability); the keen one
+is fast AND accurate (high drift, the one combination caution can't buy); and the
+prejudiced one shows the biased-start signature — fast correct responses but SLOW
+errors, the fingerprint of a mind that leaned before it looked, which a symmetric
+model cannot produce. `speed_accuracy()` traces the DDM's most famous prediction:
+sweeping the boundary alone yields a monotone accuracy-up, RT-up tradeoff,
+dissociating caution from acuity.
+
+This is also where SOMA gains a faculty it lacked by design: STOCHASTICITY. The
+base interpreter is deterministic, and every earlier layer relies on that, so the
+noise lives entirely in a seeded per-trial driver — the same seed reproduces the
+same RT distribution, and the deterministic core is provably untouched (a
+regression test confirms an ordinary belief story still runs identically).
+
+```bash
+python3 examples/narrative/twelve_seconds_in_a_jury_room.py
+```
+
+## 10. The 0.13 pass: sharpening the results, and a fixed confabulation bug
+
+This release strengthens simulations whose results were thinner than the rest,
+and fixes a real bug the strengthening exposed.
+
+**Appraisal gains construct validity.** The forward map (appraisal → emotion)
+is only a genuine prediction if it is IDENTIFIABLE — if the inverse (emotion →
+appraisal) recovers the same emotion for every one in the vocabulary.
+`check_identifiability()` confirms all 14 emotions round-trip, the same
+blind-recovery standard the Strange Situation meets; `recover_appraisal()` and
+`explain_emotion()` run the map backward, from an observed feeling to the reading
+of the world behind it and its Frijda action tendency.
+
+**Three descriptive portraits became predictive simulations.** `the_negotiator`,
+`two_sisters`, and `the_diplomat` — rich characters previously used only for a
+static portrait — gained `--predict` modes with staked, checked forecasts: the
+tipping pressure at which each breakable value becomes a lie, preregistered
+accounts of the feelings that are felt-but-never-known (the exile's terror, the
+diplomat's defended longing, one sister's resentment behind a composed face), and
+an honest early-warning analysis showing the negotiator's breach is a SHARP
+threshold transition whose driver — not whose face — is the readable warning.
+
+**A confabulation-gap bug, found and fixed.** `expect_gap` matched narrate
+events by the `<Name>.` loop prefix, but the interpreter logs narration under the
+narrator's name `self_<Name>` — so every multi-character gap prediction was
+silently falsified. Now fixed and regression-tested; two_sisters' preregistered
+"resentment behind grace" claim confirms as it always should have.
+
+*Version: SOMA 0.13.0. Tests: 265 passing. New: appraisal identifiability +
+inverse inference; --predict modes for negotiator / two_sisters / diplomat; fix
+for multi-character confabulation-gap matching.*
+
+## 11. The 0.14.1 audit: correctness, honesty, and a new diagnostic
+
+A systematic pass for errors, inaccuracies, inconsistencies, and undone work,
+fixing what it found:
+
+**A checker gap that swallowed typos.** A loop whose `sense:` named a channel
+that didn't exist used to fire never and report nothing — the story simply came
+out empty, the single most confusing failure mode in the language. The checker
+now validates every loop's sense against the declared channels (plus stimulus
+targets and coupled channels) and raises a clear `SomaTypeError` naming the
+likely typo, exactly as it already did for clock names.
+
+**Sobol indices could exceed 1.** The Jansen total-order estimator can overshoot
+on interaction-heavy outcomes with small samples; the sensitivity report now
+clamps total-order to its definitional range [0, 1], so a dial can no longer be
+reported as writing 170% of an outcome's variance.
+
+**The DDM hid heavy censoring.** When a weak drift or wide boundary left most
+walks undecided within the time limit, accuracy was computed on the decided
+minority with no warning. The decision report now flags when ≥5% of trials fail
+to reach a bound, so a 75%-accuracy figure over 12 of 500 trials can't mislead.
+`speed_accuracy` also had its temporary-state swap made exception-safe.
+
+**A missing valence.** `belonging` — the relief-feeling of a met "to-matter"
+need — was absent from the interpreter's valence table and so defaulted to
+negative, miscoloring mood. It is now correctly positive.
+
+**Docstrings that oversold their mechanism.** The learned-helplessness module
+claimed controllability was mechanized through motor "efference reafference" and
+an "escape action" that the code does not contain; the conditioning module
+claimed its dual trace was "two ordinary SOMA loops" when one trace lives in a
+thin Python driver. Both now describe honestly what they actually do — faithful
+abstractions, not simulations of machinery that isn't there.
+
+**A leaked stack frame.** The browser library-mode error banner included the
+bridge's own `exec(compile(...))` frame in user tracebacks; it now shows only
+the user's own frames.
+
+Stale test counts across the docs were corrected to the current total.
+
+*Version: SOMA 0.14.1. Tests: 280 passing. Fixes: sense-channel checker
+validation, Sobol index clamping, DDM censoring disclosure + exception-safe
+sweep, `belonging` valence, honest helplessness/conditioning docstrings,
+clean library-mode tracebacks.*
+
+## 12. The 0.14.2 audit: public API, docstrings, and stale counts
+
+A second consistency pass, after the tutorial reorder:
+
+**`__all__` was badly incomplete.** The package exported only 18 names — the
+original authoring surface — while the whole prediction and insight layer
+(`predict_feeling`, `strange_situation`, `gottman_assess`, `predict_decision`,
+`sensitivity`, `minimal_intervention`, and two dozen more) was reachable by
+direct import but absent from `__all__`, so `from soma.narrative import *` did
+not bring it in and tools reading `__all__` saw a fraction of the real API. It
+now lists all 65 public names, and a test locks it in so it cannot silently rot
+again as new layers are added.
+
+**A docstring taught a method that does not exist.** `arc.py` showed
+`story.at_arc(mira.face_events(...))`; the real API is `story.over(arc, fn)`. The
+example is corrected and runs.
+
+**Stale test count in the README.** Two lines still said 276 after the count had
+grown to 280; both fixed.
+
+Everything else checked clean: all 28 SOMA and 14 library examples run and (where
+applicable) type-check; every library example is deterministic across reruns; no
+Python warnings are raised anywhere in the prediction or insight paths under
+`-W error`; there are no TODO/FIXME/NotImplementedError markers or stray debug
+prints; and all 14 tutorial code blocks still reproduce their printed output
+through the exact browser execution path.
+
+*Version: SOMA 0.14.2. Tests: 281 passing. Fixes: complete `__all__` (+ a
+guard test), corrected `arc` docstring, README test counts.*

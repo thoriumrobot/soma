@@ -213,6 +213,30 @@ def test_all_temperaments_registered():
         assert isinstance(t, Temperament)
 
 
+def test_public_api_all_is_complete_and_importable():
+    """__all__ must list every public name and every entry must resolve. This
+    guards against __all__ silently rotting as layers are added (which it did:
+    the whole prediction/insight surface was once missing from it)."""
+    import soma.narrative as nar
+    # every __all__ entry resolves
+    unresolved = [name for name in nar.__all__ if not hasattr(nar, name)]
+    assert not unresolved, f"__all__ lists names that don't exist: {unresolved}"
+    # the key prediction + insight entry points are all exported
+    expected = {"predict_feeling", "check_identifiability", "explain_emotion",
+                "strange_situation", "validate_instrument", "marry",
+                "gottman_assess", "predict_conditioning", "predict_helplessness",
+                "triadic_design", "predict_decision", "speed_accuracy",
+                "sensitivity", "minimal_intervention", "predict_break_onset",
+                "discriminate", "complementarity", "Preregistration"}
+    missing = expected - set(nar.__all__)
+    assert not missing, f"public API missing from __all__: {missing}"
+    # `import *` brings them in
+    ns = {}
+    exec("from soma.narrative import *", ns)
+    not_splatted = expected - set(ns)
+    assert not not_splatted, f"import * did not expose: {not_splatted}"
+
+
 def test_tuned_returns_modified_copy():
     t = anxious.tuned(learn=0.1)
     assert t.learn == 0.1
@@ -785,8 +809,12 @@ def test_all_winnow_patterns_run_without_error():
     mod = importlib.import_module("examples.narrative.the_negotiator")
     importlib.reload(mod)
     chron = mod.build().result().chronicle
+    assert winnow.ALL_PATTERNS, "no winnow patterns registered"
+    ran = 0
     for name, fn in winnow.ALL_PATTERNS.items():
         fn(chron)  # must not raise
+        ran += 1
+    assert ran == len(winnow.ALL_PATTERNS)
 
 
 if __name__ == "__main__":

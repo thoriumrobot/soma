@@ -38,7 +38,9 @@ from .temperament import (Temperament, anxious, stoic, trusting, guarded,
 from .story import Story, Character
 from .arc import Arc, arc
 from .schema import predict_lie, unmet_needs, COPING_STYLES, PredictedLie
-from .appraisal import predict_feeling, PredictedFeeling, TENDENCIES
+from .appraisal import (predict_feeling, PredictedFeeling, TENDENCIES,
+                        recover_appraisal, explain_emotion,
+                        check_identifiability)
 from .attachment import STYLES as ATTACHMENT_STYLES, AttachmentStyle, SeparationReport
 from .circumplex import (Stance, predict_pull, complementarity, Pull,
                          DyadReport)
@@ -49,10 +51,55 @@ from .discriminate import discriminate, DiscriminationReport
 from .earlywarning import predict_break_onset, EarlyWarningReport
 from .counterfactual import (minimal_intervention, CounterfactualReport,
                              Intervention)
+from .strange_situation import (run_protocol as strange_situation,
+                                validate_instrument, SSReport)
+from .gottman import (COUPLE_TYPES, CoupleType, marry, assess as gottman_assess,
+                      GottmanReport)
+from .conditioning import (install as _install_conditioning,
+                           predict_conditioning, ConditioningReport)
+from .helplessness import (install as _install_helplessness,
+                           predict_helplessness, triadic_design,
+                           HelplessnessReport)
+from .decision import (install as _install_decision, predict_decision,
+                       speed_accuracy, DecisionStyle, STYLES as DECISION_STYLES,
+                       DecisionReport, SATReport)
 
 __all__ = [
+    # core authoring
     "Story", "Character", "Temperament", "Arc", "arc",
+    # temperaments
     "anxious", "stoic", "trusting", "guarded", "volatile", "numb", "tender",
     "hollowed", "TEMPERAMENTS",
+    # the lie / unmet-need layer
     "predict_lie", "unmet_needs", "COPING_STYLES", "PredictedLie",
+    # appraisal
+    "predict_feeling", "PredictedFeeling", "TENDENCIES", "recover_appraisal",
+    "explain_emotion", "check_identifiability",
+    # attachment
+    "ATTACHMENT_STYLES", "AttachmentStyle", "SeparationReport",
+    # circumplex
+    "Stance", "predict_pull", "complementarity", "Pull", "DyadReport",
+    # preregistration
+    "Preregistration", "PreregReport",
+    # insight substrate
+    "run_with", "outcome", "series",
+    # sensitivity
+    "sensitivity", "SensitivityReport",
+    # discrimination
+    "discriminate", "DiscriminationReport",
+    # early warning
+    "predict_break_onset", "EarlyWarningReport",
+    # counterfactual
+    "minimal_intervention", "CounterfactualReport", "Intervention",
+    # strange situation
+    "strange_situation", "validate_instrument", "SSReport",
+    # gottman
+    "COUPLE_TYPES", "CoupleType", "marry", "gottman_assess", "GottmanReport",
+    # conditioning
+    "predict_conditioning", "ConditioningReport",
+    # helplessness
+    "predict_helplessness", "triadic_design", "HelplessnessReport",
+    # decision
+    "predict_decision", "speed_accuracy", "DecisionStyle", "DECISION_STYLES",
+    "DecisionReport", "SATReport",
 ]

@@ -85,11 +85,106 @@ def build():
     return story
 
 
+def predict_study():
+    """Turn the portrait into forecasts. Everything below is staked before the
+    run and checked against it -- the negotiator is not just described, she is
+    predicted."""
+    print("=" * 74)
+    print("THE NEGOTIATOR, PREDICTED")
+    print("=" * 74)
+
+    # I. the tipping pressure: the least sustained pressure at which her value
+    # breaks. composed_voice is driven by pressure and betrays candor above 6;
+    # we sweep the pressure she faces and find the threshold.
+    print("\nI. THE TIPPING PRESSURE — when the calm becomes a lie")
+    from soma import run_source
+    tip = None
+    for p in range(1, 10):
+        s = build()
+        src = s.source()
+        kept = [ln for ln in src.splitlines()
+                if not ln.lstrip().startswith("stimulus ")]
+        probe = (f"stimulus Cass.pressure {{ " +
+                 "  ".join(f"at {t}s: {p}" for t in range(1, 12)) + " }")
+        r = run_source("\n".join(kept + ["", probe]) + "\n",
+                       title="negotiator__tip")
+        betrayed = any(e.kind == "emit"
+                       and "self_betrayal" in str(e.detail.get("quale", ""))
+                       for e in r.chronicle)
+        if betrayed and tip is None:
+            tip = p
+    print(f"   Cass's candor holds up to pressure {tip - 1}; at {tip}, her voice")
+    print(f"   composes itself past the line and the value breaks. The calm has")
+    print(f"   a precise price, and it is not infinite.")
+
+    # II. preregistered: the exile is felt but never known
+    print("\nII. THE CHILD WHO IS NEVER HEARD — a preregistered silence")
+    s = build()
+    audit = s.preregister()
+    audit.expect_feeling("Cass", "terror")            # the exile IS felt
+    audit.expect("the terror never reaches awareness (never broadcast)",
+                 lambda r: (not any(e.kind == "broadcast"
+                                    and "terror" in str(e.detail.get("content", "")).lower()
+                                    for e in r.chronicle),
+                            "no ignition of terror into the global workspace"))
+    audit.expect("the professional DOES reach awareness (is broadcast)",
+                 lambda r: (any(e.kind == "broadcast" for e in r.chronicle),
+                            "the protector ignites"))
+    print()
+    print(audit.check().render())
+    print("\n   Felt, never known: the terror fires all hour and never once")
+    print("   ignites into consciousness, while the professional is broadcast")
+    print("   again and again. That asymmetry is the exile's whole tragedy,")
+    print("   and it was staked before the run.")
+
+    # III. the breach is a SHARP transition, not a slow slide -- and what is
+    # foreseeable is not the voice (which snaps) but the pressure climbing
+    # toward the threshold that trips it. This is the honest early warning for
+    # a threshold breach: watch the driver approach the line.
+    print("\nIII. THE SHAPE OF THE BREACH — sharp, and seen coming in the pressure")
+    s = build()
+    src = s.source()
+    kept = [ln for ln in src.splitlines()
+            if not ln.lstrip().startswith("stimulus ")]
+    ramp = "  ".join(f"at {t}s: {round(min(9, 0.8 * t), 1)}"
+                     for t in range(1, 16))
+    from soma import run_source
+    r = run_source("\n".join(kept + ["", f"stimulus Cass.pressure {{ {ramp} }}"])
+                   + "\n", title="negotiator__ews")
+    times = r.times
+    press = r.channel_hist.get("Cass.pressure", [])
+    cv = r.channel_hist.get("Cass.composed_voice", [])
+    betray_t = next((e.t for e in r.chronicle if e.kind == "emit"
+                     and "self_betrayal" in str(e.detail.get("quale", ""))), None)
+    if betray_t:
+        # the voice is a step function; the pressure is the readable ramp
+        p_at = [(round(t), round(p, 1)) for t, p in zip(times, press)
+                if t <= betray_t]
+        v_jump = [(round(t), round(v, 1)) for t, v in zip(times, cv)
+                  if betray_t - 2 <= t <= betray_t + 1]
+        print(f"   The composed voice does not slide toward the lie — it SNAPS:")
+        print(f"   {[v for _, v in v_jump]} across the breach at {betray_t:.0f}s. The calm")
+        print(f"   is intact one beat and broken the next; there is no visible")
+        print(f"   wavering to catch in the voice itself.")
+        print(f"   But the PRESSURE that trips it is a slow, legible climb —")
+        print(f"   {[p for _, p in p_at][-6:]} — so the breach is foreseeable after all,")
+        print(f"   not by watching her face but by watching the room: the")
+        print(f"   threshold is fixed, and the pressure's approach to it is the")
+        print(f"   early warning. (A sharp transition with a readable driver —")
+        print(f"   the same structure as a fold, where the slow variable is seen")
+        print(f"   coming though the jump is not.)")
+    else:
+        print("   Under this ramp the value holds — the pressure never reaches")
+        print("   the threshold that would trip the composed voice.")
+
+
 if __name__ == "__main__":
     story = build()
     if "--source" in sys.argv:
         print(story.source())
     elif "--character" in sys.argv:
         print(story.characterize(width=86))
+    elif "--predict" in sys.argv:
+        predict_study()
     else:
         print(story.run(width=92))

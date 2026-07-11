@@ -111,7 +111,17 @@ def gather():
             + unm.build_ring().source())
     except Exception:
         pass
-    return bundle, examples
+
+    # library-mode examples: short Python programs that drive soma.narrative,
+    # including the predictive-characterization and insight layers.
+    lib_examples = []
+    try:
+        import importlib
+        man = importlib.import_module("examples.library._manifest")
+        lib_examples = man.as_payload()
+    except Exception as e:
+        print("  (library examples unavailable:", e, ")")
+    return bundle, examples, lib_examples
 
 
 # ordering for the example menu: simple -> complex, teaching files first
@@ -166,7 +176,7 @@ META = {
 
 
 def build():
-    bundle, examples = gather()
+    bundle, examples, lib_examples = gather()
     # keep only known examples, in order; append any not listed
     ordered = [k for k in EXAMPLE_ORDER if k in examples]
     for k in examples:
@@ -177,7 +187,11 @@ def build():
                 "perturb": META.get(k, (k, "", ""))[2],
                 "src": examples[k]} for k in ordered]
 
-    payload = json.dumps({"files": bundle, "examples": ex_list})
+    lib_list = [{"key": e["key"], "label": e["label"], "blurb": e["blurb"],
+                 "code": e["code"]} for e in lib_examples]
+
+    payload = json.dumps({"files": bundle, "examples": ex_list,
+                          "library": lib_list})
     # Defensive: the payload is embedded as a JS literal inside <script>. Any
     # literal "</script" in the data (there is none today, but a future example
     # might add one) would prematurely close the tag. Escape it so the browser
@@ -189,8 +203,8 @@ def build():
     with open(out, "w") as f:
         f.write(html)
     size = os.path.getsize(out)
-    print(f"wrote {out} ({size/1024:.0f} KB, {len(ex_list)} examples, "
-          f"{len(bundle)} python files)")
+    print(f"wrote {out} ({size/1024:.0f} KB, {len(ex_list)} SOMA examples, "
+          f"{len(lib_list)} library examples, {len(bundle)} python files)")
     return out
 
 
@@ -287,6 +301,17 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
   @keyframes spin{to{transform:rotate(360deg)}}
   .kbd{font-family:var(--mono);background:var(--panel2);border:1px solid var(--line);
     border-radius:4px;padding:1px 5px;font-size:11px;color:var(--dim)}
+  .mode-switch{display:inline-flex;border:1px solid var(--line);border-radius:7px;
+    overflow:hidden;background:var(--bg)}
+  .mode-btn{border:0;border-radius:0;padding:5px 14px;font-size:12.5px;
+    background:transparent;color:var(--dim);font-weight:560}
+  .mode-btn:hover{color:var(--ink);border-color:transparent}
+  .mode-btn.active{background:#243b66;color:#fff}
+  .mode-btn.active:hover{background:#2a4576;color:#fff}
+  .rail h2 .rail-hint{display:block;text-transform:none;letter-spacing:0;
+    font-weight:400;color:var(--dim);font-size:10.5px;margin-top:3px;line-height:1.35}
+  .lib-note{font-size:11.5px;color:var(--dim);margin-left:8px}
+  @media (max-width:860px){ .lib-note{display:none} }
   @media (max-width:860px){
     header .sub{display:none}
     header .hint{display:none}
@@ -321,14 +346,18 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
   <header>
     <button class="menu-btn" id="menu-btn" aria-label="examples">☰</button>
     <h1>SOMA</h1>
-    <span class="sub">a language for simulating the mind–body loop · runs the real interpreter in your browser</span>
+    <span class="sub" id="header-sub">a language for simulating the mind–body loop · runs the real interpreter in your browser</span>
     <span class="spacer"></span>
+    <div class="mode-switch" id="mode-switch">
+      <button class="mode-btn active" id="mode-soma" data-mode="soma">SOMA</button>
+      <button class="mode-btn" id="mode-lib" data-mode="library">Library</button>
+    </div>
     <span class="hint">Run: <span class="kbd">Ctrl/⌘ + Enter</span></span>
   </header>
 
   <div class="main">
     <nav class="rail" id="rail">
-      <h2>Examples</h2>
+      <h2 id="rail-head">Examples</h2>
       <div id="ex-list"></div>
     </nav>
     <div class="rail-backdrop" id="rail-backdrop"></div>
@@ -336,13 +365,19 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
     <div class="editor-col">
       <div class="toolbar">
         <span class="title" id="cur-title">untitled.soma</span>
-        <button class="primary" id="btn-run" data-cmd="run">▶ Run</button>
-        <button id="btn-check" data-cmd="check">Check</button>
-        <button id="btn-sift" data-cmd="sift">Sift</button>
-        <button id="btn-prose" data-cmd="prose">Prose</button>
-        <button id="btn-trace" data-cmd="trace">Trace</button>
-        <button id="btn-query" data-cmd="query">Query</button>
-        <button id="btn-perturb" data-cmd="perturb">Perturb…</button>
+        <span class="soma-tools" id="soma-tools">
+          <button class="primary" id="btn-run" data-cmd="run">▶ Run</button>
+          <button id="btn-check" data-cmd="check">Check</button>
+          <button id="btn-sift" data-cmd="sift">Sift</button>
+          <button id="btn-prose" data-cmd="prose">Prose</button>
+          <button id="btn-trace" data-cmd="trace">Trace</button>
+          <button id="btn-query" data-cmd="query">Query</button>
+          <button id="btn-perturb" data-cmd="perturb">Perturb…</button>
+        </span>
+        <span class="lib-tools" id="lib-tools" style="display:none">
+          <button class="primary" id="btn-run-py">▶ Run</button>
+          <span class="lib-note">Python · uses the soma.narrative library</span>
+        </span>
         <span class="spacer"></span>
         <button id="btn-new">New</button>
       </div>
@@ -406,15 +441,25 @@ const $ = id => document.getElementById(id);
 const codeEl=$("code"), outEl=$("output"), statusEl=$("status"),
       outCmdEl=$("out-cmd"), curTitleEl=$("cur-title");
 let pyodide=null, bridge=null, currentKey=null, busy=false;
+let mode="soma";   // "soma" | "library"
 
-// ---- example list ---------------------------------------------------------
+// ---- example list (mode-aware) --------------------------------------------
 function titleForKey(k){
   const base = k.includes("/") ? k.split("/").pop() : k;
-  return base + ".soma";
+  return base + (mode==="library" ? ".py" : ".soma");
+}
+function currentExamples(){
+  return mode==="library" ? (PAYLOAD.library||[]) : PAYLOAD.examples;
 }
 function buildExampleList(){
   const list=$("ex-list");
-  for(const ex of PAYLOAD.examples){
+  list.innerHTML="";
+  $("rail-head").innerHTML = mode==="library"
+    ? 'Library examples<span class="rail-hint">Python that drives the '
+      + 'soma.narrative library — predictions &amp; insights</span>'
+    : 'SOMA examples<span class="rail-hint">the base language — bodies, '
+      + 'loops, arbitration</span>';
+  for(const ex of currentExamples()){
     const div=document.createElement("div");
     div.className="ex"; div.dataset.key=ex.key;
     div.innerHTML=`<div class="nm">${esc(ex.label)}</div>`+
@@ -424,18 +469,34 @@ function buildExampleList(){
   }
 }
 function loadExample(key){
-  const ex=PAYLOAD.examples.find(e=>e.key===key);
+  const ex=currentExamples().find(e=>e.key===key);
   if(!ex) return;
-  codeEl.value=ex.src;
+  codeEl.value = mode==="library" ? ex.code : ex.src;
   currentKey=key;
   curTitleEl.textContent=titleForKey(key);
   document.querySelectorAll(".ex").forEach(e=>
     e.classList.toggle("active",e.dataset.key===key));
-  // stash a suggested perturbation
-  $("perturb-input").value=ex.perturb||"";
+  if(mode==="soma") $("perturb-input").value=ex.perturb||"";
   if(typeof closeRail==="function") closeRail();
   // auto-run the default view
-  if(pyodide && !busy) runCommand("run");
+  if(pyodide && !busy){ mode==="library" ? runPython() : runCommand("run"); }
+}
+
+// ---- switching modes ------------------------------------------------------
+function setMode(m){
+  if(m===mode) return;
+  mode=m;
+  document.querySelectorAll(".mode-btn").forEach(b=>
+    b.classList.toggle("active", b.dataset.mode===m));
+  $("soma-tools").style.display = m==="soma" ? "" : "none";
+  $("lib-tools").style.display  = m==="library" ? "" : "none";
+  $("perturb-row").classList.remove("show");
+  $("header-sub").textContent = m==="library"
+    ? "the high-level library · write Python that predicts characters, in your browser"
+    : "a language for simulating the mind–body loop · runs the real interpreter in your browser";
+  buildExampleList();
+  const first = currentExamples()[0];
+  if(first) loadExample(first.key);
 }
 
 // ---- running --------------------------------------------------------------
@@ -469,6 +530,33 @@ web_bridge.run_command(_CMD, _SRC, _TITLE, **_o)
   }finally{ busy=false; }
 }
 
+// ---- running library (Python) code ----------------------------------------
+async function runPython(){
+  if(!pyodide || busy) return;
+  busy=true; setStatus("running…","busy");
+  outCmdEl.textContent="python";
+  try{
+    const src=codeEl.value;
+    const opts={width:computeWidth()};
+    bridge.set_src(src, currentTitle(), JSON.stringify(opts), "python");
+    const result = await pyodide.runPythonAsync(`
+import json, web_bridge
+_o = json.loads(_OPTS)
+web_bridge.run_python(_SRC, **_o)
+`);
+    lastCmd = null;   // library runs are re-run explicitly, not on resize
+    lastWasPython = true;
+    outEl.innerHTML=ansiToHtml(result);
+    outEl.scrollTop=0; outEl.scrollLeft=0;
+    const clean = result.replace(/\x1b\[[0-9;]*m/g,"");
+    if(clean.includes("\u2717")) setStatus("done — with an error or a falsified claim (see output)","err");
+    else setStatus("done","ok");
+  }catch(e){
+    outEl.textContent=String(e);
+    setStatus("runtime error","err");
+  }finally{ busy=false; }
+}
+
 // How many monospace columns fit in the output pane right now, at the current
 // font size? The interpreter renders its boxes to exactly this width, so the
 // dashboard, sift, and prose always fit without horizontal scroll -- on a phone
@@ -484,11 +572,22 @@ function computeWidth(){
 }
 
 let lastCmd = "run";
-function rerunForResize(){ if(pyodide && !busy && lastCmd) runCommand(lastCmd); }
+let lastWasPython = false;
+function rerunForResize(){
+  if(!pyodide || busy) return;
+  if(mode==="library" && lastWasPython){ runPython(); }
+  else if(mode==="soma" && lastCmd){ runCommand(lastCmd); }
+}
 function setStatus(msg, kind){
   statusEl.textContent=msg;
   statusEl.className="status"+(kind?(" "+kind):"");
 }
+
+// ---- wire mode switch -----------------------------------------------------
+document.querySelectorAll(".mode-btn").forEach(b=>{
+  b.onclick=()=>setMode(b.dataset.mode);
+});
+$("btn-run-py").onclick=()=>runPython();
 
 // ---- wire buttons ---------------------------------------------------------
 document.querySelectorAll("[data-cmd]").forEach(btn=>{
@@ -507,11 +606,13 @@ $("perturb-input").addEventListener("keydown",e=>{
   if(e.key==="Enter"){ e.preventDefault(); $("btn-perturb-go").click(); }
 });
 $("btn-new").onclick=()=>{
-  codeEl.value=NEW_TEMPLATE; currentKey=null;
-  curTitleEl.textContent="untitled.soma";
+  codeEl.value = mode==="library" ? NEW_PY_TEMPLATE : NEW_TEMPLATE;
+  currentKey=null;
+  curTitleEl.textContent = mode==="library" ? "untitled.py" : "untitled.soma";
   document.querySelectorAll(".ex").forEach(e=>e.classList.remove("active"));
-  $("perturb-input").value="";
-  outEl.textContent=""; outCmdEl.textContent=""; setStatus("new program — edit and Run","");
+  if(mode==="soma") $("perturb-input").value="";
+  outEl.textContent=""; outCmdEl.textContent="";
+  setStatus(mode==="library"?"new program — edit and Run":"new program — edit and Run","");
   codeEl.focus();
 };
 $("wrap-toggle").onchange=e=>outEl.classList.toggle("wrap-lines",e.target.checked);
@@ -542,7 +643,8 @@ window.addEventListener("resize",()=>{
 
 // Ctrl/Cmd+Enter to run
 codeEl.addEventListener("keydown",e=>{
-  if((e.ctrlKey||e.metaKey)&&e.key==="Enter"){ e.preventDefault(); runCommand("run"); }
+  if((e.ctrlKey||e.metaKey)&&e.key==="Enter"){ e.preventDefault();
+    mode==="library" ? runPython() : runCommand("run"); }
   // tab inserts two spaces
   if(e.key==="Tab"){ e.preventDefault();
     const s=codeEl.selectionStart, en=codeEl.selectionEnd;
@@ -569,6 +671,22 @@ loop noticing @cardiac {
   conviction: 0.3
   act { emit feel(surprise) }
 }
+`;
+
+const NEW_PY_TEMPLATE = `# A new library program. Describe a character, then predict something.
+from soma.narrative import Story, tender
+
+story = Story("untitled", span="10s", step="1s", about="a first feeling")
+c = story.character("Someone", temperament=tender)
+c.senses("a_face")
+c.appraises("a_face", feeling="delight", when="a_face > 3")
+
+story.at("2s", c.hears("a_face", 7))
+
+# see the run, or the character, or a prediction:
+print(story.run(width=76))
+# print(story.characterize())
+# print(story.source())          # the SOMA it compiled to
 `;
 
 // ---- boot -----------------------------------------------------------------
@@ -623,7 +741,8 @@ web_bridge.run_command(_CMD, _SRC, _TITLE, **json.loads(_OPTS))`);
     $("splash").style.display="none";
     setStatus("ready","ok");
     buildExampleList();
-    loadExample(PAYLOAD.examples[0].key);
+    const first0 = currentExamples()[0];
+    if(first0) loadExample(first0.key);
   }catch(e){
     // Emscripten's FS.ErrnoError is not an Error and stringifies as
     // "[object Object]"; render something a human can act on instead.

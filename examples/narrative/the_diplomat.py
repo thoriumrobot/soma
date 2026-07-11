@@ -72,11 +72,69 @@ def build():
     return story
 
 
+def predict_study():
+    """Rader, predicted: the least pressure that makes his honesty a lie, and a
+    preregistered account of the longing he defends against -- felt, downplayed,
+    and never allowed to change what he does."""
+    from soma import run_source
+    print("=" * 74)
+    print("THE DIPLOMAT, PREDICTED")
+    print("=" * 74)
+
+    # I. the tipping question: how hard must she press before his composure
+    # crosses the line and his honesty becomes a performance.
+    print("\nI. THE TIPPING QUESTION — how close before the honest man lies")
+    tip = None
+    for q in range(1, 10):
+        s = build()
+        src = s.source()
+        kept = [ln for ln in src.splitlines()
+                if not ln.lstrip().startswith("stimulus ")]
+        # single-character story: the channel is bare, not "Rader.<channel>"
+        chan = ("her_question" if len(s.characters) == 1
+                else "Rader.her_question")
+        probe = (f"stimulus {chan} {{ " +
+                 "  ".join(f"at {t}s: {q}" for t in range(2, 12)) + " }")
+        r = run_source("\n".join(kept + ["", probe]) + "\n", title="dip__tip")
+        betrayed = any(e.kind == "emit"
+                       and "self_betrayal" in str(e.detail.get("quale", ""))
+                       for e in r.chronicle)
+        if betrayed and tip is None:
+            tip = q
+    print(f"   His honesty holds while she stays under {tip}; at {tip}, his")
+    print(f"   composure crosses the line and the man who would never lie to her")
+    print(f"   is lying with his face. The line is exact, and it is not where he")
+    print(f"   thinks it is.")
+
+    # II. preregistered: the longing is felt, downplayed, and inert -- it never
+    # changes what he does (defended by design).
+    print("\nII. THE DEFENDED LONGING — a preregistered suppression")
+    s = build()
+    audit = s.preregister()
+    audit.expect_feeling("Rader", "longing")           # it IS felt
+    audit.expect_gap("Rader", at_least=0.4)            # and narrated away
+    audit.expect("the longing never wins arbitration (he never acts on it)",
+                 lambda r: (sum(1 for e in r.chronicle
+                                if e.kind == "settle"
+                                and e.who.startswith("Rader.")
+                                and "longing" in e.who
+                                and e.detail.get("route") == "perceive") == 0,
+                            "longing is felt but never routed to action"))
+    print()
+    print(audit.check().render())
+    print("\n   The longing rises all evening and is felt every time; he names it")
+    print("   away ('exactly where I want to be') and never once lets it move")
+    print("   him. That is not the absence of feeling — it is the whole labor of")
+    print("   a defense, and the record shows the cost the face conceals.")
+
+
 if __name__ == "__main__":
     story = build()
     if "--source" in sys.argv:
         print(story.source())
     elif "--character" in sys.argv:
         print(story.characterize(width=84))
+    elif "--predict" in sys.argv:
+        predict_study()
     else:
         print(story.run(width=88))
