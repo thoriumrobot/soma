@@ -1,4 +1,4 @@
-# SOMA 0.14.2 — Grammar Reference
+# SOMA 0.24.0 — Grammar Reference
 
 The canonical surface syntax is ASCII. The spec's Unicode forms are accepted as
 aliases: `◜`→`{`, `◞`→`}`, `⤋`→`->`, `⤊`→`^`.

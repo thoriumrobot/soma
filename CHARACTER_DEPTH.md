@@ -171,7 +171,7 @@ late). As before, the models validate the finished text rather than turning up
 work to do in it; the value this round is in the instrument, which is now able to
 express — and detect — the deepest layer of character the craft is built on.
 
-*Version at time of writing: SOMA 0.6.0 (current release 0.14.2). This note
+*Version at time of writing: SOMA 0.6.0 (current release 0.24.0). This note
 records a specific development round; the mechanisms it introduced remain in
 place and are documented in their current form in `NARRATIVE.md` and
 `PREDICTION.md`. Tutorial has a §5.5 on the wound/lie/need/arc.*

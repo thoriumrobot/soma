@@ -608,7 +608,8 @@ class Interpreter:
                     ls.belief += 0.1 * (sense - ls.belief)   # acting resists updating
                 ls.label = self.label_of(st.target)
             elif isinstance(st, A.Move):
-                self.exec_action(st.action, ls, t, f)
+                if self.exec_action(st.action, ls, t, f) is False:
+                    break     # insolvent: the rest of this act does not happen
             elif isinstance(st, A.Ignore):
                 # You suppress an error *because* your prior outranks your
                 # senses. Once precision arbitration flips to `perceive` (as
@@ -643,7 +644,13 @@ class Interpreter:
                 if spent < amt:
                     self.chron.log(t, f, "budget", ls.decl.name,
                                    note=f"body cannot conjure {amt - spent:.0f} {rname}")
-            return
+                    # the affine commitment, enforced at the act level: an
+                    # action the body cannot fund does not happen. Returning
+                    # False halts the remainder of this loop's act block for
+                    # the frame -- the burnout that ends a surge the will
+                    # alone would sustain forever.
+                    return False
+            return True
         if fn == "set" and len(call.args) >= 2:
             cname = self._res(call.args[0].name, self.channels) \
                 if isinstance(call.args[0], A.Ref) else None
@@ -657,7 +664,7 @@ class Interpreter:
                 # not the absolute state of the world afterwards. Subtracting the
                 # absolute value would have the organism deny its own existence.
                 self._last_action[ls.decl.name] = val - prev
-            return
+            return True
         # otherwise: a labeled bodily action = a decision
         label = self.label_of(call)
         self.chron.log(t, f, "move", ls.decl.name, action=label,

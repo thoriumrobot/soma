@@ -11,6 +11,87 @@ from soma.interpreter import Interpreter
 from soma.checker import SomaTypeError, ConsentError
 from soma import winnow, viz, query as qmod
 from soma import prose as prose_mod, perturb as perturb_mod
+import os as _os
+import json as _wsjson
+import re as _wsre
+
+# ---------------------------------------------------------------------------
+# the workspace: named files, shared between the SOMA editor and library code
+# ---------------------------------------------------------------------------
+# In the browser this lives at /work on Pyodide's virtual filesystem; user
+# Python runs with /work as its cwd, so `open("my_story.soma")` and
+# `run_file("my_story.soma")` just work. Natively (tests) it falls back to a
+# local .soma_work directory.
+
+def _workdir():
+    for cand in ("/work", _os.path.join(_os.getcwd(), ".soma_work")):
+        try:
+            _os.makedirs(cand, exist_ok=True)
+            probe = _os.path.join(cand, ".probe")
+            with open(probe, "w") as f:
+                f.write("")
+            _os.remove(probe)
+            return cand
+        except Exception:
+            continue
+    return _os.getcwd()
+
+
+_SAFE_NAME = _wsre.compile(r"^[A-Za-z0-9._ -]{1,80}$")
+
+
+def _safe_name(name):
+    name = _os.path.basename(str(name)).strip()
+    if not name or name.startswith(".") or not _SAFE_NAME.match(name):
+        raise ValueError(
+            "file names may use letters, digits, dot, dash, underscore and "
+            "space (got %r)" % name)
+    return name
+
+
+def ws_save(name, content):
+    """Save a file into the shared workspace. Returns JSON {name, size}."""
+    try:
+        name = _safe_name(name)
+        path = _os.path.join(_workdir(), name)
+        with open(path, "w") as f:
+            f.write(content)
+        return _wsjson.dumps({"name": name, "size": len(content)})
+    except Exception as e:
+        return _wsjson.dumps({"error": str(e)})
+
+
+def ws_list():
+    """JSON list of workspace files: [{name, size}], sorted by name."""
+    wd = _workdir()
+    out = []
+    try:
+        for fn in sorted(_os.listdir(wd)):
+            p = _os.path.join(wd, fn)
+            if _os.path.isfile(p) and not fn.startswith("."):
+                out.append({"name": fn, "size": _os.path.getsize(p)})
+    except Exception:
+        pass
+    return _wsjson.dumps(out)
+
+
+def ws_read(name):
+    """JSON {name, content} for one workspace file (or {error})."""
+    try:
+        name = _safe_name(name)
+        with open(_os.path.join(_workdir(), name)) as f:
+            return _wsjson.dumps({"name": name, "content": f.read()})
+    except Exception as e:
+        return _wsjson.dumps({"error": str(e)})
+
+
+def ws_delete(name):
+    try:
+        name = _safe_name(name)
+        _os.remove(_os.path.join(_workdir(), name))
+        return _wsjson.dumps({"ok": True})
+    except Exception as e:
+        return _wsjson.dumps({"error": str(e)})
 
 
 def _run(src, title, functional_only=False):
@@ -132,6 +213,30 @@ def _library_namespace():
             ns[name] = getattr(narrative, name)
     # and the base run_source, for hand-written SOMA text run through the library
     ns["run_source"] = soma.run_source
+
+    # files: run_file/open resolve in the shared workspace (the same files the
+    # Save button writes and the "Your files" rail lists), so a story authored
+    # in the SOMA editor can be saved once and driven from Python here.
+    def run_file(path, *, title=None):
+        p = str(path)
+        if not _os.path.isabs(p) and not _os.path.exists(p):
+            cand = _os.path.join(_workdir(), p)
+            if _os.path.exists(cand):
+                p = cand
+        return soma.run_file(p, title=title)
+
+    def workspace():
+        """List the files saved in this page's workspace."""
+        files = _wsjson.loads(ws_list())
+        if not files:
+            print("(the workspace is empty — use “Save ▸ file” in either "
+                  "editor, or open(name, 'w') here)")
+        for f in files:
+            print(f"  {f['name']:<28} {f['size']} bytes")
+        return [f["name"] for f in files]
+
+    ns["run_file"] = run_file
+    ns["workspace"] = workspace
     return ns
 
 
@@ -157,6 +262,17 @@ def run_python(code, **opts):
     width = int(opts.get("width", 92))
     ns = _library_namespace()
     buf = io.StringIO()
+    _cwd = _os.getcwd()
+    try:
+        _os.chdir(_workdir())
+        return _run_python_inner(code, ns, buf, width)
+    finally:
+        _os.chdir(_cwd)
+
+
+def _run_python_inner(code, ns, buf, width):
+    import contextlib
+    import traceback
     try:
         with contextlib.redirect_stdout(buf), contextlib.redirect_stderr(buf):
             exec(compile(code, "<your code>", "exec"), ns)

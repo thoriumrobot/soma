@@ -116,6 +116,9 @@ class _Appraisal:
     shows_on: Optional[str] = None   # a surface channel this appraisal drives (the tell)
     shows_value: float = 8.0
     expects: Optional[float] = None   # explicit prior; None -> temperament default
+    spend_first: bool = False    # spend the affine budget BEFORE driving the
+                                 # body, so insolvency starves the drive (a
+                                 # metabolic ceiling on a self-amplifying loop)
 
 
 @dataclass
@@ -385,7 +388,7 @@ class Character:
                   updates: bool = False, stops_seeing: bool = False,
                   effortful: bool = False, shows_on: Optional[str] = None,
                   shows_value: float = 8.0, fades_to: Optional[float] = None,
-                  expects: Optional[float] = None):
+                  expects: Optional[float] = None, spend_first: bool = False):
         """A loop that reads a channel and reacts. Temperament sets the dials
         unless overridden. `drives` names a body channel the appraisal pushes
         (appraisal reaching into physiology); `feeling` is emitted when it fires.
@@ -422,7 +425,8 @@ class Character:
             drives_body=drives, drives_to=to,
             feeling=feeling, spends=bool(feeling), when=when,
             updates=updates, stops_seeing=stops_seeing, effortful=effortful,
-            shows_on=shows_on, shows_value=shows_value, expects=expects))
+            shows_on=shows_on, shows_value=shows_value, expects=expects,
+            spend_first=spend_first))
         if shows_on:
             self._expose_surface(shows_on)
             if fades_to is not None:
@@ -1109,6 +1113,31 @@ class Story:
         return self._result()
 
     # ---- prediction: forecast a response to a situation never scripted --------
+    def probe(self, who, stimulus: dict, *, beats: int = 6):
+        """The raw probe under `predict`: strip every scripted stimulus, present
+        only `stimulus` ({channel: value}, sustained for `beats` beats), run the
+        character's whole structure against it, and return the full `Result`.
+
+        `predict` summarizes this Result into a Prediction; the characterization
+        layers (signature, density, selfguides) read richer measures off the same
+        probe -- routes per situation, state distributions, which quale fired --
+        so every study is grounded in one shared definition of "facing an unseen
+        situation"."""
+        name = who.name if isinstance(who, Character) else who
+        multi = len(self.characters) > 1
+        src = self.source()
+        kept = [ln for ln in src.splitlines()
+                if not ln.lstrip().startswith("stimulus ")]
+        probe = []
+        for ch, val in stimulus.items():
+            scoped = f"{name}.{ch}" if multi else ch
+            body = "  ".join(f"at {i}s: {_num_probe(val)}"
+                             for i in range(1, beats + 1))
+            probe.append(f"stimulus {scoped} {{ {body} }}")
+        probe_src = "\n".join(kept + [""] + probe) + "\n"
+        from soma import run_source
+        return run_source(probe_src, title=f"{self.title}__probe")
+
     def predict(self, who, stimulus: dict, *, beats: int = 6, hold: float = 8.0):
         """Forecast how a character would respond to a situation the author never
         wrote -- a counterfactual the model has not seen. This is the difference
@@ -1124,25 +1153,10 @@ class Story:
             # -> faced with equal regard at full strength, Blade SUPPRESSES it;
             #    his lie does not break. (Predicted, not scripted.)
         """
-        import re as _re
         name = who.name if isinstance(who, Character) else who
-        multi = len(self.characters) > 1
-        # build the probe source: the character's whole structure, but the only
-        # input is the stimulus under test.
-        src = self.source()
-        kept = [ln for ln in src.splitlines()
-                if not ln.lstrip().startswith("stimulus ")]
-        probe = []
-        for ch, val in stimulus.items():
-            scoped = f"{name}.{ch}" if multi else ch
-            body = "  ".join(f"at {i}s: {_num_probe(val)}"
-                             for i in range(1, beats + 1))
-            probe.append(f"stimulus {scoped} {{ {body} }}")
-        probe_src = "\n".join(kept + [""] + probe) + "\n"
-
-        from soma import run_source
-        r = run_source(probe_src, title=f"{self.title}__predict")
+        r = self.probe(who, stimulus, beats=beats)
         chron = r.chronicle
+        multi = len(self.characters) > 1
 
         def owns(w):
             return (w.split(".")[0] == name) if multi else True

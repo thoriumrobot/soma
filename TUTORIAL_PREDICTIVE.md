@@ -12,6 +12,15 @@ those questions with staked, checkable predictions rather than assertions.
 
 You do not need to install anything. Everything here runs in your browser.
 
+**A companion tutorial.** This document covers the *prediction* layers —
+appraisal, attachment, tipping points, conditioning, the Gottman model,
+drift-diffusion decisions, and the sensitivity/counterfactual insight tools. Its
+companion, [`TUTORIAL_CHARACTERIZATION.md`](TUTORIAL_CHARACTERIZATION.md),
+covers the later *predictive characterization* layers — the behavioral
+signature, self-guides, state distributions, phase landscapes, symptom
+networks, the inverse problem, choice under active inference, and recursive
+theory of mind. The two are complementary; read either first.
+
 ---
 
 ## Part 0 — Running code as you read

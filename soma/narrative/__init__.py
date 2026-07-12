@@ -49,6 +49,34 @@ from .insight import run_with, outcome, series
 from .sensitivity import sensitivity, SensitivityReport
 from .discriminate import discriminate, DiscriminationReport
 from .earlywarning import predict_break_onset, EarlyWarningReport
+from .signature import (signature, similarity, diagnostic_situation,
+                        SignatureReport, IfThen)
+from .selfguides import (install as install_selfguide, ideal, ought,
+                         predict_shortfall, regulatory_focus,
+                         contrast as selfguide_contrast, PredictedShortfall)
+from .density import density, compare as compare_density, DensityReport
+from .phase import (phase_portrait, fit_influence, resilience,
+                    second_stable_state, state_portrait, hysteresis,
+                    PortraitReport, FittedModel, ResilienceReport,
+                    LandscapeChange, Attractor, HysteresisReport)
+from .futures import (futures, pivotal, dose_response, by_outcome, by_break,
+                      FuturesReport, DoseResponse)
+from .network import (symptom_network, depression_network, stress_response,
+                      tipping_stress, hysteresis_loop, equilibrium_modes,
+                      kindling, target_symptom, SymptomNetwork,
+                      StressResponse, NetworkHysteresis, EquilibriumModes,
+                      KindlingReport, DEPRESSION_SYMPTOMS, DEPRESSION_EDGES)
+from .idiographic import (simulate_diary, estimate_network, recovery,
+                          rebuild_network, compare_hubs, Diary,
+                          TemporalNetwork, RecoveryReport)
+from .choice import (Option, decide, expected_free_energy, explore_exploit,
+                     temptation, curiosity_of, Decision,
+                     ExploreExploitReport, TemptationReport)
+from .mentalizing import (Mind, RandomMind, play, tournament, depth_advantage,
+                          detect_depth, hide_and_seek, coordination,
+                          Match, Tournament, DepthReading,
+                          legibility, LegibilityReport,
+                          social_params_of, mind_of, face_off)
 from .counterfactual import (minimal_intervention, CounterfactualReport,
                              Intervention)
 from .strange_situation import (run_protocol as strange_situation,

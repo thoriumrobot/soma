@@ -168,6 +168,9 @@ def cmd_ast(args):
 def main(argv=None):
     argv = argv if argv is not None else sys.argv[1:]
     p = argparse.ArgumentParser(prog="somac", description="the SOMA toolchain")
+    from soma import __version__
+    p.add_argument("--version", action="version",
+                   version=f"soma {__version__}")
     sub = p.add_subparsers(dest="cmd", required=True)
 
     def common(sp):

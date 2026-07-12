@@ -72,7 +72,8 @@ loop noticing @cardiac {
 r = run_source(soma_src, title="handwritten")
 for e in r.chronicle:
     if e.kind == "emit":
-        print(f"{e.t:>4}s  felt {e.detail.get('quale')}")
+        q = str(e.detail.get("quale")).replace("Qualia<", "").rstrip(">")
+        print(f"{e.t:>4}s  felt {q}")
 """)
 
 # --------------------------------------------------------------------------
@@ -328,6 +329,260 @@ print(audit.check().render())
 # call, since the browser bridge execs with __name__ != "__main__"). Each
 # composes several prediction/insight tools into one worked study -- richer
 # and longer than the single-concept examples above.
+
+# --- the predictive-characterization layers (0.15-0.22) -----------------
+
+_ex("lib/pc_signature", "0.15 · the behavioral signature", "trait-identical, profile-different — and the situation that tells them apart",
+r"""
+# 0.15 -- the behavioral SIGNATURE: two people can be trait-IDENTICAL and
+# still be nobody's twins. Character is the if-THEN profile across situations
+# (Mischel & Shoda's CAPS), and it is computable -- including the one
+# situation you would stage to tell two people apart.
+from soma.narrative import (Story, guarded, signature, similarity,
+                            diagnostic_situation)
+
+story = Story("wediko", span="8s", step="1s", about="acute distress")
+ren = story.character("Ren", temperament=guarded)
+ren.senses("judgment"); ren.senses("warmth")
+ren.appraises("judgment", as_threat=True, feeling="fear",
+              precision=0.3, conviction=0.9)
+ren.appraises("warmth", feeling="comfort",
+              precision=0.9, conviction=0.2, updates=True)
+
+sol = story.character("Sol", temperament=guarded)      # the SAME temperament
+sol.senses("judgment"); sol.senses("warmth")
+sol.appraises("judgment", feeling="fear",
+              precision=0.9, conviction=0.2, updates=True)
+sol.appraises("warmth", as_threat=True, feeling="wariness",
+              precision=0.3, conviction=0.9)
+
+battery = {"a judging eye": {"judgment": 8},
+           "an open warmth": {"warmth": 8}}
+sr, ss = signature(story, ren, battery), signature(story, sol, battery)
+print(sr.render()); print()
+print(ss.render()); print()
+print(f"profile similarity: {similarity(sr, ss):.2f} "
+      f"(mean levels equal: {sr.mean_level() == ss.mean_level()})")
+d = diagnostic_situation(story, ren, sol, battery)
+print(f"stage THIS to tell them apart: '{d['situation']}' "
+      f"(separation {d['separation']})")
+""")
+
+_ex("lib/pc_portrait", "0.17 · the intrapersonal landscape", "calm and panic as attractors; reappraisal as a bifurcation",
+r"""
+# 0.17 -- the INTRAPERSONAL LANDSCAPE: a panic-prone psyche has TWO stable
+# states, calm and attack, and the AROUSAL SCHEMA (how readily the body is
+# read as catastrophe) decides how much of the plane drains into the bad one
+# (Robinaugh et al.'s panic model). Reappraisal is a bifurcation.
+from soma.narrative import Story, anxious, state_portrait
+
+def panic_person(schema):
+    guard = round(85 - 50 * schema)   # high schema = a low bar for misreading
+    s = Story("panic", span="70s", step="1s", about="acute distress")
+    p = s.character("Noa", temperament=anxious)
+    p.senses("stressor", baseline=0.0)
+    p.appraises("stressor", as_threat=True, when="stressor > 4",
+                drives="arousal", to=70, fades_to=20, expects=0.0,
+                precision=0.9, conviction=0.2)
+    p.appraises("arousal", as_threat=True, when=f"arousal > {guard}",
+                feeling="dread", drives="perceived_threat", to=90, fades_to=5,
+                expects=20.0, precision=0.9, conviction=0.3)
+    p.appraises("perceived_threat", as_threat=True, when="perceived_threat > 50",
+                feeling="terror", drives="arousal", to=95, fades_to=20,
+                expects=5.0, precision=0.9, conviction=0.3)
+    return s
+
+port = state_portrait(panic_person(schema=0.85), "Noa",
+                      ("arousal", "perceived_threat"), grid=5, lo=0, hi=100,
+                      beats=24, high_label="panic", low_label="calm",
+                      healthy_is="low")
+print(port.render())
+print()
+print("REAPPRAISAL (raising the bar at which the body is read as danger):")
+for schema in (0.85, 0.6, 0.4, 0.2):
+    port = state_portrait(panic_person(schema), "Noa",
+                          ("arousal", "perceived_threat"), grid=5, lo=0,
+                          hi=100, beats=24, high_label="panic",
+                          low_label="calm", healthy_is="low")
+    panic = 1 - port.healthy_share
+    gone = "  <- panic attractor GONE" if panic == 0 else ""
+    print(f"  schema {schema:.2f}: panic basin {panic:>4.0%} "
+          + "█" * round(panic * 20) + gone)
+""")
+
+_ex("lib/pc_network", "0.18 · a person as a network", "nine symptoms that feed each other; vulnerability is connectivity",
+r"""
+# 0.18 -- a person AS A NETWORK: depression as nine symptoms that feed each
+# other (Cramer et al.). Vulnerability is CONNECTIVITY: the same stressors,
+# a different wiring strength, a different fate.
+from soma.narrative import depression_network, stress_response
+
+from soma.narrative import hysteresis_loop
+
+for label, conn in (("resilient (conn 0.45)", 0.45),
+                    ("vulnerable (conn 1.40)", 1.40)):
+    net = depression_network(connectivity=conn)
+    r = stress_response(net, levels=(0, 1, 2, 2.5, 3))
+    print(label)
+    print(r.render())
+    print()
+print("The vulnerable wiring tips at a stress the resilient one shrugs off. "
+      "And\nonce tipped, does lifting the stress lift the person? Sweep it "
+      "back down:\n")
+for label, conn in (("vulnerable", 1.4), ("severe", 3.2)):
+    h = hysteresis_loop(depression_network(name=label, connectivity=conn))
+    print(h.render())
+    print()
+print("The vulnerable network's depression OUTLIVES its cause (it releases "
+      "only\nwell below its trigger); the severe one never lets go -- at "
+      "zero stress it\nholds itself down. Spontaneous non-recovery, "
+      "generated.")
+""")
+
+_ex("lib/pc_diary", "0.19 · the diary (inverse problem)", "estimate a person's wiring from their diary; pick the treatment target",
+r"""
+# 0.19 -- the INVERSE PROBLEM: Ana and Bo report the same nine symptoms and
+# would get the same diagnosis. Simulate each person's daily diary, estimate
+# their PERSONAL network from the diary alone (lag-1 VAR, Bringmann/Epskamp),
+# and find different treatment targets. The average patient does not exist.
+from soma.narrative import (symptom_network, DEPRESSION_SYMPTOMS,
+                            simulate_diary, compare_hubs)
+
+S = DEPRESSION_SYMPTOMS
+ANA = [("insomnia","fatigue"), ("fatigue","mood"), ("mood","interest"),
+       ("mood","worthless"), ("mood","concentration"), ("interest","mood"),
+       ("worthless","mood"), ("mood","appetite"), ("mood","suicidal"),
+       ("concentration","mood"), ("fatigue","concentration")]   # mood-centred
+BO  = [("insomnia","fatigue"), ("insomnia","concentration"),
+       ("insomnia","mood"), ("insomnia","interest"),
+       ("fatigue","concentration"), ("fatigue","psychomotor"),
+       ("fatigue","interest"), ("insomnia","appetite"),
+       ("mood","worthless"), ("worthless","suicidal"),
+       ("fatigue","mood")]                                       # sleep-driven
+
+for name, edges, thr in (("Ana", ANA, None), ("Bo", BO, {"insomnia": 1.5})):
+    net = symptom_network(name, S, edges, connectivity=1.0,
+                          thresholds=thr or {})
+    diary = simulate_diary(net, days=250, seed=5)
+    r = compare_hubs(diary)
+    mark = "OK" if r["correct"] else "MISS"
+    print(f"{name}: recovered hub = '{r['recovered_hub']}' "
+          f"(true '{r['true_hub']}') {mark}")
+    print(f"   -> the model recommends targeting {r['recovered_hub']}")
+print()
+print("Same checklist, different wiring, different target -- and the diary "
+      "alone\nis enough to tell them apart.")
+""")
+
+_ex("lib/pc_choice", "0.20 · choice (expected free energy)", "explore vs exploit from one dial; the temperament decides",
+r"""
+# 0.20 -- CHOICE under expected free energy: a chooser wants two things at
+# once, what they prefer AND what they'd learn (Friston et al.). Curiosity
+# trades them -- and curiosity is a temperament.
+from soma.narrative import (Option, decide, explore_exploit, curiosity_of,
+                            Story, guarded, stoic, anxious, tender)
+
+safe  = Option("the known road",   reward=6, uncertainty=0.6)
+risky = Option("the unknown road", reward=5, uncertainty=3.5)
+print(explore_exploit(safe, risky, preference=8,
+                      curiosities=(0, 0.3, 1, 3)).render())
+print()
+
+stay  = Option("stay",  reward=8,   uncertainty=0.5)
+leave = Option("leave", reward=5.5, uncertainty=2.5)
+print("the same fork, four temperaments (curiosity derived, not authored):")
+for t in (guarded, stoic, anxious, tender):
+    s = Story("t", span="4s", step="1s", about="acute distress")
+    c = s.character("C", temperament=t)
+    d = decide(c, [stay, leave], preference=8, decisiveness=2.5,
+               sigma_pref=1.5)
+    print(f"  {t.name:<9} (curiosity {curiosity_of(c):>4.2f}): "
+          f"P(leave) {d.p('leave'):>4.0%} -> {d.choice}")
+""")
+
+_ex("lib/pc_other_mind", "0.21 · the other mind (k-ToM)", "depth wins, over-mentalizing loses, and depth is readable from moves",
+r"""
+# 0.21 -- the OTHER MIND: recursion depth ("I think that you think...") is a
+# character trait (Devaine & Daunizeau's k-ToM). Competition rewards it;
+# over-attributing it is a rout; and depth can be READ from moves alone.
+from soma.narrative import tournament, play, detect_depth
+
+t = tournament((0, 1, 2), rounds=40, reps=12)
+print(t.render())
+print()
+strict = play(2, 0, infer_level=False, rounds=40, reps=12)
+infer  = play(2, 0, infer_level=True,  rounds=40, reps=12)
+print(f"over-mentalizing a naive opponent: strict 2-ToM earns "
+      f"{strict.score_a:.2f},\nthe level-INFERRING 2-ToM earns "
+      f"{infer.score_a:.2f} -- seeing a simple person as a schemer\n"
+      "hands them your pattern.")
+print()
+m = play(0, 1, rounds=120, reps=1, seed=4)
+print(detect_depth(m.history, seat=1, candidates=(0, 1, 2)).render())
+""")
+
+_ex("lib/pc_tell", "0.22 · the tell", "decisiveness is legibility; the guarded are read",
+r"""
+# 0.22 -- THE TELL: the more decisively a mind converts its model into action,
+# the more legible its pattern is to a mind one level deeper. And decisiveness
+# derives from CONVICTION -- so the guarded are read.
+from soma.narrative import legibility, face_off, social_params_of
+from soma.narrative import guarded, stoic, anxious, tender
+
+print(legibility(betas=(2, 5, 12), rounds=40, reps=12).render())
+print()
+print("a 2-ToM reader vs 1-ToM hiders of each temperament "
+      "(α, β derived from\nprecision and conviction -- the dials that also "
+      "drive feeling and choice):")
+for t in (guarded, stoic, anxious, tender):
+    m = face_off(stoic, t, k_a=2, k_b=1, rounds=40, reps=12)
+    a, b = social_params_of(t)
+    print(f"  {t.name:<9} (α={a}, β={b:>4}): loses {m.score_a:.2f}")
+print()
+print("Conviction protects the interior and betrays the surface.")
+""")
+
+_ex("lib/pc_files", "files · SOMA files, from Python", "write a .soma file, run it with run_file, change a dial, diff the endings",
+r"""
+# FILES -- write a SOMA file here, run it through the library, change one
+# number, and diff the endings. Files saved with the Save button (either
+# editor) appear in "Your files" and are visible to this code -- and files
+# written here appear in the rail after the run.
+src = '''
+sim { duration: 6s  dt: 1s }
+body Vera @cardiac { intero heart : BPM baseline 70 }
+stimulus heart { at 2s: 120 }
+loop noticing @cardiac {
+  prior:      predict(70)
+  sense:      heart
+  precision:  0.9
+  conviction: 0.3
+  act { emit feel(surprise) }
+}
+'''
+with open("first_light.soma", "w") as f:
+    f.write(src)
+
+print("workspace now holds:"); workspace(); print()
+
+def feelings(res):
+    out = []
+    for e in res.chronicle:
+        if e.kind == "emit":
+            q = str(e.detail.get("quale"))
+            q = q.replace("Qualia<", "").rstrip(">")
+            out.append(f"{q} at {e.t:g}s")
+            break                      # the first is the story
+    return ", ".join(out) or "nothing"
+
+print("as written (trusts the senses)  ->", feelings(run_file("first_light.soma")))
+
+# one dial changed: precision so low the racing heart never registers
+r2 = run_source(src.replace("precision:  0.9", "precision:  0.05"),
+                title="first_light (numb)")
+print("at precision 0.05 (numb)        ->", feelings(r2),
+      " -- the same heart, unfelt")
+""")
 
 _ex("capstone/four_ways_of_leaving", "capstone · four ways of leaving", "attachment, appraisal, and circumplex -- preregistered end to end",
 r"""
@@ -1356,6 +1611,8 @@ _RAIL_ORDER = [
     "lib/conditioning", "lib/helplessness", "lib/decision",
     "lib/strange_situation", "lib/gottman",
     "lib/sensitivity", "lib/counterfactual",
+    "lib/pc_signature", "lib/pc_portrait", "lib/pc_network", "lib/pc_diary",
+    "lib/pc_choice", "lib/pc_other_mind", "lib/pc_tell", "lib/pc_files",
     "capstone/four_ways_of_leaving", "capstone/anatomy_of_a_breaking",
     "capstone/marriage_that_could_have_held", "capstone/five_marriages",
     "capstone/the_spiral", "capstone/the_strange_situation",

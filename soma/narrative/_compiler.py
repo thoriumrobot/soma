@@ -265,6 +265,16 @@ class Compiler:
                 self.emit(f"{indent}    attend {c.name}_spotlight 1")
             if a.updates:
                 self.emit(f"{indent}    update -> revise_my_picture")
+            spent_early = False
+            if getattr(a, "spend_first", False) and a.feeling and c._budget is not None:
+                # a costly reaction whose drive on the body should itself be
+                # gated by the budget: spend BEFORE driving, so when the body
+                # can no longer fund the surge, the drive does not happen and
+                # the vicious cycle starves. (Robinaugh's homeostatic ceiling,
+                # as an affine resource rather than a subtracted term.)
+                self.emit(f"{indent}    move ! spend({c.name}_budget, "
+                          f"{_num(c.temp.feeling_cost)}){guard}")
+                spent_early = True
             if a.drives_body:
                 # the drive on the body is part of the same reaction as the
                 # feeling: if the appraisal only fires under a condition, so does
@@ -276,7 +286,7 @@ class Compiler:
                 self.emit(f"{indent}    move ! set({a.shows_on}, "
                           f"{_num(a.shows_value)}){guard}")
             if a.feeling:
-                if c._budget is not None:
+                if c._budget is not None and not spent_early:
                     self.emit(f"{indent}    move ! spend({c.name}_budget, "
                               f"{_num(c.temp.feeling_cost)}){guard}")
                 self.emit(f"{indent}    emit feel({a.feeling}){guard}")

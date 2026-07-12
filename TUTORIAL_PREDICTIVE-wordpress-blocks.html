@@ -14,6 +14,10 @@
 <p>You do not need to install anything. Everything here runs in your browser.</p>
 <!-- /wp:paragraph -->
 
+<!-- wp:paragraph -->
+<p><strong>A companion tutorial.</strong> This document covers the <em>prediction</em> layers — appraisal, attachment, tipping points, conditioning, the Gottman model, drift-diffusion decisions, and the sensitivity/counterfactual insight tools. Its companion, [<code>TUTORIAL_CHARACTERIZATION.md</code>](TUTORIAL_CHARACTERIZATION.md), covers the later <em>predictive characterization</em> layers — the behavioral signature, self-guides, state distributions, phase landscapes, symptom networks, the inverse problem, choice under active inference, and recursive theory of mind. The two are complementary; read either first.</p>
+<!-- /wp:paragraph -->
+
 <!-- wp:separator -->
 <hr class="wp-block-separator has-alpha-channel-opacity"/>
 <!-- /wp:separator -->
@@ -31,7 +35,14 @@
 <!-- /wp:paragraph -->
 
 <!-- wp:list -->
-<ul class="wp-block-list"><li><strong>SOMA</strong> — the base language: bodies, loops, stimuli, written by hand.</li><li><strong>Library</strong> — the high-level <code>soma.narrative</code> API, written as Python. <strong>This is the mode this tutorial uses.</strong></li></ul>
+<ul>
+<!-- wp:list-item -->
+<li><strong>SOMA</strong> — the base language: bodies, loops, stimuli, written by hand.</li>
+<!-- /wp:list-item -->
+<!-- wp:list-item -->
+<li><strong>Library</strong> — the high-level <code>soma.narrative</code> API, written as Python. <strong>This is the mode this tutorial uses.</strong></li>
+<!-- /wp:list-item -->
+</ul>
 <!-- /wp:list -->
 
 <!-- wp:paragraph -->
@@ -39,7 +50,20 @@
 <!-- /wp:paragraph -->
 
 <!-- wp:list -->
-<ul class="wp-block-list"><li>a <strong>left rail</strong> of ready-to-run examples (the same ones this tutorial walks through),</li><li>a <strong>code editor</strong> in the middle,</li><li>an <strong>output pane</strong> on the right,</li><li>a <strong>▶ Run</strong> button (or press <strong>Ctrl/⌘ + Enter</strong>).</li></ul>
+<ul>
+<!-- wp:list-item -->
+<li>a <strong>left rail</strong> of ready-to-run examples (the same ones this tutorial walks through),</li>
+<!-- /wp:list-item -->
+<!-- wp:list-item -->
+<li>a <strong>code editor</strong> in the middle,</li>
+<!-- /wp:list-item -->
+<!-- wp:list-item -->
+<li>an <strong>output pane</strong> on the right,</li>
+<!-- /wp:list-item -->
+<!-- wp:list-item -->
+<li>a <strong>▶ Run</strong> button (or press <strong>Ctrl/⌘ + Enter</strong>).</li>
+<!-- /wp:list-item -->
+</ul>
 <!-- /wp:list -->
 
 <!-- wp:paragraph -->
@@ -51,7 +75,14 @@
 <!-- /wp:paragraph -->
 
 <!-- wp:list {"ordered":true} -->
-<ol class="wp-block-list"><li><strong>Both directions work on one page.</strong> Library code can run <em>hand-written SOMA text</em> through <code>run_source(...)</code>, and any character you build with the library can print the SOMA it compiles to with <code>story.source()</code>. You can write SOMA, drive it from Python, read the SOMA back — all in the same editor.</li><li><strong>Errors are friendly.</strong> If your code raises, you get a red banner with just your own traceback (no interpreter internals), and partial output up to the error is preserved.</li></ol>
+<ol>
+<!-- wp:list-item -->
+<li><strong>Both directions work on one page.</strong> Library code can run <em>hand-written SOMA text</em> through <code>run_source(...)</code>, and any character you build with the library can print the SOMA it compiles to with <code>story.source()</code>. You can write SOMA, drive it from Python, read the SOMA back — all in the same editor.</li>
+<!-- /wp:list-item -->
+<!-- wp:list-item -->
+<li><strong>Errors are friendly.</strong> If your code raises, you get a red banner with just your own traceback (no interpreter internals), and partial output up to the error is preserved.</li>
+<!-- /wp:list-item -->
+</ol>
 <!-- /wp:list -->
 
 <!-- wp:paragraph -->
@@ -121,7 +152,23 @@ print(story.run(width=76))</code></pre>
 <!-- /wp:paragraph -->
 
 <!-- wp:list -->
-<ul class="wp-block-list"><li><code>Story("hello", span="8s", step="1s")</code> sets up an 8-second simulation ticking once per second. Time in SOMA is literal; every row of the trace is one tick.</li><li><code>story.character("Wen", temperament=tender)</code> creates a person. A <em>temperament</em> is a bundle of defaults for how strongly she trusts her senses versus her expectations — <code>tender</code> means open, responsive, easily moved.</li><li><code>c.senses("her_face")</code> gives Wen an <em>exteroceptive channel</em> — something she can perceive from the outside world. You can see it in the <strong>BODY</strong> panel: <code>her_face</code> starts at 0 and jumps to 7 (the <code>▁▁███████</code> sparkline).</li><li><code>c.appraises("her_face", feeling="delight", when="her_face &gt; 3")</code> is the loop: <em>when the face is present (&gt; 3), feel delight.</em> This is what fires seven times in the trace (<code>emit … quale=Qualia&lt;delight&gt;</code>).</li><li><code>story.at("2s", c.hears("her_face", 7))</code> is the event: at 2 seconds, the face appears at strength 7. That is the <code>stimulus her_face value=7.0</code> row.</li></ul>
+<ul>
+<!-- wp:list-item -->
+<li><code>Story("hello", span="8s", step="1s")</code> sets up an 8-second simulation ticking once per second. Time in SOMA is literal; every row of the trace is one tick.</li>
+<!-- /wp:list-item -->
+<!-- wp:list-item -->
+<li><code>story.character("Wen", temperament=tender)</code> creates a person. A <em>temperament</em> is a bundle of defaults for how strongly she trusts her senses versus her expectations — <code>tender</code> means open, responsive, easily moved.</li>
+<!-- /wp:list-item -->
+<!-- wp:list-item -->
+<li><code>c.senses("her_face")</code> gives Wen an <em>exteroceptive channel</em> — something she can perceive from the outside world. You can see it in the <strong>BODY</strong> panel: <code>her_face</code> starts at 0 and jumps to 7 (the <code>▁▁███████</code> sparkline).</li>
+<!-- /wp:list-item -->
+<!-- wp:list-item -->
+<li><code>c.appraises("her_face", feeling="delight", when="her_face &gt; 3")</code> is the loop: <em>when the face is present (&gt; 3), feel delight.</em> This is what fires seven times in the trace (<code>emit … quale=Qualia&lt;delight&gt;</code>).</li>
+<!-- /wp:list-item -->
+<!-- wp:list-item -->
+<li><code>story.at("2s", c.hears("her_face", 7))</code> is the event: at 2 seconds, the face appears at strength 7. That is the <code>stimulus her_face value=7.0</code> row.</li>
+<!-- /wp:list-item -->
+</ul>
 <!-- /wp:list -->
 
 <!-- wp:paragraph -->
@@ -456,7 +503,14 @@ Separation probe — Mara (anxious); forecast staked by the style table before t
 <!-- /wp:paragraph -->
 
 <!-- wp:list -->
-<ul class="wp-block-list"><li>The <strong>avoidant</strong> Mara shows <em>no visible protest</em> and <em>no</em> approach-avoidance conflict — but her body's arousal rises anyway, and her narrator reports calm over that spike. The forecast predicted exactly this pattern: outward composure, inward alarm, a confabulation gap between the two. That is the avoidant signature — a racing heart under a calm face.</li><li>The <strong>anxious</strong> Mara shows the opposite: a <em>loud protest</em>, real arousal, and — the diagnostic line — arousal that does <em>not</em> settle after the reunion. The alarm stays on. Where the avoidant child disowns the distress, the anxious child cannot put it down.</li></ul>
+<ul>
+<!-- wp:list-item -->
+<li>The <strong>avoidant</strong> Mara shows <em>no visible protest</em> and <em>no</em> approach-avoidance conflict — but her body's arousal rises anyway, and her narrator reports calm over that spike. The forecast predicted exactly this pattern: outward composure, inward alarm, a confabulation gap between the two. That is the avoidant signature — a racing heart under a calm face.</li>
+<!-- /wp:list-item -->
+<!-- wp:list-item -->
+<li>The <strong>anxious</strong> Mara shows the opposite: a <em>loud protest</em>, real arousal, and — the diagnostic line — arousal that does <em>not</em> settle after the reunion. The alarm stays on. Where the avoidant child disowns the distress, the anxious child cannot put it down.</li>
+<!-- /wp:list-item -->
+</ul>
 <!-- /wp:list -->
 
 <!-- wp:paragraph -->
@@ -577,7 +631,20 @@ print(rep.render())</code></pre>
 <!-- /wp:paragraph -->
 
 <!-- wp:list -->
-<ul class="wp-block-list"><li><strong>acquisition</strong> <code>▁▁▅▇██████</code> — the tone comes to predict food; the learned value climbs from 0 to 7.5 and plateaus.</li><li><strong>extinction</strong> <code>██▃▂▁▁▁▁▁▁</code> — food stops; the response falls back to ~0.5.</li><li><strong>rest</strong> <code>▂▃▄▅▆▆▇▇▇█</code> — <em>nothing happens at all</em>, and yet the value climbs back to 6.5. This is spontaneous recovery, the result the whole example is built around.</li><li><strong>reacquisition</strong> <code>▁▁▅▇██</code> — retraining, which starts from a higher floor.</li></ul>
+<ul>
+<!-- wp:list-item -->
+<li><strong>acquisition</strong> <code>▁▁▅▇██████</code> — the tone comes to predict food; the learned value climbs from 0 to 7.5 and plateaus.</li>
+<!-- /wp:list-item -->
+<!-- wp:list-item -->
+<li><strong>extinction</strong> <code>██▃▂▁▁▁▁▁▁</code> — food stops; the response falls back to ~0.5.</li>
+<!-- /wp:list-item -->
+<!-- wp:list-item -->
+<li><strong>rest</strong> <code>▂▃▄▅▆▆▇▇▇█</code> — <em>nothing happens at all</em>, and yet the value climbs back to 6.5. This is spontaneous recovery, the result the whole example is built around.</li>
+<!-- /wp:list-item -->
+<!-- wp:list-item -->
+<li><strong>reacquisition</strong> <code>▁▁▅▇██</code> — retraining, which starts from a higher floor.</li>
+<!-- /wp:list-item -->
+</ul>
 <!-- /wp:list -->
 
 <!-- wp:paragraph -->
@@ -650,7 +717,17 @@ transfer asymmetry holds: True</code></pre>
 <!-- /wp:paragraph -->
 
 <!-- wp:list -->
-<ul class="wp-block-list"><li>A deficit appears <strong>only after uncontrollable pretreatment</strong>. Controllable adversity and no adversity both leave the subject coping — it is not hardship that breaks you, it is hardship you cannot affect.</li><li>For the <strong>global</strong> style, the uncontrollable deficit shows up in <em>both</em> the similar and the dissimilar novel task — it generalizes everywhere.</li><li>For the <strong>specific</strong> style, the uncontrollable deficit shows up <em>only</em> in the similar task — it stays contained.</li></ul>
+<ul>
+<!-- wp:list-item -->
+<li>A deficit appears <strong>only after uncontrollable pretreatment</strong>. Controllable adversity and no adversity both leave the subject coping — it is not hardship that breaks you, it is hardship you cannot affect.</li>
+<!-- /wp:list-item -->
+<!-- wp:list-item -->
+<li>For the <strong>global</strong> style, the uncontrollable deficit shows up in <em>both</em> the similar and the dissimilar novel task — it generalizes everywhere.</li>
+<!-- /wp:list-item -->
+<!-- wp:list-item -->
+<li>For the <strong>specific</strong> style, the uncontrollable deficit shows up <em>only</em> in the similar task — it stays contained.</li>
+<!-- /wp:list-item -->
+</ul>
 <!-- /wp:list -->
 
 <!-- wp:paragraph -->
@@ -721,7 +798,23 @@ SPEED-ACCURACY TRADEOFF — Juror, boundary swept (drift held fixed):
 <!-- /wp:paragraph -->
 
 <!-- wp:list -->
-<ul class="wp-block-list"><li><strong>impulsive</strong> — fast (0.92s) and error-prone (68%): a narrow boundary, commits on little evidence.</li><li><strong>deliberate</strong> — slow (3.37s) and accurate (85%): a wide boundary, waits for more evidence. Same evidence <em>quality</em> as impulsive; only the caution differs.</li><li><strong>keen</strong> — fast <em>and</em> accurate (1.76s, 92%): a high drift rate — this juror simply sees more per unit time, the one combination caution alone cannot buy.</li><li><strong>muddled</strong> — slow and inaccurate: a low drift rate, poor evidence.</li><li><strong>prejudiced</strong> — the tell is in the timing: correct verdicts come fast (1.52s) but errors come <strong>slow</strong> (2.65s). That asymmetry is the fingerprint of a <em>starting bias</em> — a juror leaning toward one verdict before the evidence, so reaching the wrong one means climbing upstream the whole way. A symmetric model cannot produce it.</li></ul>
+<ul>
+<!-- wp:list-item -->
+<li><strong>impulsive</strong> — fast (0.92s) and error-prone (68%): a narrow boundary, commits on little evidence.</li>
+<!-- /wp:list-item -->
+<!-- wp:list-item -->
+<li><strong>deliberate</strong> — slow (3.37s) and accurate (85%): a wide boundary, waits for more evidence. Same evidence <em>quality</em> as impulsive; only the caution differs.</li>
+<!-- /wp:list-item -->
+<!-- wp:list-item -->
+<li><strong>keen</strong> — fast <em>and</em> accurate (1.76s, 92%): a high drift rate — this juror simply sees more per unit time, the one combination caution alone cannot buy.</li>
+<!-- /wp:list-item -->
+<!-- wp:list-item -->
+<li><strong>muddled</strong> — slow and inaccurate: a low drift rate, poor evidence.</li>
+<!-- /wp:list-item -->
+<!-- wp:list-item -->
+<li><strong>prejudiced</strong> — the tell is in the timing: correct verdicts come fast (1.52s) but errors come <strong>slow</strong> (2.65s). That asymmetry is the fingerprint of a <em>starting bias</em> — a juror leaning toward one verdict before the evidence, so reaching the wrong one means climbing upstream the whole way. A symmetric model cannot produce it.</li>
+<!-- /wp:list-item -->
+</ul>
 <!-- /wp:list -->
 
 <!-- wp:paragraph -->
@@ -854,7 +947,17 @@ OK hostile_detached: ratio   0.00:1  reciprocity  96%  thin-slice: falls</code><
 <!-- /wp:paragraph -->
 
 <!-- wp:list -->
-<ul class="wp-block-list"><li><strong>ratio</strong> — positive to negative interactions. The stable types (validating, volatile) run at 14:1; the unstable types (hostile, hostile-detached) at 0:1. Gottman's famous "magic ratio" is 5:1, and the split falls cleanly on either side of it. (The avoider sits at 0:1 too but is <em>stable</em> — see below.)</li><li><strong>reciprocity</strong> — negative-affect reciprocity, the probability that one partner's hostility is answered by the other's. This is the cascade signature: <strong>96%</strong> in the unstable couples (hostility feeds hostility, an absorbing state), <strong>0%</strong> in the regulated ones. This single number separates the doomed couples from the safe ones more cleanly than the ratio does.</li><li><strong>thin-slice</strong> — the forecast made from the <em>first quarter of the conversation alone</em>. It calls "holds" for every stable type and "falls" for every unstable one, matching the full run's outcome in all five cases.</li></ul>
+<ul>
+<!-- wp:list-item -->
+<li><strong>ratio</strong> — positive to negative interactions. The stable types (validating, volatile) run at 14:1; the unstable types (hostile, hostile-detached) at 0:1. Gottman's famous "magic ratio" is 5:1, and the split falls cleanly on either side of it. (The avoider sits at 0:1 too but is <em>stable</em> — see below.)</li>
+<!-- /wp:list-item -->
+<!-- wp:list-item -->
+<li><strong>reciprocity</strong> — negative-affect reciprocity, the probability that one partner's hostility is answered by the other's. This is the cascade signature: <strong>96%</strong> in the unstable couples (hostility feeds hostility, an absorbing state), <strong>0%</strong> in the regulated ones. This single number separates the doomed couples from the safe ones more cleanly than the ratio does.</li>
+<!-- /wp:list-item -->
+<!-- wp:list-item -->
+<li><strong>thin-slice</strong> — the forecast made from the <em>first quarter of the conversation alone</em>. It calls "holds" for every stable type and "falls" for every unstable one, matching the full run's outcome in all five cases.</li>
+<!-- /wp:list-item -->
+</ul>
 <!-- /wp:list -->
 
 <!-- wp:paragraph -->
@@ -925,7 +1028,14 @@ print(rep.render())</code></pre>
 <!-- /wp:paragraph -->
 
 <!-- wp:list -->
-<ul class="wp-block-list"><li><strong>conviction</strong> and <strong>precision</strong> both read <em>"acts on its own"</em> (main ≈ total ≈ 1.0): each single-handedly determines when the belief breaks. That makes sense — how much you trust the belief versus the evidence is exactly the tug-of-war that sets the breaking time.</li><li><strong>learn</strong> reads <em>"acts through interaction"</em> (main 0.12, total 1.00): the hardening rate barely matters on its own, but it matters a great deal <em>in combination</em> with the others. It shapes the outcome only through how it compounds conviction over time.</li></ul>
+<ul>
+<!-- wp:list-item -->
+<li><strong>conviction</strong> and <strong>precision</strong> both read <em>"acts on its own"</em> (main ≈ total ≈ 1.0): each single-handedly determines when the belief breaks. That makes sense — how much you trust the belief versus the evidence is exactly the tug-of-war that sets the breaking time.</li>
+<!-- /wp:list-item -->
+<!-- wp:list-item -->
+<li><strong>learn</strong> reads <em>"acts through interaction"</em> (main 0.12, total 1.00): the hardening rate barely matters on its own, but it matters a great deal <em>in combination</em> with the others. It shapes the outcome only through how it compounds conviction over time.</li>
+<!-- /wp:list-item -->
+</ul>
 <!-- /wp:list -->
 
 <!-- wp:paragraph -->
@@ -2919,7 +3029,23 @@ III &amp; IV. THE TRIADIC DESIGN AND THE TRANSFER ASYMMETRY
 <!-- /wp:paragraph -->
 
 <!-- wp:list {"ordered":true} -->
-<ol class="wp-block-list"><li><strong>Build</strong> a character in the vocabulary of feelings, beliefs, relationships.</li><li><strong>Stake</strong> a forecast — a specific, falsifiable claim about what they will do.</li><li><strong>Run</strong> them forward; the Chronicle records what the body actually did.</li><li><strong>Check</strong> the forecast against the Chronicle.</li><li><strong>Interrogate</strong> the result: which trait drove it, what would have flipped it.</li></ol>
+<ol>
+<!-- wp:list-item -->
+<li><strong>Build</strong> a character in the vocabulary of feelings, beliefs, relationships.</li>
+<!-- /wp:list-item -->
+<!-- wp:list-item -->
+<li><strong>Stake</strong> a forecast — a specific, falsifiable claim about what they will do.</li>
+<!-- /wp:list-item -->
+<!-- wp:list-item -->
+<li><strong>Run</strong> them forward; the Chronicle records what the body actually did.</li>
+<!-- /wp:list-item -->
+<!-- wp:list-item -->
+<li><strong>Check</strong> the forecast against the Chronicle.</li>
+<!-- /wp:list-item -->
+<!-- wp:list-item -->
+<li><strong>Interrogate</strong> the result: which trait drove it, what would have flipped it.</li>
+<!-- /wp:list-item -->
+</ol>
 <!-- /wp:list -->
 
 <!-- wp:paragraph -->
@@ -2939,7 +3065,23 @@ III &amp; IV. THE TRIADIC DESIGN AND THE TRANSFER ASYMMETRY
 <!-- /wp:heading -->
 
 <!-- wp:list -->
-<ul class="wp-block-list"><li>Try modifying any example above in the <strong>Library</strong> editor: change a temperament, a threshold, a couple type, and re-run.</li><li>Use <code>story.source()</code> on anything you build, copy the SOMA into <strong>SOMA</strong> mode, and inspect or perturb it directly.</li><li>The eight <strong>capstone</strong> examples in the Library rail (Part 5) are the full, unedited command-line studies — run any of them directly with <code>python3 examples/narrative/&lt;name&gt;.py</code> for output at full terminal width, or keep editing them in the browser.</li><li>The SOMA-mode rail's narrative-only examples (<code>the_negotiator</code> and the others) build equally layered characters without the prediction/insight tools turned on them — read those for the craft, then bring what Part 5 taught to bear on them yourself.</li><li>The reference for the prediction layers is <code>PREDICTION.md</code>; the base language is documented in <code>GRAMMAR.md</code> and taught in <code>TUTORIAL.md</code>.</li></ul>
+<ul>
+<!-- wp:list-item -->
+<li>Try modifying any example above in the <strong>Library</strong> editor: change a temperament, a threshold, a couple type, and re-run.</li>
+<!-- /wp:list-item -->
+<!-- wp:list-item -->
+<li>Use <code>story.source()</code> on anything you build, copy the SOMA into <strong>SOMA</strong> mode, and inspect or perturb it directly.</li>
+<!-- /wp:list-item -->
+<!-- wp:list-item -->
+<li>The eight <strong>capstone</strong> examples in the Library rail (Part 5) are the full, unedited command-line studies — run any of them directly with <code>python3 examples/narrative/&lt;name&gt;.py</code> for output at full terminal width, or keep editing them in the browser.</li>
+<!-- /wp:list-item -->
+<!-- wp:list-item -->
+<li>The SOMA-mode rail's narrative-only examples (<code>the_negotiator</code> and the others) build equally layered characters without the prediction/insight tools turned on them — read those for the craft, then bring what Part 5 taught to bear on them yourself.</li>
+<!-- /wp:list-item -->
+<!-- wp:list-item -->
+<li>The reference for the prediction layers is <code>PREDICTION.md</code>; the base language is documented in <code>GRAMMAR.md</code> and taught in <code>TUTORIAL.md</code>.</li>
+<!-- /wp:list-item -->
+</ul>
 <!-- /wp:list -->
 
 <!-- wp:paragraph -->

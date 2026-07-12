@@ -521,12 +521,25 @@ class Parser:
         return self.comparison()
 
     def comparison(self):
+        # Python-style chained comparison: `3 < x < 7` means
+        # `(3 < x) and (x < 7)`, not `(3 < x) < 7`. Chains of length one
+        # remain plain Bin nodes; longer chains fold into a product of the
+        # pairwise comparisons (comparisons evaluate to 0.0/1.0, so `*` is
+        # `and`).
+        _CMP = ("<", ">", "<=", ">=", "==", "!=")
         left = self.addsub()
-        while self.cur.value in ("<", ">", "<=", ">=", "==", "!="):
+        if self.cur.value not in _CMP:
+            return left
+        terms, operands = [], [left]
+        while self.cur.value in _CMP:
             op = self.advance().value
             right = self.addsub()
-            left = A.Bin(op, left, right)
-        return left
+            terms.append(A.Bin(op, operands[-1], right))
+            operands.append(right)
+        out = terms[0]
+        for t in terms[1:]:
+            out = A.Bin("*", out, t)
+        return out
 
     def addsub(self):
         left = self.muldiv()

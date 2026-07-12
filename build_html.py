@@ -331,6 +331,16 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
   .menu-btn{background:var(--panel2);border:1px solid var(--line);border-radius:6px;
     padding:5px 10px;cursor:pointer;color:var(--ink);font-size:13px}
   .rail-backdrop{display:none;position:fixed;inset:0;background:#0009;z-index:25}
+  .ws-empty{padding:4px 14px 10px;color:var(--dim);font-size:11.5px}
+  .ws{display:flex;align-items:center;padding:5px 8px 5px 14px;cursor:pointer;
+    border-left:2px solid transparent}
+  .ws:hover{background:var(--panel2)}
+  .ws .nm{font-family:var(--mono);font-size:12px;color:var(--ink);flex:1;
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .ws .sz{font-size:10.5px;color:var(--dim);margin:0 6px}
+  .ws .del{border:0;background:transparent;color:var(--dim);cursor:pointer;
+    font-size:13px;padding:0 4px;border-radius:4px}
+  .ws .del:hover{color:var(--err);background:var(--panel2)}
 </style>
 </head>
 <body>
@@ -359,6 +369,10 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
     <nav class="rail" id="rail">
       <h2 id="rail-head">Examples</h2>
       <div id="ex-list"></div>
+      <h2>Your files<span class="rail-hint">saved with “Save ▸ file”; visible
+        to library code as <b>open("name")</b> / <b>run_file("name")</b>; files
+        written by your Python appear here after the run</span></h2>
+      <div id="ws-list"><div class="ws-empty">(none yet)</div></div>
     </nav>
     <div class="rail-backdrop" id="rail-backdrop"></div>
 
@@ -376,9 +390,10 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
         </span>
         <span class="lib-tools" id="lib-tools" style="display:none">
           <button class="primary" id="btn-run-py">▶ Run</button>
-          <span class="lib-note">Python · uses the soma.narrative library</span>
+          <span class="lib-note">Python · soma.narrative preloaded · your files: open("x.soma") / run_file("x.soma")</span>
         </span>
         <span class="spacer"></span>
+        <button id="btn-save" title="save this editor's text as a named workspace file">Save ▸ file</button>
         <button id="btn-new">New</button>
       </div>
       <div class="perturb-row" id="perturb-row">
@@ -443,6 +458,108 @@ const codeEl=$("code"), outEl=$("output"), statusEl=$("status"),
 let pyodide=null, bridge=null, currentKey=null, busy=false;
 let mode="soma";   // "soma" | "library"
 
+// ---- the workspace: named files shared by both editors and library code ----
+let wsFiles = {};                        // name -> content (mirrored to localStorage)
+try{ wsFiles = JSON.parse(localStorage.getItem("soma-ws-files")||"{}"); }catch(e){}
+function wsPersist(){ try{ localStorage.setItem("soma-ws-files", JSON.stringify(wsFiles)); }catch(e){} }
+
+async function pyWsSave(name, content){
+  pyodide.globals.set("_WSN", name); pyodide.globals.set("_WSC", content);
+  return await pyodide.runPythonAsync(`import web_bridge; web_bridge.ws_save(_WSN,_WSC)`);
+}
+async function pyWsList(){
+  return JSON.parse(await pyodide.runPythonAsync(`import web_bridge; web_bridge.ws_list()`));
+}
+async function pyWsRead(name){
+  pyodide.globals.set("_WSN", name);
+  return JSON.parse(await pyodide.runPythonAsync(`import web_bridge; web_bridge.ws_read(_WSN)`));
+}
+async function pyWsDelete(name){
+  pyodide.globals.set("_WSN", name);
+  return await pyodide.runPythonAsync(`import web_bridge; web_bridge.ws_delete(_WSN)`);
+}
+
+function renderWs(){
+  const box = $("ws-list");
+  const names = Object.keys(wsFiles).sort();
+  if(names.length===0){ box.innerHTML='<div class="ws-empty">(none yet)</div>'; return; }
+  box.innerHTML="";
+  for(const name of names){
+    const row=document.createElement("div");
+    row.className="ws";
+    row.innerHTML=`<span class="nm">${esc(name)}</span>`+
+      `<span class="sz">${wsFiles[name].length}b</span>`+
+      `<button class="del" title="delete">✕</button>`;
+    row.querySelector(".nm").onclick=()=>openWsFile(name);
+    row.querySelector(".del").onclick=async ev=>{
+      ev.stopPropagation();
+      if(!confirm(`delete ${name}?`)) return;
+      delete wsFiles[name]; wsPersist(); renderWs();
+      if(pyodide) try{ await pyWsDelete(name); }catch(e){}
+    };
+    box.appendChild(row);
+  }
+}
+function openWsFile(name){
+  const content = wsFiles[name];
+  if(content===undefined) return;
+  // a .soma file opens in the SOMA editor, a .py file in the Library editor
+  const want = name.endsWith(".py") ? "library" : "soma";
+  if(want!==mode) setMode(want, {keepBuffer:true});
+  codeEl.value = content;
+  currentKey = null;
+  curTitleEl.textContent = name;
+  document.querySelectorAll(".ex").forEach(e=>e.classList.remove("active"));
+  stashBuffer();
+  if(typeof closeRail==="function") closeRail();
+  setStatus(`opened ${name} — edit, Run, or Save ▸ file to update it`,"ok");
+}
+async function saveCurrent(){
+  if(!pyodide){ setStatus("still loading…","err"); return; }
+  let def = curTitleEl.textContent.trim() || "untitled";
+  if(!/\.[A-Za-z0-9]+$/.test(def)) def += (mode==="library" ? ".py" : ".soma");
+  const name = prompt("save as (letters, digits, . _ - allowed):", def);
+  if(!name) return;
+  const res = JSON.parse(await pyWsSave(name, codeEl.value));
+  if(res.error){ setStatus("save failed: "+res.error, "err"); return; }
+  wsFiles[res.name] = codeEl.value; wsPersist(); renderWs();
+  curTitleEl.textContent = res.name;
+  setStatus(`saved ${res.name} (${res.size} bytes) — library code can open it by name`,"ok");
+}
+// after a library run, mirror any files the user's Python wrote or changed
+async function syncWorkspaceFromPy(){
+  try{
+    const listed = await pyWsList();
+    let changed=false;
+    const seen = new Set();
+    for(const f of listed){
+      seen.add(f.name);
+      if(wsFiles[f.name]===undefined || wsFiles[f.name].length!==f.size){
+        const r = await pyWsRead(f.name);
+        if(!r.error){ wsFiles[r.name]=r.content; changed=true; }
+      }
+    }
+    for(const name of Object.keys(wsFiles)){
+      if(!seen.has(name)){ delete wsFiles[name]; changed=true; }  // os.remove'd
+    }
+    if(changed){ wsPersist(); renderWs(); }
+  }catch(e){ /* non-fatal */ }
+}
+
+// ---- per-mode buffers: switching modes never destroys work ----------------
+const bufState = {soma:null, library:null};
+try{
+  const b = JSON.parse(localStorage.getItem("soma-buffers")||"{}");
+  if(b.soma) bufState.soma=b.soma;
+  if(b.library) bufState.library=b.library;
+}catch(e){}
+function stashBuffer(){
+  bufState[mode] = {code:codeEl.value, title:curTitleEl.textContent, key:currentKey};
+  try{ localStorage.setItem("soma-buffers", JSON.stringify(bufState)); }catch(e){}
+}
+let stashTimer=null;
+function stashSoon(){ clearTimeout(stashTimer); stashTimer=setTimeout(stashBuffer, 400); }
+
 // ---- example list (mode-aware) --------------------------------------------
 function titleForKey(k){
   const base = k.includes("/") ? k.split("/").pop() : k;
@@ -477,14 +594,16 @@ function loadExample(key){
   document.querySelectorAll(".ex").forEach(e=>
     e.classList.toggle("active",e.dataset.key===key));
   if(mode==="soma") $("perturb-input").value=ex.perturb||"";
+  stashBuffer();
   if(typeof closeRail==="function") closeRail();
   // auto-run the default view
   if(pyodide && !busy){ mode==="library" ? runPython() : runCommand("run"); }
 }
 
 // ---- switching modes ------------------------------------------------------
-function setMode(m){
+function setMode(m, opts){
   if(m===mode) return;
+  stashBuffer();                             // never lose the other editor's work
   mode=m;
   document.querySelectorAll(".mode-btn").forEach(b=>
     b.classList.toggle("active", b.dataset.mode===m));
@@ -495,8 +614,19 @@ function setMode(m){
     ? "the high-level library · write Python that predicts characters, in your browser"
     : "a language for simulating the mind–body loop · runs the real interpreter in your browser";
   buildExampleList();
-  const first = currentExamples()[0];
-  if(first) loadExample(first.key);
+  if(opts && opts.keepBuffer){ return; }     // caller will fill the editor
+  const stash = bufState[m];
+  if(stash && stash.code !== undefined && stash.code !== ""){
+    codeEl.value = stash.code;
+    curTitleEl.textContent = stash.title || (m==="library"?"untitled.py":"untitled.soma");
+    currentKey = stash.key || null;
+    document.querySelectorAll(".ex").forEach(e=>
+      e.classList.toggle("active", e.dataset.key===currentKey));
+    setStatus("restored your "+(m==="library"?"Python":"SOMA")+" buffer","ok");
+  } else {
+    const first = currentExamples()[0];
+    if(first) loadExample(first.key);
+  }
 }
 
 // ---- running --------------------------------------------------------------
@@ -546,6 +676,7 @@ web_bridge.run_python(_SRC, **_o)
 `);
     lastCmd = null;   // library runs are re-run explicitly, not on resize
     lastWasPython = true;
+    syncWorkspaceFromPy();
     outEl.innerHTML=ansiToHtml(result);
     outEl.scrollTop=0; outEl.scrollLeft=0;
     const clean = result.replace(/\x1b\[[0-9;]*m/g,"");
@@ -588,6 +719,8 @@ document.querySelectorAll(".mode-btn").forEach(b=>{
   b.onclick=()=>setMode(b.dataset.mode);
 });
 $("btn-run-py").onclick=()=>runPython();
+$("btn-save").onclick=()=>saveCurrent();
+codeEl.addEventListener("input", stashSoon);
 
 // ---- wire buttons ---------------------------------------------------------
 document.querySelectorAll("[data-cmd]").forEach(btn=>{
@@ -687,6 +820,11 @@ story.at("2s", c.hears("a_face", 7))
 print(story.run(width=76))
 # print(story.characterize())
 # print(story.source())          # the SOMA it compiled to
+
+# files: anything saved with "Save ▸ file" is readable here --
+#   r = run_file("my_story.soma"); workspace()  # list your files
+# and the predictive layers are one import away, e.g.:
+#   from soma.narrative import explore_exploit, tournament, state_portrait
 `;
 
 // ---- boot -----------------------------------------------------------------
@@ -737,12 +875,29 @@ import builtins as _b
       await pyodide.runPythonAsync(`import json, web_bridge
 web_bridge.run_command(_CMD, _SRC, _TITLE, **json.loads(_OPTS))`);
     }catch(e){ /* warm-up failure is non-fatal */ }
+    // restore this browser's workspace files into the virtual FS
+    try{
+      for(const [name, content] of Object.entries(wsFiles)){
+        await pyWsSave(name, content);
+      }
+    }catch(e){ /* non-fatal */ }
     // done
     $("splash").style.display="none";
     setStatus("ready","ok");
     buildExampleList();
-    const first0 = currentExamples()[0];
-    if(first0) loadExample(first0.key);
+    renderWs();
+    const stash0 = bufState[mode];
+    if(stash0 && stash0.code){
+      codeEl.value = stash0.code;
+      curTitleEl.textContent = stash0.title || "untitled.soma";
+      currentKey = stash0.key || null;
+      document.querySelectorAll(".ex").forEach(e=>
+        e.classList.toggle("active", e.dataset.key===currentKey));
+      setStatus("restored your last session — Run when ready","ok");
+    } else {
+      const first0 = currentExamples()[0];
+      if(first0) loadExample(first0.key);
+    }
   }catch(e){
     // Emscripten's FS.ErrnoError is not an Error and stringifies as
     // "[object Object]"; render something a human can act on instead.

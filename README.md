@@ -1,4 +1,4 @@
-# SOMA 0.14.2 — a compiler & runtime for the simulation of embodied consciousness
+# SOMA 0.24.0 — a compiler & runtime for the simulation of embodied consciousness
 
 SOMA is a domain-specific language for novelists. You describe a character as a
 set of **loops** — prediction ⇄ error ⇄ action circuits — running on many
@@ -19,7 +19,7 @@ python -m soma query   examples/a_marriage.soma
 python -m soma run     examples/bad_news.soma --phi
 python -m soma run     examples/the_appointment.soma      # medical dismissal
 python -m soma run     examples/the_interrogation.soma    # dissociation in bands
-python -m pytest -q            # 283 tests
+python -m pytest -q            # 403 tests
 ```
 
 ### Run it in a browser — no install
@@ -218,10 +218,188 @@ say something you did not put in. Three tools cross that line (see `PREDICTION.m
 
 `python3 examples/narrative/the_unmooring.py predictions` collects the forecasts;
 `CHARACTER_DEPTH.md` and `PREDICTION.md` document the research and the mechanisms.
-**`TUTORIAL_PREDICTIVE.md`** is a self-contained, browser-runnable walkthrough of
-every predictive simulation — from a first character to the Strange Situation and
-the Gottman thin-slice forecast — with complete code, real output, and an
-explanation of how each leads to a novelistic insight.
+Two self-contained, browser-runnable tutorials walk every simulation with
+complete code, real output, and an explanation of each result:
+**`TUTORIAL_PREDICTIVE.md`** covers the prediction layers (appraisal, attachment,
+tipping points, conditioning, the Gottman thin-slice forecast, the Strange
+Situation, drift-diffusion decisions, sensitivity and counterfactual), and
+**`TUTORIAL_CHARACTERIZATION.md`** covers the predictive-characterization layers
+(the behavioral signature, self-guides, state distributions, phase landscapes,
+symptom networks, the inverse problem, choice under active inference, and
+recursive theory of mind).
+
+## 0.15: predictive characterization — the profile, the guide, the distribution
+
+Personality science's answer to "what would predict a *person*" is never a single
+number, and 0.15 adds one module per structure, all sharing the new
+**`Story.probe`** substrate (the raw run under `predict`: scripted timeline
+stripped, one unseen input, full `Result` back):
+
+- **`signature`** — Mischel & Shoda's CAPS: personality as a stable **if...then
+  profile** of situation→response contingencies, not an average. Extract a
+  character's profile over a battery of unseen situations, score two profiles'
+  `similarity`, and find the **`diagnostic_situation`** — the one scene to stage
+  that maximally tells two characters apart. `examples/narrative/the_same_on_average.py`
+  reproduces the Wediko finding: two characters with *identical* mean-level
+  behavior and near-inverse signatures.
+- **`selfguides`** — Higgins' self-discrepancy theory: install an **ideal**
+  (aspiration) or **ought** (obligation) as a loop whose prior *is* the standard,
+  and the library derives — with no emotion term in the spec — that the same
+  failure **dejects** the ideal-holder (despair/shame) and **agitates** the
+  ought-holder (guilt/fear). `contrast` stages the experiment and checks both
+  qualia in the Chronicle; `regulatory_focus` reads promotion/prevention off the
+  guides and hands the decision layer a caution bias. (The specificity caveat
+  from the replication literature is documented and the quale is overridable.)
+- **`density`** — Fleeson's Whole Trait Theory: a trait is the **whole density
+  distribution of states** — the mean is the trait score, and the *width and
+  skew are themselves stable traits*, with width reflecting **reactivity** to
+  situational cues. Sample a character across randomized unseen situations and
+  `compare` two distributions for the Fleeson contrast: same mean, different
+  width — equally anxious on average, utterly different people.
+
+`PREDICTION.md` §0.15 records the research and the mechanisms.
+
+## 0.16: the landscape and the ensemble — predictions about the *space* of trajectories
+
+The deepest questions about a relationship — *could this marriage have held? was
+this ending fated or flipped?* — are questions about the space of trajectories,
+and two literatures answer them formally:
+
+- **`phase`** — Gottman & Murray's *Mathematics of Marriage*, staged on the
+  simulation itself. `phase_portrait` sweeps a grid of opening manners, runs the
+  real coupled characters from each, and returns the **attractors and basins**
+  the machine displays: a validating couple's plane keeps one warm attractor, a
+  hostile couple's plane **contains no good ending at all**, and a brittle couple
+  is bistable — the opening decides the marriage. `fit_influence` performs
+  Gottman's own move on the run (uninfluenced state, inertia, and a bilinear-vs-
+  **ojive** influence function with *fitted* negativity thresholds, selected by
+  R²) and validates the fitted map's attractors against the empirical ones
+  bidirectionally. `resilience` reads Holling's quantity both ways (basin share +
+  a kick probe measuring the basin's radius), and `second_stable_state` is
+  **therapy as bifurcation**: the least dial change at which a warm basin comes
+  into existence.
+- **`futures`** — ensemble forecasting over nearby worlds: `futures` returns the
+  **distribution over endings** with its entropy (destiny vs a coin), `pivotal`
+  names the dial that decides the fate as an effect size, and `dose_response`
+  deepens "the smallest change that would have saved it" into a probability
+  curve with a minimal effective dose. For the slow-curdling marriage this finds
+  a contested fate hinged on the learning rate (d ≈ +3.2), an honest null (the
+  extraordinary day's *intensity* is not a dose — arbitration is
+  magnitude-blind), and the "last good year" as a curve over timing.
+
+`examples/narrative/the_shape_of_a_marriage.py` runs all seven studies;
+`PREDICTION.md` §0.16 records the research and the mechanisms.
+
+## 0.17: the intrapersonal landscape — a disorder as an attractor, a poet as a cycle
+
+The most elaborated formal character simulations in the literature model a
+*person* as a system of interlocking feedback loops, and 0.17 stages the two
+flagships end-to-end in `examples/narrative/the_vicious_cycle.py`:
+
+- **Panic** (Robinaugh et al.'s computational model of panic disorder): three
+  appraisals wired mouth-to-tail — arousal misread as catastrophe (the **arousal
+  schema**, as the misinterpretation guard), threat driving arousal back up, and
+  escape as the dampening arc. Six studies: the same stressor shrugged off vs
+  igniting a self-sustaining attack; the **state portrait** of arousal ×
+  perceived threat with calm and panic attractors (the panic basin's share *is*
+  the vulnerability); **hysteresis** — the trigger is not the release (loop
+  width ∞: you cannot reassure someone out of a panic at the level that started
+  it); **burnout** — a finite metabolic budget makes the attack end itself;
+  **reappraisal as bifurcation** — the schema dose at which the panic attractor
+  ceases to exist; and the ensemble finding that the schema (d≈+2.3), not the
+  day's severity (d≈+0.5), decides who has attack-days.
+- **The poet** (Rinaldi's *Laura and Petrarch* limit-cycle model): a relaxation
+  oscillator in two appraisals whose steady state is neither ecstasy nor despair
+  but the **cycle** between them — detected as a single cyclic attractor (swing
+  ±29, period ≈ 8 beats) holding 100% of the plane, error-gated so one nudge
+  starts it forever.
+
+Staging them improved every layer: **core** — chained comparisons now have
+Python band semantics (`3 < x < 7`), and the affine commitment is enforced at
+the act (a failed `spend` halts the rest of the act block: an action the body
+cannot fund does not happen); **narrative** — `spend_first=True` gates a
+drive on the budget, so insolvency starves a self-amplifying loop;
+**phase** — `state_portrait` (the plane of one psyche), **cyclic attractors**
+(kind/amplitude/period), and a `hysteresis` instrument with resolution-aware
+bistability. `PREDICTION.md` §0.17 records the research and the mechanisms.
+
+## 0.18: the network — a person as a system of symptoms
+
+`soma.narrative.network` models a disorder the way Cramer et al. do: not as a
+hidden cause but as a **network of symptoms that activate each other**, with no
+central variable. Vulnerability is **connectivity** — the same stress tips a
+tightly-wired network where a loose one shrugs. `examples/narrative/the_weight.py`
+stages the depression network end to end: a **stress response** (where it tips),
+**hysteresis** (the depression outlives its cause, and at severe connectivity
+holds itself down at zero stress — spontaneous non-recovery), **bimodality**
+(well or depressed, rarely between), and **kindling** (episodes that become
+autonomous). `PREDICTION.md` §0.18 records the research and the mechanisms.
+
+## 0.19: the inverse problem — recovering the wiring from a diary
+
+`soma.narrative.idiographic` runs 0.18 backwards. Two patients report the same
+nine symptoms; `simulate_diary` generates each one's day-to-day self-reports and
+`estimate_network` fits a person-specific network (a lag-1 vector
+autoregression) from that diary *alone*, recovering a different hub — and so a
+different treatment target — for each. `examples/narrative/the_diary.py` closes
+the loop (author → live → observe → estimate → re-run) and finds the
+identifiability law that a hub must *vary* to be seen. `PREDICTION.md` §0.19
+records the research and the mechanisms.
+
+## 0.20: choice — the space of a character's decisions
+
+`soma.narrative.choice` predicts what a character *does* at a fork, using active
+inference's expected free energy (Friston et al.): choiceworthiness = pragmatic
+value (closeness to what they prefer) + curiosity × epistemic value (how much
+they'd learn). This activates the active-inference builtins dormant in
+`soma.mathlib`. `examples/narrative/the_fork.py` shows the explore/exploit
+crossover, preference as a target rather than a ceiling (a character declines an
+overshoot), and — the integration — curiosity *derived* from the same
+temperament dials as feeling, so the guarded hold and the tender leap unauthored.
+`PREDICTION.md` §0.20 records the research and the mechanisms.
+
+## 0.21: the other mind — recursive theory of mind
+
+`soma.narrative.mentalizing` takes the social fork: the value of my move depends
+on what you will do, which depends on what you believe about me. It implements
+the k-ToM framework (Devaine, Hollard & Daunizeau): a 0-level mind tracks what
+you *do*; a k-level mind simulates you at every lower depth and learns which you
+are. `examples/narrative/the_other_mind.py` runs five studies — the competitive
+ladder (depth wins), cooperation's saturation (one level is enough), the rout of
+over-mentalizing a naive opponent, the coin hypothesis (knowing when *not* to
+attribute a mind), and reading a mind's depth from its moves. `PREDICTION.md`
+§0.21 records the research and the mechanisms.
+
+## 0.22: the tell — decisiveness is legibility, and the layers close
+
+An audit of under-delivering results became a finding: the depth advantage is a
+function of the *shallower* mind's own decisiveness. Wavering is armor;
+conviction is a tell (`legibility`). And decisiveness derives from **conviction**,
+the same dial that armors a character's beliefs — so `mind_of` and `face_off`
+let Story characters meet in play with parameters drawn from temperament, and the
+conviction that protects the interior betrays the surface. `tests/test_integration.py`
+stakes the whole-character coherence itself. `PREDICTION.md` §0.22 records the
+research and the mechanisms.
+
+## 0.23: the playground closes the loop — files and every layer in the browser
+
+The playground gains eight predictive-characterization examples (0.15–0.22) in
+Library mode and a real file workflow: **Save ▸ file** in either editor writes a
+named file into a shared workspace; a **Your files** rail reopens it; library
+Python sees the same files (`open("x.soma")`, `run_file("x.soma")`,
+`workspace()`), and files written *by* your Python appear in the rail. Buffers
+and files persist across reloads, and switching modes never loses work.
+`soma.run_file` joins the package API. `PREDICTION.md` §0.23 records the details.
+
+## 0.24: the audit — a semantic correction and honest renders
+
+A full-repo audit fixed a semantic conflation and a plumbing bug. Spontaneous
+non-recovery now means what Cramer et al. mean — the network holds itself down at
+*zero* stress — and is distinguished from mere hysteresis; the render reports
+three honest regimes. `decide()` no longer ignores a dict-supplied decisiveness.
+`PortraitReport.healthy_share` is public, `somac --version` works, and the
+shipped examples print clean quale names. `PREDICTION.md` §0.24 records
+everything found, fixed, and confirmed sound.
 
 **The full predictive suite (0.8–0.14).** What began as three tools is now a
 library of documented psychological models, each rebuilt in SOMA and each making
@@ -625,7 +803,7 @@ soma/
   narrative/      high-level authoring library (Story, Character, temperaments,
                   arcs) that compiles narrative intent to ordinary SOMA
 examples/         17 worked programs (+ examples/narrative/ library scripts)
-tests/            283 tests (pytest; 91 core + 192 narrative, prediction & web)
+tests/            403 tests (pytest; 91 core + 312 narrative, prediction, web & playground)
 ```
 
 ## Invariants the implementation guarantees
