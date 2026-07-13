@@ -1,4 +1,4 @@
-# SOMA 0.24.0 — a compiler & runtime for the simulation of embodied consciousness
+# SOMA 0.26.0 — a compiler & runtime for the simulation of embodied consciousness
 
 SOMA is a domain-specific language for novelists. You describe a character as a
 set of **loops** — prediction ⇄ error ⇄ action circuits — running on many
@@ -19,7 +19,7 @@ python -m soma query   examples/a_marriage.soma
 python -m soma run     examples/bad_news.soma --phi
 python -m soma run     examples/the_appointment.soma      # medical dismissal
 python -m soma run     examples/the_interrogation.soma    # dissociation in bands
-python -m pytest -q            # 403 tests
+python -m pytest -q            # 416 tests
 ```
 
 ### Run it in a browser — no install
@@ -401,6 +401,33 @@ three honest regimes. `decide()` no longer ignores a dict-supplied decisiveness.
 shipped examples print clean quale names. `PREDICTION.md` §0.24 records
 everything found, fixed, and confirmed sound.
 
+## 0.25: legitimacy — the belief that holds the holder
+
+`soma.narrative.legitimacy` models system justification (Jost, Laurin/Kay,
+Wakslak): why the people a system injures defend it. A legitimizing belief's
+conviction is derived from three antecedents (dependence, inescapability,
+threat), its trust in the evidence of harm derived inversely (motivated
+ignorance), and the palliative trade wired into the body, gated on the belief
+itself: while it holds, injury buys quiet at the price of self-worth, with
+outrage dampened; when it breaks, the grief arrives whole and the anger becomes
+available. `palliative_tradeoff` prices the belief, `antecedent_dose` draws the
+exodus curve (an exit is not a destination, it is a solvent), and
+`conscientize` doses Freire's pedagogy. `examples/narrative/the_feather.py`
+stages it on THE UNMOORING's cast. `PREDICTION.md` §0.25 records the research
+and the mechanisms.
+
+## 0.26: the legible release
+
+Every study renderer now draws its finding instead of only stating it: phase
+portraits letter basins by temperature (`wwww` vs `cccc`, no more identical
+`aaaa` planes), stress curves and hysteresis loops render as aligned bar
+tracks (the loop is visible as the up/down asymmetry), the legitimacy trade
+shows paired bars and the exodus curve a walking tipping-point marker,
+tournaments mark who is out-thinking whom, signatures open with route glyphs
+(`▼▲` vs `▲▼` — two trait-identical people, distinguishable at a glance), and
+temporal networks carry magnitude bars. Mechanisms untouched; both tutorials
+regenerated from live runs. `PREDICTION.md` §0.26 has the full list.
+
 **The full predictive suite (0.8–0.14).** What began as three tools is now a
 library of documented psychological models, each rebuilt in SOMA and each making
 a falsifiable, signature prediction a weaker account could not:
@@ -719,6 +746,24 @@ psychedelic state are all one-line changes to a precision schedule.
 | `workspace` | the gut bids for consciousness and loses | `never ignited`, `attention starved` |
 | `rebus` | one dial relaxes a belief hardened into a body | route flips `act` → `perceive` |
 
+These are the hand-written core-language `.soma` files under `examples/`. Two
+further catalogs sit above them:
+
+**The narrative flagships** (`examples/narrative/*.py`) — one per predictive
+layer, each a runnable study that stages the layer on real characters:
+`the_same_on_average` (0.15, the signature), `the_shape_of_a_marriage` (0.16,
+the landscape), `the_vicious_cycle` (0.17, the intrapersonal portrait),
+`the_weight` (0.18, the network), `the_diary` (0.19, the inverse problem),
+`the_fork` (0.20, choice), `the_other_mind` (0.21, theory of mind), and
+`the_feather` (0.25, legitimacy — system justification staged on THE
+UNMOORING's cast). Alongside them are the character studies (`a_marriage`,
+`five_marriages`, `the_spiral`, `twelve_seconds_in_a_jury_room`,
+`the_strange_situation`, `what_the_body_learns`, and more).
+
+**The playground library** (`examples/library/`, 31 examples) — every layer
+above, plus the core-language demos, packaged to run in the browser with no
+install. Open `index.html` and pick from the **Library** menu.
+
 ## Winnow-S
 
 Two layers. **Curated sift patterns** (`python -m soma sift FILE [PATTERN]`):
@@ -803,7 +848,7 @@ soma/
   narrative/      high-level authoring library (Story, Character, temperaments,
                   arcs) that compiles narrative intent to ordinary SOMA
 examples/         17 worked programs (+ examples/narrative/ library scripts)
-tests/            403 tests (pytest; 91 core + 312 narrative, prediction, web & playground)
+tests/            416 tests (pytest; 91 core + 325 narrative, prediction, web & playground)
 ```
 
 ## Invariants the implementation guarantees

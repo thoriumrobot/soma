@@ -45,10 +45,15 @@ class DiscriminationReport:
     def render(self) -> str:
         lines = [f"DISCRIMINATION — the scene that separates two readings of "
                  f"{self.who} (outcome: {self.outcome_name}):"]
-        lines.append("  probe                          reading A   reading B   apart")
+        lines.append("  probe                          reading A   reading B"
+                     "   apart")
+        from soma.viz import bar
+        scale = max((div for *_, div in self.rows), default=1.0) or 1.0
         for label, ya, yb, div in self.rows:
+            mark = ("  <- here" if (self.best and label == self.best[0]
+                                    and div > 1e-9) else "")
             lines.append(f"  {label:<28s} {_fmt(ya):>9s}   {_fmt(yb):>9s}   "
-                         f"{div:5.2f}")
+                         f"{div:5.2f} {bar(div / scale, 8)}{mark}")
         if self.best and self.best[3] > 1e-9:
             lines.append(f"  -> WRITE THIS SCENE: {self.best[0]} — the two "
                          f"natures come apart most here.")

@@ -451,7 +451,7 @@ class Compiler:
             self.emit(f"{indent}loop the_lie_{lid} @{c.clock} {{",
                       f"{indent}  prior:      predict({_num(l.expects)})",
                       f"{indent}  sense:      {l.evidence}",
-                      f"{indent}  precision:  0.35",
+                      f"{indent}  precision:  {_num(l.evidence_trust)}",
                       f"{indent}  conviction: {_num(l.conviction)}",
                       f"{indent}  learn:      {_num(l.learn)}{ov}{mode}",
                       f"{indent}  act {{",

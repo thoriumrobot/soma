@@ -542,6 +542,38 @@ print()
 print("Conviction protects the interior and betrays the surface.")
 """)
 
+_ex("lib/pc_legitimacy", "0.25 · legitimacy (system justification)", "the belief that holds the holder; an exit is a solvent",
+r"""
+# 0.25 -- LEGITIMACY: why the people a system injures defend it (Jost;
+# Laurin/Kay; Wakslak). A legitimizing belief's conviction is DERIVED from
+# three antecedents -- dependence, inescapability, threat -- and its trust in
+# the evidence of harm derived inversely (motivated ignorance). While it
+# holds, injury buys quiet at the price of self-worth; when it breaks, the
+# grief arrives whole and the outrage becomes available.
+from soma.narrative import (Story, guarded, stoic, justifies,
+                            palliative_tradeoff, antecedent_dose)
+
+# The widow: dependent on the system, and it is the only world there is.
+def widow():
+    s = Story("the_feather", span="16s", step="1s", about="acute distress")
+    neva = s.character("Neva", temperament=guarded)
+    justifies(neva, "perch", dependence=0.9, inescapability=0.9)
+    return s
+
+print(palliative_tradeoff(widow, "Neva", harm=6.0).render())
+print()
+
+# The exodus curve: nothing changes but the thinkability of leaving.
+def drifter(inescapability):
+    s = Story("the_quarter", span="16s", step="1s", about="acute distress")
+    d = s.character("Drifter", temperament=stoic)
+    justifies(d, "perch", dependence=0.85, inescapability=inescapability)
+    return s
+
+print(antecedent_dose(drifter, "Drifter",
+                      levels=(0.95, 0.5, 0.1)).render())
+""")
+
 _ex("lib/pc_files", "files · SOMA files, from Python", "write a .soma file, run it with run_file, change a dial, diff the endings",
 r"""
 # FILES -- write a SOMA file here, run it through the library, change one
@@ -1612,7 +1644,8 @@ _RAIL_ORDER = [
     "lib/strange_situation", "lib/gottman",
     "lib/sensitivity", "lib/counterfactual",
     "lib/pc_signature", "lib/pc_portrait", "lib/pc_network", "lib/pc_diary",
-    "lib/pc_choice", "lib/pc_other_mind", "lib/pc_tell", "lib/pc_files",
+    "lib/pc_choice", "lib/pc_other_mind", "lib/pc_tell", "lib/pc_legitimacy",
+    "lib/pc_files",
     "capstone/four_ways_of_leaving", "capstone/anatomy_of_a_breaking",
     "capstone/marriage_that_could_have_held", "capstone/five_marriages",
     "capstone/the_spiral", "capstone/the_strange_situation",

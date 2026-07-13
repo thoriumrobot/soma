@@ -242,6 +242,18 @@ def bar(frac, width=20):
     return fill * n + empty * (width - n)
 
 
+def track(pos, lo, hi, width=10, mark=None, none_char="—"):
+    """A scale from `lo` to `hi` with a marker at `pos`: `|···▲······|`.
+    `pos=None` renders an empty scale (no threshold in range)."""
+    mark = mark or ("▲" if _USE_UNICODE else "^")
+    dot = "·" if _USE_UNICODE else "."
+    if pos is None:
+        return "|" + dot * width + "|" + f" {none_char}"
+    frac = 0.0 if hi <= lo else max(0.0, min(1.0, (pos - lo) / (hi - lo)))
+    i = min(width - 1, int(round(frac * (width - 1))))
+    return "|" + dot * i + mark + dot * (width - 1 - i) + "|"
+
+
 def rule(width=None, ch="─"):
     width = width or term_width()
     return (ch if _USE_UNICODE else "-") * width

@@ -110,12 +110,15 @@ heart rising when the words land and settling once they pass.
   With `cued_by`/`evokes` it also plants a somatic memory, so the wound can fire
   wordlessly long after its story is forgotten
 - `.believes(lie, claim=, disconfirmed_by=, feeling=, harms=, conviction=,
-  breakable=, says=)` — the **Lie**: a high-conviction belief that reads the very
+  breakable=, says=, evidence_trust=)` — the **Lie**: a high-conviction belief that reads the very
   evidence that would disconfirm it and suppresses it (self-deception, in SOMA's
   own precision arbitration), hardening with each denial. `harms="self"`
   (psychological weakness) or `"others"` (moral). `breakable=True` (default) lets
   it break, the moment derived automatically from conviction vs. evidence;
-  `breakable=None` keeps it — the tragic arc. The lie is spoken, so it makes a
+  `breakable=None` keeps it — the tragic arc. `evidence_trust` (default 0.35)
+  is the precision the disconfirming channel is granted — lower it and the lie
+  is not so much defended as never tested (motivated ignorance), and its auto
+  breaking point rises with conviction/evidence_trust. The lie is spoken, so it makes a
   confabulation gap against the need aching underneath
 - `.needs(truth, opposes=, feeling=, fed_feeling=)` — the **Need**: the salve to the
   lie, the opposite of it, *not* fed by getting the want — met only when the lie is
@@ -504,6 +507,88 @@ autocorrelation — the fingerprints of critical slowing down).
   interaction. Indices are bounded to [0, 1].
 - `story.minimal_intervention(target=, dials=, character=)` finds the smallest
   single-dial change that flips the outcome — the margin the ending turned on.
+- `discriminate(story, who, probes, outcome)` finds the one scene that most
+  separates two readings of a character — the diagnostic situation to write.
+
+## Predictive characterization (0.15–0.22)
+
+Where the models above predict an *event*, these predict a *character*: the
+stable profile a person is, the space of their possible trajectories, the
+network they emerge from. `TUTORIAL_CHARACTERIZATION.md` walks all of them.
+
+**The signature (0.15).** `signature(story, who, situations)` extracts the
+CAPS if…then profile — what the person does in each of a battery of situations,
+every one unseen. `similarity(a, b)` scores two profiles; `diagnostic_situation`
+names the scene that tells two same-on-average people apart. `selfguides` maps
+Higgins' ideal/ought self-guides to the distinct emotions their violation
+produces; `density(story, who, channel)` returns Fleeson's within-person
+distribution — the mean *and the width*, both traits.
+
+**The landscape (0.16).** `phase_portrait(story, a, b)` sweeps a grid of opening
+moods, runs the real coupled characters from each, and returns the *attractors*
+and *basins* — the space of a relationship's endings, drawn. `futures(story,
+dials, classify)` samples the ensemble of outcomes over a dial-space; the
+report's `pivotal()` names the dial the fate turns on.
+
+**The intrapersonal landscape (0.17).** `state_portrait(story, who, x, y)` turns
+the same lens inward on one psyche: calm and panic as competing attractors,
+recovery as the basin between them; a `healthy_share` reports how much of the
+plane flows to the well pole.
+
+**The network (0.18).** `symptom_network` / `depression_network(connectivity=)`
+build a person as a system of mutually-reinforcing symptoms. `stress_response`
+traces the dose–response and its tipping point; `hysteresis_loop` shows the
+episode outliving its cause (and `spontaneous_nonrecovery` the case where it
+never releases); `equilibrium_modes` the bimodality of a strongly-connected
+psyche.
+
+**The inverse problem (0.19).** `simulate_diary(net)` generates a daily record;
+`estimate_network(diary)` recovers the lag-1 wiring back from it (ridge VAR);
+`compare_hubs` recovers which symptom drives the system — and the identifiability
+limit, that a hub must vary to be seen.
+
+**Choice (0.20).** `Option(name, reward=, uncertainty=)` and `decide(prefs,
+options, curiosity=)` implement choice under expected free energy — a chooser
+wants what they prefer *and* what they'd learn. `explore_exploit` traces the
+crossover; `curiosity_of(temperament)` reads the drive off the character.
+
+**The other mind (0.21).** `Mind`, `play`, and `tournament` implement recursive
+theory of mind (k-ToM): depth beats shallower depth, over-mentalizing loses to
+a simpleton, and `detect_depth` reads a mind's recursion depth back from its
+moves alone.
+
+**The tell (0.22).** `legibility` and `face_off` show that the more decisively a
+mind converts its model into action, the more legible it is to a deeper reader;
+`social_params_of(temperament)` derives the (α, β) of the softmax from the same
+precision and conviction that drive feeling and choice — so the guarded, who
+hold their priors hardest, are the most read.
+
+## System justification — the belief that holds the holder (0.25)
+
+`soma.narrative.legitimacy` models why the people a system injures so often
+defend it (Jost & Banaji; Jost & Hunyady's palliative function; Jost & Thompson's
+internalization cost; Wakslak et al. on dampened outrage; Laurin, Shepherd & Kay
+on inescapability; Friesen et al. on the three antecedents).
+
+- `justifies(char, system, dependence=, inescapability=, threat=,
+  disadvantaged=)` wires a legitimizing belief as an ordinary breakable lie
+  whose **conviction is derived** from the three antecedents and whose trust in
+  the evidence of harm is **derived inversely** (motivated ignorance). The
+  palliative trade is wired into the body and gated on the belief itself: while
+  it holds, injury buys quiet (anxiety down) at the price of self-regard (worth
+  down, for the disadvantaged), with outrage dampened; when it breaks, the grief
+  arrives whole and the outrage becomes available.
+- `derived_conviction(...)` and `derived_evidence_trust(...)` expose the two
+  derivations directly.
+- `palliative_tradeoff(builder, who)` prices the belief: mean anxiety and worth
+  with it versus without — the comfort and the tax, both real.
+- `antecedent_dose(make_story, who, dial=)` draws the **exodus curve**: the
+  tipping point as a function of one antecedent. At high inescapability the
+  belief holds against everything the system ordinarily deals; open the exit and
+  the same injuries suffice. An exit is not a destination — it is a solvent.
+- `conscientize(make_story, who, sessions=)` doses Freire's critical
+  consciousness: each session of dialogic challenge lowers *felt* inescapability,
+  and the tipping point falls with it.
 
 Every prediction is a claim about the *model* of a character, never about a real
 person; the reports print that caveat themselves.

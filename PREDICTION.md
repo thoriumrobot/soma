@@ -1223,3 +1223,120 @@ semantics + three-regime render; `decide()` decisiveness plumbing. New:
 `PortraitReport.healthy_share`, `somac --version`, severe-regime study in
 `the_weight.py`, demonstrated recovery claims in `lib/pc_network`,
 `.gitignore`.*
+
+---
+
+## 0.25 — Legitimacy: the belief that holds the holder
+
+The layer models system justification — why the people a system injures so
+often defend it — grounded in Jost & Banaji (1994), Jost & Hunyady (2002, the
+palliative function), Jost & Thompson (2000, the self-worth cost to the
+disadvantaged), Wakslak et al. (2007, the dampening of moral outrage), Laurin,
+Shepherd & Kay (2010, inescapability raises defense of the status quo), and
+Friesen et al. (2019, the three antecedents: threat, dependence,
+inescapability — and "motivated ignorance").
+
+`justifies(char, system, dependence=, inescapability=, threat=)` wires a
+legitimizing belief as an ordinary `believes(...)` lie whose **conviction is
+derived from the three antecedents** and whose **trust in the disconfirming
+evidence is derived inversely** (motivated ignorance — a new `evidence_trust`
+parameter on `believes()`, default unchanged at 0.35). The palliative trade is
+wired into the body and *gated on the belief itself* via the lie's `_seen`
+channel: while the belief holds, injury buys quiet (anxiety driven down) at
+the price of self-regard (worth driven down, disadvantaged only), with outrage
+dampened; the moment it breaks — the standard overwhelm revelation — the
+palliation stops, the grief arrives whole, and the outrage becomes available.
+
+Because both dials are derived, the predictions are too. `palliative_tradeoff`
+prices the belief (with it: anxiety 25, worth 31; without: anxiety 86, worth
+60 — the belief buys ~60 points of quiet and charges ~29 of worth).
+`antecedent_dose` produces the **exodus curve**: at inescapability 0.95 the
+belief breaks only at harm ≥ 7 (holding against everything the system
+ordinarily deals); at 0.25, harm ≥ 3 suffices — nobody's injuries changed, the
+thinkability of an exit changed what they were allowed to mean. `conscientize`
+doses Freire's critical consciousness: each session of dialogic challenge
+lowers *felt* inescapability, and the tipping point falls from 6 to 3 over
+eight sessions. The flagship `examples/narrative/the_feather.py` stages all of
+it on THE UNMOORING's cast — Neva's condolence-feather priced as the purchase
+she says it is, the homeland legend as a solvent, the Mender's year as a dose,
+and the dark-of-moon night as a quarter's beliefs breaking together.
+
+*Version: SOMA 0.25.0. Tests: 416 passing. New: `soma/narrative/legitimacy.py`
+(justifies, derived_conviction, derived_evidence_trust, palliative_tradeoff,
+antecedent_dose, conscientize); `evidence_trust` on `believes()`;
+`examples/narrative/the_feather.py`; `tests/test_legitimacy.py` (13).*
+
+---
+
+## 0.26 — The legible release: every study output, drawn
+
+Every report renderer was audited for the question "does the text show the
+finding, or only state it?" and upgraded where the answer was the latter. No
+mechanism changed; 416 tests still pass; every number is the same. What
+changed is that the outputs now carry their own visual argument:
+
+* **Phase portraits** letter each basin by its *temperature* (`w`arm, `c`old,
+  `m`ixed, or the psyche's labels such as `p`anic) instead of by attractor
+  index — so two landscapes that differ only in what their single attractor
+  *is* draw visibly different planes (`wwww` vs `cccc`, where both previously
+  rendered `aaaa`), and a split landscape draws its own boundary. Duplicate
+  temperatures fall back to index letters, so basins stay distinguishable.
+* **Dose–response and hysteresis** (network layer) render as aligned bar
+  tracks: the stress sweep shows the jump at the tipping point, and the
+  hysteresis loop is visible as the asymmetry between the up and down columns
+  at the same stress level (1 symptom up, 6 down — the loop, as a shape).
+  Equilibrium-mode histograms carry counts; kindling shows the falling
+  threshold as a shrinking bar.
+* **The legitimacy reports** draw the trade as paired anxiety/worth bars
+  (with vs. without the belief), and the exodus and conscientization curves
+  carry a `|···▲······|` harm-scale track per row, so the tipping point is a
+  marker that visibly walks left as inescapability falls.
+* **Tournaments** (theory of mind) mark each cell ▲/▽ for who is being
+  out-thought, making the below-diagonal ladder pop; **signatures** open each
+  if–then line with a route glyph (▼ suppress, ▲ take in, ◆ breaks), so two
+  trait-identical people with crossed profiles read as `▼▲` vs `▲▼` at a
+  glance; **temporal networks** put magnitude bars on edges and out-strength
+  bars on the hub ranking; **density** anchors its histogram with the range.
+* **Second batch, from the follow-up audit:** **early warning** draws its
+  overwhelm accumulator as a progress bar against the bound; **sensitivity**
+  puts a variance bar on each dial's total effect; **discrimination** bars the
+  divergence column and marks the winning probe `<- here` in the table
+  itself; **learned helplessness** shows pretreatment vs. novel-task
+  initiations as paired bars; and the **speed–accuracy tradeoff** carries
+  accuracy and RT bars, so the boundary sweep reads as two opposing ramps.
+* A shared `track(pos, lo, hi)` scale-with-marker primitive joined
+  `soma/viz.py` alongside the existing `bar` and `sparkline`.
+* The audit also closed an undone item from 0.25: the legitimacy layer now
+  has its playground library example (`lib/pc_legitimacy` — the trade priced
+  and the exodus curve, 31 library examples total), matching the pattern
+  every other layer follows.
+* **Documentation brought fully current.** The predictive-characterization
+  family (0.15–0.22) and the legitimacy layer (0.25) are now indexed in
+  NARRATIVE.md's API reference (previously it stopped at the 0.6–0.7
+  prediction models); `TUTORIAL_CHARACTERIZATION.md` gained **§2.12 Legitimacy**,
+  built from a live-verified snippet through the same pipeline as every other
+  section, with the roadmap and "how the instruments relate" summary extended
+  to match; both WordPress exports regenerated (130 and 302 balanced blocks);
+  the assembled `TUTORIAL_PREDICTIVE_CHARACTERIZATION.md` rebuilt (1091 lines);
+  and README's example section now documents the narrative-flagship and
+  playground-library catalogs alongside the seventeen core `.soma` files.
+
+Both tutorials' output blocks were regenerated from live runs against the new
+renderers — TUTORIAL_CHARACTERIZATION.md via its snippet pipeline (all 14
+pass) and TUTORIAL_PREDICTIVE.md via a block-by-block re-run of every fenced
+example (22 blocks: 14 bit-identical, 8 regenerated, 0 errors; two previously
+hand-abbreviated output blocks are now literal). Both WordPress exports
+re-emitted; §2.4's prose now explains the temperature glyphs. The audit also
+fixed stale version stamps (README, GRAMMAR.md, CHARACTER_DEPTH.md), corrected
+two `legitimacy` docstrings whose "never breaks" claims overstated the
+calibrated behavior (the never-regime exists but requires all three
+antecedents near ceiling), documented `evidence_trust` in `believes()`'s
+docstring and NARRATIVE.md, and repaired a tutorial sentence that attributed a
+split basin to the volatile couple (whose plane is single-warm; split
+landscapes are described generically now).
+
+*Version: SOMA 0.26.0. Tests: 416 passing. Changed: `soma/viz.py` (track),
+`soma/narrative/{phase,network,legitimacy,mentalizing,signature,idiographic,
+density,earlywarning,sensitivity,discriminate,helplessness,decision}.py`
+(render methods only), both tutorials + WordPress exports, NARRATIVE.md,
+README.md, GRAMMAR.md, CHARACTER_DEPTH.md.*

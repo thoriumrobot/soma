@@ -109,8 +109,12 @@ class EarlyWarningReport:
                  f"before any revelation:"]
         lines.append(f"  signal: {self.channel}")
         if self.detail.get("bound") is not None:
-            lines.append(f"  accumulator at {self.detail.get('debt_last', 0):.1f} "
-                         f"of bound {self.detail['bound']:.1f}, "
+            from soma.viz import bar
+            debt = self.detail.get("debt_last", 0)
+            bound = self.detail["bound"]
+            frac = 0.0 if bound <= 0 else min(1.0, debt / bound)
+            lines.append(f"  accumulator {bar(frac, 16)} {debt:.1f} of "
+                         f"bound {bound:.1f}, "
                          f"slope {self.detail.get('slope', 0):+.2f}/s")
         lines.append(f"  fluctuation variance trend:   {self.var_trend:+.2f} "
                      f"({'rising' if self.var_trend > 0.15 else 'flat/falling'})")

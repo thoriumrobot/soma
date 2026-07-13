@@ -57,7 +57,9 @@ class SensitivityReport:
             lines.append("  outcome did not vary across the sampled space — "
                          "no dial in this range writes this ending.")
             return "\n".join(lines)
-        lines.append("  dial                                  main   total   reading")
+        lines.append("  dial                                  main   total"
+                     "              reading")
+        from soma.viz import bar
         for p, st in self.ranked():
             si = self.first_order.get(p, 0.0)
             parts = p.split(".")
@@ -72,7 +74,8 @@ class SensitivityReport:
                 reading = "acts through interaction"
             else:
                 reading = "mixed"
-            lines.append(f"  {short:<36s} {si:5.2f}  {st:5.2f}   {reading}")
+            lines.append(f"  {short:<36s} {si:5.2f}  {st:5.2f} "
+                         f"{bar(st, 10)}  {reading}")
         for n in self.notes:
             lines.append(f"  ({n})")
         return "\n".join(lines)

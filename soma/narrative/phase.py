@@ -234,12 +234,11 @@ class PortraitReport:
     def attractor_of(self, a0, b0) -> Attractor:
         return self.attractors[self.basins[(a0, b0)]]
 
-    def render(self) -> str:
-        lines = [f"PHASE PORTRAIT — {self.a_name} x {self.b_name} "
-                 f"({len(self.attractors)} attractor"
-                 f"{'s' if len(self.attractors) != 1 else ''}):"]
-        marks = "ABCDEFGH"
-        for i, at in enumerate(self.attractors):
+    def _tags(self) -> list:
+        """The temperature tag of each attractor (warm/cold/mixed, or the
+        psyche's high/low labels), used for both the legend and the glyphs."""
+        tags = []
+        for at in self.attractors:
             if self.subject == "psyche":
                 line = getattr(self, "_positive_line", None)
                 l2 = line
@@ -251,21 +250,54 @@ class PortraitReport:
                 lo = at.a < line and at.b < l2
                 tag = (self.high_label if hi else self.low_label if lo
                        else "mixed")
-                if at.cyclic:
-                    tag += " cycle"
+            else:
+                tag = at.label()
+            if at.cyclic:
+                tag += " cycle"
+            tags.append(tag)
+        return tags
+
+    def _glyphs(self, tags) -> list:
+        """One grid glyph per attractor, keyed to its TEMPERATURE rather than
+        its index, so two landscapes that differ only in what their single
+        attractor is (a warm one vs. a cold one) draw visibly different
+        planes: `wwww` vs `cccc`, not `aaaa` vs `aaaa`. Duplicated tags fall
+        back to index letters so every basin stays distinguishable."""
+        marks = "abcdefgh"
+        glyphs, seen = [], set()
+        for i, tag in enumerate(tags):
+            g = tag[0].lower() if tag else marks[i]
+            if g in seen:
+                g = marks[i]
+            seen.add(g)
+            glyphs.append(g)
+        return glyphs
+
+    def render(self) -> str:
+        lines = [f"PHASE PORTRAIT — {self.a_name} x {self.b_name} "
+                 f"({len(self.attractors)} attractor"
+                 f"{'s' if len(self.attractors) != 1 else ''}):"]
+        tags = self._tags()
+        glyphs = self._glyphs(tags)
+        for i, at in enumerate(self.attractors):
+            if self.subject == "psyche":
                 cyc = (f" (swing ±{at.amplitude / 2:.1f}"
                        + (f", period ≈ {at.period:.0f} beats" if at.period
                           else "") + ")") if at.cyclic else ""
-                lines.append(f"  {marks[i]}: ({at.a:.1f}, {at.b:.1f}) [{tag}] "
+                lines.append(f"  {glyphs[i]}: ({at.a:.1f}, {at.b:.1f}) "
+                             f"[{tags[i]}] "
                              f"holding {at.share:.0%} of the plane{cyc}")
             else:
-                lines.append(f"  {marks[i]}: {at.render()}")
+                lines.append(f"  {glyphs[i]}: {at.render()}")
         # the plane, drawn: rows are the second axis (high at top),
-        # columns are the first; each cell is the basin it belongs to.
+        # columns are the first; each cell is the basin it belongs to,
+        # lettered by its temperature (w=warm, c=cold, m=mixed, ...).
         grid2 = getattr(self, "_grid2", self.grid)
-        lines.append(f"  basins ({self.a_name} →, {self.b_name} ↑):")
+        lines.append(f"  basins ({self.a_name} →, {self.b_name} ↑; "
+                     + ", ".join(f"{g}={t}" for g, t in zip(glyphs, tags))
+                     + "):")
         for b0 in sorted(grid2, reverse=True):
-            row = "".join(marks[self.basins[(a0, b0)]].lower()
+            row = "".join(glyphs[self.basins[(a0, b0)]]
                           for a0 in sorted(self.grid))
             lines.append(f"    {b0:>5.1f} |{row}|")
         lines.append("          " + "".join("-" for _ in self.grid))
