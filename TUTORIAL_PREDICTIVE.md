@@ -107,22 +107,10 @@ print(story.run(width=76))
 ╰──────────────────────────────────────────────────────────────────────────╯
 ╭─ CHRONICLE · trace (17 of 17 events) ────────────────────────────────────╮
 │     0.0s settle   appraising_h sense=0.0 belief=0.0 error=0.0 pi_s=0.88 …
-│     1.0s settle   appraising_h sense=0.0 belief=0.0 error=0.0 pi_s=0.88 …
 │     2.0s stimulus her_face     value=7.0
 │     2.0s settle   appraising_h sense=7.0 belief=0.0 error=6.16 pi_s=0.88…
 │     2.0s emit     appraising_h quale=Qualia<delight>
-│     3.0s settle   appraising_h sense=7.0 belief=0.0 error=6.16 pi_s=0.88…
-│     3.0s emit     appraising_h quale=Qualia<delight>
-│     4.0s settle   appraising_h sense=7.0 belief=0.0 error=6.16 pi_s=0.88…
-│     4.0s emit     appraising_h quale=Qualia<delight>
-│     5.0s settle   appraising_h sense=7.0 belief=0.0 error=6.16 pi_s=0.88…
-│     5.0s emit     appraising_h quale=Qualia<delight>
-│     6.0s settle   appraising_h sense=7.0 belief=0.0 error=6.16 pi_s=0.88…
-│     6.0s emit     appraising_h quale=Qualia<delight>
-│     7.0s settle   appraising_h sense=7.0 belief=0.0 error=6.16 pi_s=0.88…
-│     7.0s emit     appraising_h quale=Qualia<delight>
-│     8.0s settle   appraising_h sense=7.0 belief=0.0 error=6.16 pi_s=0.88…
-│     8.0s emit     appraising_h quale=Qualia<delight>
+│     …
 ╰──────────────────────────────────────────────────────────────────────────╯
 ```
 
@@ -210,7 +198,7 @@ loop the_lie_only_needed @cardiac {
   }
 }
 
-stimulus kept_for_nothing { at 2s: 8  at 3s: 8  at 4s: 8  at 5s: 8  at 6s: 8  at 7s: 8  at 8s: 8  at 9s: 8  at 10s: 8  at 11s: 8 }
+stimulus kept_for_nothing { at 2s: 8  at 3s: 8  at 4s: 8  ... }
 ```
 
 Notice what `believes(..., breakable=True)` compiled to: a loop with **high
@@ -565,7 +553,7 @@ tipping point: {'who': 'Vane', 'channel': 'the_evidence', 'breaks_at': 3.0, 'in_
 
 EARLY WARNING — Vane, read only before any revelation:
   signal: overwhelm-debt (the destabilizing variable)
-  accumulator ███████████████· 18.9 of bound 20.1, slope +2.10/s
+  accumulator at 18.9 of bound 20.1, slope +2.10/s
   fluctuation variance trend:   -0.39 (flat/falling)
   fluctuation autocorr. trend:  +0.36 (rising)
   -> FORECAST: break coming (strong signal) — crossing predicted at ≈14s
@@ -795,11 +783,11 @@ muddled          63%       2.32s      2.24s   +1.29
 prejudiced       86%       1.52s      2.65s   +1.92
 
 SPEED-ACCURACY TRADEOFF — Juror, boundary swept (drift held fixed):
-    boundary   accuracy               mean RT
-      0.60      67% ███████···   1.03s ██······
-      1.00      75% ███████···   2.25s ████····
-      1.50      84% ████████··   3.49s ██████··
-      2.00      91% █████████·   4.30s ████████
+    boundary   accuracy   mean RT
+      0.60        67%     1.03s
+      1.00        75%     2.25s
+      1.50        84%     3.49s
+      2.00        91%     4.30s
     ✓ CONFIRMED: wider boundary raises accuracy (more evidence, fewer errors) — ['67%', '75%', '84%', '91%']
     ✓ CONFIRMED: wider boundary lengthens RT (more evidence takes longer) — ['1.03', '2.25', '3.49', '4.30']
 ```
@@ -1047,10 +1035,10 @@ print(rep.render())
 
 ```
 SENSITIVITY of 'break_time' (Ink) — variance-based, 120 runs
-  dial                                  main   total              reading
-  the_lie_only_needed.conviction        1.00   1.00 ██████████  acts on its own
-  the_lie_only_needed.learn             0.12   1.00 ██████████  acts through interaction
-  the_lie_only_needed.precision         1.00   1.00 ██████████  acts on its own
+  dial                                  main   total   reading
+  the_lie_only_needed.conviction        1.00   1.00   acts on its own
+  the_lie_only_needed.learn             0.12   1.00   acts through interaction
+  the_lie_only_needed.precision         1.00   1.00   acts on its own
   (main = variance removed if this dial were fixed; total = variance attributable to it including interactions)
 ```
 
@@ -1560,10 +1548,10 @@ II. SENSITIVITY — which dial writes this ending
 ==========================================================================
 
 SENSITIVITY of 'break_time' (Halvor) — variance-based, 160 runs
-  dial                                  main   total              reading
-  …e_lie_kept_means_needed.precision    0.04   0.76 ████████··  acts through interaction
-  the_lie_kept_means_needed.learn       0.00   0.72 ███████···  acts through interaction
-  …_lie_kept_means_needed.conviction    0.17   0.71 ███████···  acts through interaction
+  dial                                  main   total   reading
+  …e_lie_kept_means_needed.precision    0.04   0.76   acts through interaction
+  the_lie_kept_means_needed.learn       0.00   0.72   acts through interaction
+  …_lie_kept_means_needed.conviction    0.17   0.71   acts through interaction
   (main = variance removed if this dial were fixed; total = variance attributable to it including interactions)
 
   (The heavy interaction is not noise; it is a recovered mechanism. SOMA's
@@ -1581,10 +1569,10 @@ III. DISCRIMINATION — the scene that separates two readings
 
 DISCRIMINATION — the scene that separates two readings of Halvor (outcome: break_time):
   probe                          reading A   reading B   apart
-  her_visits=4                      15.0       never    1.00 ████████  <- here
-  her_visits=6                      13.0       never    1.00 ████████
-  her_visits=9                       7.0       never    1.00 ████████
-  her_visits=2                     never       never    0.00 ········
+  her_visits=4                      15.0       never    1.00
+  her_visits=6                      13.0       never    1.00
+  her_visits=9                       7.0       never    1.00
+  her_visits=2                     never       never    0.00
   -> WRITE THIS SCENE: her_visits=4 — the two natures come apart most here.
   (divergence 1.00 = the two readings differ qualitatively (one breaks, one never does) — the sharpest possible separation)
 
@@ -1599,7 +1587,7 @@ IV. EARLY WARNING — is the break legible before it happens?
 
 EARLY WARNING — Halvor, read only before any revelation:
   signal: overwhelm-debt (the destabilizing variable)
-  accumulator ███████████····· 17.8 of bound 24.9, slope +4.45/s
+  accumulator at 17.8 of bound 24.9, slope +4.45/s
   fluctuation variance trend:   +0.80 (rising)
   fluctuation autocorr. trend:  -0.64 (flat/falling)
   -> FORECAST: break coming (strong signal) — crossing predicted at ≈11s
@@ -1610,7 +1598,7 @@ EARLY WARNING — Halvor, read only before any revelation:
 
 EARLY WARNING — Halvor, read only before any revelation:
   signal: overwhelm-debt (the destabilizing variable)
-  accumulator ███████████····· 11.0 of bound 16.1, slope +1.10/s
+  accumulator at 11.0 of bound 16.1, slope +1.10/s
   fluctuation variance trend:   +0.88 (rising)
   fluctuation autocorr. trend:  -0.32 (flat/falling)
   -> FORECAST: stable (strong signal) — at this rate the bound is not reached until ≈25s, past the horizon
@@ -1856,10 +1844,10 @@ II. SENSITIVITY — is the tragedy the learning, or the trusting?
 ==========================================================================
 
 SENSITIVITY of 'perceive_frac' (Soren) — variance-based, 120 runs
-  dial                                  main   total              reading
-  appraising_her_face.learn             0.00   0.53 █████·····  acts through interaction
-  appraising_her_face.conviction        0.12   0.12 █·········  acts on its own
-  appraising_her_face.precision         0.07   0.07 █·········  acts on its own
+  dial                                  main   total   reading
+  appraising_her_face.learn             0.00   0.53   acts through interaction
+  appraising_her_face.conviction        0.12   0.12   acts on its own
+  appraising_her_face.precision         0.07   0.07   acts on its own
   (main = variance removed if this dial were fixed; total = variance attributable to it including interactions)
 
   (The outcome is the fraction of his life the world still gets in.)
@@ -2911,12 +2899,12 @@ III. THE SPEED-ACCURACY DIAL — hurry, then be sure
 ==========================================================================
 
 SPEED-ACCURACY TRADEOFF — Juror, boundary swept (drift held fixed):
-    boundary   accuracy               mean RT
-      0.50      64% ██████····   0.84s ██······
-      0.80      71% ███████···   1.63s ███·····
-      1.10      77% ████████··   2.49s █████···
-      1.50      84% ████████··   3.44s ██████··
-      2.00      90% █████████·   4.24s ████████
+    boundary   accuracy   mean RT
+      0.50        64%     0.84s
+      0.80        71%     1.63s
+      1.10        77%     2.49s
+      1.50        84%     3.44s
+      2.00        90%     4.24s
     ✓ CONFIRMED: wider boundary raises accuracy (more evidence, fewer errors) — ['64%', '71%', '77%', '84%', '90%']
     ✓ CONFIRMED: wider boundary lengthens RT (more evidence takes longer) — ['0.84', '1.63', '2.49', '3.44', '4.24']
 

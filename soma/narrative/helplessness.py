@@ -74,13 +74,8 @@ class HelplessnessReport:
         lines.append(f"    pretreatment: {self.pretreatment}; novel task: "
                      f"{'similar' if self.novel_similar else 'DISSIMILAR'} "
                      f"to pretreatment")
-        from soma.viz import bar
-        top = max(self.initiations_pre, self.initiations_test, 1)
-        lines.append(f"    initiations, pretreatment "
-                     f"{bar(self.initiations_pre / top, 12)} "
-                     f"{self.initiations_pre}")
-        lines.append(f"    initiations, novel task   "
-                     f"{bar(self.initiations_test / top, 12)} "
+        lines.append(f"    response initiations — pretreatment: "
+                     f"{self.initiations_pre}, novel task: "
                      f"{self.initiations_test}")
         lines.append(f"    novel task {'SOLVED' if self.escaped else 'not solved'}"
                      f"; helplessness deficit: "

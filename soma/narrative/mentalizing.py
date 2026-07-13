@@ -269,18 +269,13 @@ class Tournament:
 
     def render(self) -> str:
         head = ("TOURNAMENT — " + self.game + " (cell = seat-0 payoff/round; "
-                "0.50 = even; ▲ seat-0 out-thinks, ▽ is out-thought)")
-        cols = "            " + "   ".join(f"k={k}" for k in self.levels)
+                "0.50 = even)")
+        cols = "            " + "  ".join(f"k={k}" for k in self.levels)
         rows = []
         for ka in self.levels:
-            cells = []
-            for kb in self.levels:
-                v = self.matrix[(ka, kb)]
-                mark = "▲" if v >= 0.55 else "▽" if v <= 0.45 else " "
-                cells.append(f"{v:.2f}{mark}")
-            rows.append((f"  seat0 k={ka}: " + "  ".join(cells)).rstrip())
-        rows.append("  (the ▲s live below the diagonal: one level of depth "
-                    "is one level of edge)")
+            cells = "  ".join(f"{self.matrix[(ka, kb)]:.2f}"
+                              for kb in self.levels)
+            rows.append(f"  seat0 k={ka}: {cells}")
         return "\n".join([head, cols] + rows)
 
     def ladder_holds(self) -> bool:

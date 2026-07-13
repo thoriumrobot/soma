@@ -3,7 +3,7 @@
 *A self-contained guide to the high-level libraries for turning a described
 character into falsifiable predictions.*
 
-Generated against SOMA 0.26.0. Every code block in this tutorial was executed
+Generated against SOMA 0.24.0. Every code block in this tutorial was executed
 through the same library the browser playground uses; every output block is the
 real, unedited result of running the code directly above it.
 
@@ -34,8 +34,7 @@ output, and what the output means.**
 
 **A companion tutorial.** This document covers the *predictive
 characterization* layers — signature, self-guides, density, landscape, network,
-inverse problem, choice, theory of mind, the tell, and legitimacy/system
-justification (the 0.15–0.25 work). Its companion,
+inverse problem, choice, and theory of mind (the 0.15–0.22 work). Its companion,
 [`TUTORIAL_PREDICTIVE.md`](TUTORIAL_PREDICTIVE.md), covers the earlier
 *prediction* layers — appraisal, attachment, tipping points, conditioning, the
 Gottman model, drift-diffusion decisions, and the sensitivity/counterfactual
@@ -240,12 +239,10 @@ situations: the profile of what they take in, the emotion a failure produces,
 the distribution of states they occupy. The next three widen the lens from a
 single response to the *space* of trajectories — first for a relationship
 (2.4–2.5), then, turning the same idea inward, for a single psyche (2.6). The
-next make a person *emergent* from a symptom network (2.7) and then recover
+last five make a person *emergent* from a symptom network (2.7) and then recover
 that network from behaviour (2.8), before moving from what a character feels to
 what they *do*: how they choose (2.9), how they play against other minds (2.10),
-and how readable they are in the process (2.11). The last (2.12) turns the whole
-apparatus on a character's *loyalty to what harms them*, and derives even that
-from their circumstances.
+and how readable they are in the process (2.11).
 
 Two ideas recur and are worth watching for. The first is the **attractor**, a
 stable state a trajectory settles into; it is introduced on a couple in 2.4 and
@@ -306,14 +303,14 @@ print(f"the one situation that separates them: '{d['situation']}' "
 Output:
 
 ```
-Behavioral signature -- Ren (if...then profile; every situation unseen; ▼ suppress ▲ take in ◆ breaks):
-  ▼ if a judging eye            then they SUPPRESS it, feeling fear
-  ▲ if an open warmth           then they TAKE IT IN, feeling comfort
+Behavioral signature -- Ren (if...then profile; every situation unseen):
+  if a judging eye            then they SUPPRESS it, feeling fear
+  if an open warmth           then they TAKE IT IN, feeling comfort
   mean level (the trait-score view): suppresses 50%, takes in 50%, breaks 0%
 
-Behavioral signature -- Sol (if...then profile; every situation unseen; ▼ suppress ▲ take in ◆ breaks):
-  ▲ if a judging eye            then they TAKE IT IN, feeling fear
-  ▼ if an open warmth           then they SUPPRESS it, feeling wariness
+Behavioral signature -- Sol (if...then profile; every situation unseen):
+  if a judging eye            then they TAKE IT IN, feeling fear
+  if an open warmth           then they SUPPRESS it, feeling wariness
   mean level (the trait-score view): suppresses 50%, takes in 50%, breaks 0%
 
 profile similarity: 0.33 (mean levels equal: True)
@@ -426,12 +423,12 @@ Output:
 
 ```
 Density -- Wren, arousal across 16 unseen situations on 'news':
-  47 |█        ▂| 98   (the distribution IS the character)
+  █        ▂
   mean 56.33 (the trait score)   sd 20.10 (the width -- itself a trait)   skew +1.60
   range [46.67, 98.16]   reactivity to the cue +0.74
 
 Density -- Moss, arousal across 16 unseen situations on 'news':
-  47 |▁        █| 74   (the distribution IS the character)
+  ▁        █
   mean 70.73 (the trait score)   sd 9.09 (the width -- itself a trait)   skew -2.27
   range [46.67, 74.16]   reactivity to the cue +0.57
 
@@ -484,38 +481,33 @@ Output:
 ```
 --- validating couple ---
 PHASE PORTRAIT — Ada x Ben (1 attractor):
-  w: (7.6, 7.6) [warm] holding 100% of the plane
-  basins (Ada →, Ben ↑; w=warm):
-      9.0 |wwww|
-      6.3 |wwww|
-      3.7 |wwww|
-      1.0 |wwww|
+  A: (7.6, 7.6) [warm] holding 100% of the plane
+  basins (Ada →, Ben ↑):
+      9.0 |aaaa|
+      6.3 |aaaa|
+      3.7 |aaaa|
+      1.0 |aaaa|
           ----
   the warm basin holds 100% of the plane — the couple's resilience, as a region.
 
 --- hostile couple ---
 PHASE PORTRAIT — Ada x Ben (1 attractor):
-  c: (2.4, 2.4) [cold] holding 100% of the plane
-  basins (Ada →, Ben ↑; c=cold):
-      9.0 |cccc|
-      6.3 |cccc|
-      3.7 |cccc|
-      1.0 |cccc|
+  A: (2.4, 2.4) [cold] holding 100% of the plane
+  basins (Ada →, Ben ↑):
+      9.0 |aaaa|
+      6.3 |aaaa|
+      3.7 |aaaa|
+      1.0 |aaaa|
           ----
   NO WARM ATTRACTOR: every opening decays to the cold state. The landscape does not contain a good ending.
 ```
 
 
-The grid letters each basin by its **temperature** — `w` for warm, `c` for
-cold — so the two landscapes are legible at a glance: the validating couple's
-plane is solid `w`, the hostile couple's solid `c`. (With a split landscape —
-one whose openings can end in different attractors — the boundary between the
-regions is drawn in the grid itself, and any two attractors sharing a
-temperature fall back to index letters so the basins stay distinguishable.) The **validating couple's** entire plane drains into a single warm
-attractor at (7.6, 7.6): whatever mood they start the evening in, they end up
-warm — that is their resilience, shown as a region rather than asserted as a
-virtue. The **hostile couple's** plane contains **no warm attractor at all**:
-every opening, even a warm one, decays to the cold state at (2.4, 2.4). This is a prediction
+The **validating couple's** entire plane drains into a single warm attractor at
+(7.6, 7.6): whatever mood they start the evening in, they end up warm — that is
+their resilience, shown as a region rather than asserted as a virtue. The
+**hostile couple's** plane contains **no warm attractor at all**: every opening,
+even a warm one, decays to the cold state at (2.4, 2.4). This is a prediction
 about the *shape of their possibilities* — the hostile couple cannot reach a
 good ending not because of bad luck on a given night but because their landscape
 does not contain one.
@@ -632,14 +624,14 @@ Output:
 
 ```
 PHASE PORTRAIT — Noa.arousal x Noa.perceived_threat (2 attractors):
-  c: (20.0, 5.0) [calm] holding 36% of the plane
-  p: (95.0, 90.0) [panic] holding 64% of the plane
-  basins (Noa.arousal →, Noa.perceived_threat ↑; c=calm, p=panic):
-    100.0 |ppppp|
-     75.0 |ppppp|
-     50.0 |cccpp|
-     25.0 |cccpp|
-      0.0 |cccpp|
+  A: (20.0, 5.0) [calm] holding 36% of the plane
+  B: (95.0, 90.0) [panic] holding 64% of the plane
+  basins (Noa.arousal →, Noa.perceived_threat ↑):
+    100.0 |bbbbb|
+     75.0 |bbbbb|
+     50.0 |aaabb|
+     25.0 |aaabb|
+      0.0 |aaabb|
           -----
   the healthy basin holds 36% of the plane — a psyche is a set of attractors, and a disorder is one of them.
 
@@ -692,40 +684,24 @@ Output:
 
 ```
 STRESS RESPONSE — resilient (connectivity 0.45):
-    stress    0: ············ 0 symptoms
-    stress    1: ············ 0 symptoms
-    stress    2: ············ 0 symptoms
-    stress  2.5: ············ 0 symptoms
-    stress    3: ████████████ 9 symptoms  <- tips
+  0->0  1->0  2->0  2.5->0  3->9
   tips into depression at stress ≥ 3
 
 STRESS RESPONSE — vulnerable (connectivity 1.4):
-    stress    0: ············ 0 symptoms
-    stress    1: ············ 0 symptoms
-    stress    2: ████········ 3 symptoms
-    stress  2.5: █████████··· 7 symptoms  <- tips
-    stress    3: ████████████ 9 symptoms
+  0->0  1->0  2->3  2.5->7  3->9
   tips into depression at stress ≥ 2.5
 
 does removing the stress lift the depression?
 HYSTERESIS — vulnerable (connectivity 1.4):
-    stress   up sweep            down sweep
-        4    █████████ 9
-        3    █████████ 9 <-triggers  █████████ 9
-        2    █········ 1             ██████··· 6
-        1    ········· 0             ········· 0 <-releases
-        0    ········· 0             ········· 0
+  stress up:   0->0  1->0  2->1  3->9  4->9
+  stress down: 3->9  2->6  1->0  0->0
   triggers at 3.0, releases at 1 — the depression outlives its cause by 2
   hysteretic: lifting the stress below its trigger is not enough — it
   releases only at 1. The depression outlives its cause.
 
 HYSTERESIS — severe (connectivity 3.2):
-    stress   up sweep            down sweep
-        4    █████████ 9
-        3    █████████ 9             █████████ 9
-        2    ███████·· 7 <-triggers  █████████ 9
-        1    ········· 0             ███████·· 7
-        0    ········· 0             █████···· 5
+  stress up:   0->0  1->0  2->7  3->9  4->9
+  stress down: 3->9  2->9  1->7  0->5
   triggers at 2.0, never releases in range — the depression outlives its cause by ∞
   spontaneous non-recovery: removing the stressor does NOT lift the depression — the network holds itself down.
 ```
@@ -897,12 +873,11 @@ print(detect_depth(m.history, seat=1, candidates=(0, 1, 2)).render())
 Output:
 
 ```
-TOURNAMENT — hide_and_seek (cell = seat-0 payoff/round; 0.50 = even; ▲ seat-0 out-thinks, ▽ is out-thought)
-            k=0   k=1   k=2
-  seat0 k=0: 0.50   0.36▽  0.40▽
-  seat0 k=1: 0.64▲  0.50   0.36▽
-  seat0 k=2: 0.64▲  0.64▲  0.49
-  (the ▲s live below the diagonal: one level of depth is one level of edge)
+TOURNAMENT — hide_and_seek (cell = seat-0 payoff/round; 0.50 = even)
+            k=0  k=1  k=2
+  seat0 k=0: 0.50  0.36  0.40
+  seat0 k=1: 0.64  0.50  0.36
+  seat0 k=2: 0.64  0.64  0.49
 
 over-mentalizing a NAIVE opponent: a strict 2-ToM earns 0.06,
 the level-INFERRING 2-ToM earns 0.64 -- seeing a simple person
@@ -988,104 +963,6 @@ these instruments describe one character and not eleven.
 
 ---
 
-### 2.12 Legitimacy — the belief that holds the holder (0.25)
-
-The instruments so far predict what a character feels, chooses, and reveals.
-This one predicts something harder: why a character *defends the very thing that
-injures them*. It is the psychology of system justification — Jost and Banaji's
-observation that people, including the disadvantaged, are motivated to see the
-social order they live under as fair, because the belief itself does work: it
-quiets anxiety (Jost and Hunyady's *palliative function*), at a cost to
-self-regard for those it disadvantages (Jost and Thompson), while dampening the
-outrage that would move them to act (Wakslak and colleagues). Three contextual
-antecedents raise the motive — how much you **depend** on the system, how
-**inescapable** it is, and how **threatened** it is (Friesen and colleagues) —
-and the strongest single lever is inescapability: Laurin, Shepherd and Kay
-showed that making a system harder to leave makes people defend it *more*.
-
-The layer's move is that the conviction is not authored. You give a character
-their context, and `justifies` **derives** how hard they hold the belief from
-the three antecedents — and derives, inversely, how much they let the evidence
-of harm count at all (motivated ignorance). Everything downstream follows.
-
-```python
-from soma.narrative import Story, guarded, stoic
-from soma.narrative import justifies, palliative_tradeoff, antecedent_dose
-
-# 0.25 -- SYSTEM JUSTIFICATION: why the people a system injures defend it. A
-# legitimizing belief's conviction is DERIVED from three antecedents
-# (dependence, inescapability, threat); while it holds, injury buys quiet at
-# the price of self-worth. Nobody authors the conviction -- the context does.
-
-# Neva, a pillar-diver's widow: dependent on the system, and it is the only
-# world there is. She nails the lord's condolence-feather over her door.
-def widow():
-    s = Story("the_feather", span="16s", step="1s", about="acute distress")
-    neva = s.character("Neva", temperament=guarded)
-    justifies(neva, "perch", dependence=0.9, inescapability=0.9)
-    return s
-
-print(palliative_tradeoff(widow, "Neva", harm=6.0).render())
-print()
-
-# The exodus curve: hold everything fixed but the thinkability of leaving.
-def drifter(inescapability):
-    s = Story("the_quarter", span="16s", step="1s", about="acute distress")
-    d = s.character("Drifter", temperament=stoic)
-    justifies(d, "perch", dependence=0.85, inescapability=inescapability)
-    return s
-
-print(antecedent_dose(drifter, "Drifter", levels=(0.95, 0.5, 0.1)).render())
-```
-
-Output:
-
-```
-THE TRADE — Neva, the same injury, with and without the belief:
-  anxiety  with belief  █████···············  25.2
-           without      █████████████████···  86.1
-  worth    with belief  ██████··············  31.1
-           without      ████████████········  60.0
-  the belief buys 60.9 points of quiet and charges 28.9 points of worth.
-  'Let me have the luck' is not a delusion; it is a priced purchase.
-
-THE EXODUS CURVE — Drifter: tipping point of the belief as inescapability falls
-                        conviction                breaking harm  0        9
-  inescapability 0.95  0.824 ████████████··  |·······▲··| breaks at harm >= 7
-  inescapability 0.50  0.671 █████████·····  |····▲·····| breaks at harm >= 4
-  inescapability 0.10  0.535 ███████·······  |···▲······| breaks at harm >= 3
-  An exit is not a destination. It is a solvent.
-```
-
-**What the output means.** The first study *prices* the belief. Neva, a
-pillar-diver's widow, is maximally dependent on the perch-lords' order and has
-nowhere to go; her derived conviction is high. Staged against the same injury
-with and without that belief, the model shows the trade in two channels at once:
-with the belief her anxiety sits at **25** against **86** without it — the belief
-buys about **61 points of quiet** — but her self-worth sits at **31** against
-**60** — it *charges* about **29 points of worth**. That is the palliative
-function and its price, both real, neither a delusion. (Read the two rows as two
-women: Neva, who nails the feather over her door, and the narrator's mother, who
-*would never look at it* — the same widowing, one belief apart.)
-
-The second study is the novel's engine, and the theory's sharpest claim. It
-holds dependence and the injuries fixed and moves only **inescapability**. At
-0.95 — no way out — the belief holds against harm all the way to 7, more than
-the system ordinarily deals, so in practice it never breaks. Lower it to 0.10 —
-an exit becomes thinkable — and the *same* injuries, now at a harm of 3, are
-enough to break it. Nobody's suffering changed. What changed is what the
-suffering was allowed to mean. Laurin, Shepherd and Kay, run in reverse: an exit
-is not a destination, it is a solvent. (The companion instrument `conscientize`
-doses the same lever the other way — each session of Freire-style dialogue
-lowers *felt* inescapability, and the tipping point falls with it.)
-
-This is the layer at its most characterizing: it takes the one thing that most
-resists a psychological account — a person's loyalty to what harms them — and
-makes it fall out of their circumstances rather than their character. Change the
-circumstances and the loyalty changes, on a curve you can read.
-
----
-
 ## How the instruments relate
 
 Every instrument in Part 2 reads a different prediction off the *same* small
@@ -1105,10 +982,6 @@ machine introduced in Part 1 — a character as a set of arbitration dials
   curiosity, decisiveness — but derive them from the *same* precision and
   conviction that drove the feeling layers, so the character stays one coherent
   object rather than a stack of unrelated models.
-- **Legitimacy** (2.12) predicts why a character defends what injures them, and
-  derives the conviction behind that defense from their circumstances —
-  dependence, inescapability, threat — so that loyalty to a harmful system
-  becomes a curve you can move rather than a fixed trait.
 
 The through-line is the definition we began with. Each instrument stakes a claim
 about what a described person will do in a situation you have not yet shown them,

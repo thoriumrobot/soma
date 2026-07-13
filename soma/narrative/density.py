@@ -185,8 +185,7 @@ class DensityReport:
         lo, hi = self.spread
         return (f"Density -- {self.who}, {self.measure} across {len(self.states)} "
                 f"unseen situations on '{self.probe_channel}':\n"
-                f"  {lo:.0f} |{_histogram(self.states)}| {hi:.0f}"
-                f"   (the distribution IS the character)\n"
+                f"  {_histogram(self.states)}\n"
                 f"  mean {self.mean:.2f} (the trait score)   sd {self.sd:.2f} "
                 f"(the width -- itself a trait)   skew {self.skew:+.2f}\n"
                 f"  range [{lo:.2f}, {hi:.2f}]   reactivity to the cue "

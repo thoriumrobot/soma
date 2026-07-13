@@ -23,38 +23,23 @@ def esc(s: str) -> str:
 _CODE_SPAN = re.compile(r"`([^`]+)`")
 _BOLD = re.compile(r"\*\*(.+?)\*\*")
 _ITALIC = re.compile(r"(?<!\*)\*(?!\*)(.+?)(?<!\*)\*(?!\*)")
-_LINK = re.compile(r"\[([^\]]+)\]\(([^)]+)\)")
 
 
 def inline(text: str) -> str:
-    """Render inline markdown (code, links, bold, italic) to safe HTML.
+    """Render inline markdown (code, bold, italic) to safe HTML.
 
-    Code spans are protected first (their contents escaped and wrapped), then
-    links (whose visible text may itself contain a code span), the surrounding
-    text is HTML-escaped, emphasis is applied, and the protected spans are
-    restored -- so asterisks, brackets, or angle brackets inside `code` or a
-    link never trigger formatting or break the markup.
+    Code spans are protected first (their contents escaped and wrapped), the
+    surrounding text is then HTML-escaped, emphasis is applied, and the code
+    spans are restored -- so asterisks or angle brackets inside `code` never
+    trigger formatting or break the markup.
     """
     tokens: list[str] = []
 
-    def stash_code(m: re.Match) -> str:
+    def stash(m: re.Match) -> str:
         tokens.append(f"<code>{esc(m.group(1))}</code>")
         return f"\x00{len(tokens) - 1}\x00"
 
-    def stash_link(m: re.Match) -> str:
-        label, url = m.group(1), m.group(2)
-        # the label may already contain a stashed \x00N\x00 code token; render
-        # its remaining markdown (bold/italic) and restore any code tokens.
-        label = _BOLD.sub(r"<strong>\1</strong>", esc(label))
-        label = _ITALIC.sub(r"<em>\1</em>", label)
-        label = re.sub(r"\x00(\d+)\x00",
-                       lambda mm: tokens[int(mm.group(1))], label)
-        href = esc(url)
-        tokens.append(f'<a href="{href}">{label}</a>')
-        return f"\x00{len(tokens) - 1}\x00"
-
-    text = _CODE_SPAN.sub(stash_code, text)
-    text = _LINK.sub(stash_link, text)
+    text = _CODE_SPAN.sub(stash, text)
     text = esc(text)
     text = _BOLD.sub(r"<strong>\1</strong>", text)
     text = _ITALIC.sub(r"<em>\1</em>", text)

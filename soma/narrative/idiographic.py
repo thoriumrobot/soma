@@ -198,22 +198,14 @@ class TemporalNetwork:
         return edges[:k]
 
     def render(self, k: int = 10) -> str:
-        from soma.viz import bar
         lines = [f"TEMPORAL NETWORK — {self.name} (estimated from the diary):"]
         lines.append(f"  strongest directed edges (source → target, lag-1):")
-        top = self.top_edges(k)
-        scale = max((abs(co) for co, _, _ in top), default=1.0) or 1.0
-        for co, s, t in top:
-            lines.append(f"    {co:+.3f} {bar(abs(co) / scale, 10)} "
-                         f"{s:>13} → {t}")
+        for co, s, t in self.top_edges(k):
+            lines.append(f"    {co:+.3f}  {s:>13} → {t}")
         os = self.out_strength()
-        rank = sorted(os, key=os.get, reverse=True)
-        scale2 = max((os[r] for r in rank), default=1.0) or 1.0
-        lines.append("  out-strength (who drives the system):")
-        for r in rank[:3]:
-            hub_mark = "  <- hub" if r == self.hub() else ""
-            lines.append(f"    {r:>13} {bar(os[r] / scale2, 12)} "
-                         f"{os[r]:.2f}{hub_mark}")
+        rank = sorted(os, key=os.get, reverse=True)[:3]
+        lines.append(f"  hub (out-strength): {self.hub()} "
+                     f"— top 3: {', '.join(rank)}")
         return "\n".join(lines)
 
 

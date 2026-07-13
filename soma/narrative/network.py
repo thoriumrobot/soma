@@ -231,20 +231,12 @@ class StressResponse:
     tipping: Optional[float]       # least stress reaching the depressed state
 
     def render(self) -> str:
-        from soma.viz import bar
-        top = max((n for _, n in self.curve), default=1) or 1
-        rows = []
-        for s, n in self.curve:
-            mark = ("  <- tips" if (self.tipping is not None
-                                    and abs(s - self.tipping) < 1e-9) else "")
-            rows.append(f"    stress {s:>4g}: {bar(n / top, 12)} "
-                        f"{n} symptom{'s' if n != 1 else ''}{mark}")
+        rows = "  ".join(f"{s:g}->{n}" for s, n in self.curve)
         tail = (f"tips into depression at stress ≥ {self.tipping:g}"
                 if self.tipping is not None
                 else "does not reach the depressed state in range")
-        return (f"STRESS RESPONSE — {self.name} "
-                f"(connectivity {self.connectivity:g}):\n"
-                + "\n".join(rows) + f"\n  {tail}")
+        return (f"STRESS RESPONSE — {self.name} (connectivity {self.connectivity:g}):"
+                f"\n  {rows}\n  {tail}")
 
 
 def stress_response(net: SymptomNetwork, *,
@@ -299,25 +291,11 @@ class NetworkHysteresis:
         return self.releases_at is None
 
     def render(self) -> str:
-        from soma.viz import bar
-        up = dict(self.up_path)
-        down = dict(self.down_path)
-        levels = sorted(set(up) | set(down), reverse=True)
-        top = max(list(up.values()) + list(down.values()) + [1])
-        rows = ["    stress   up sweep            down sweep"]
-        for s in levels:
-            u = (f"{bar(up[s] / top, 9)} {up[s]}" if s in up
-                 else " " * 11)
-            d = (f"{bar(down[s] / top, 9)} {down[s]}" if s in down
-                 else "")
-            tr = " <-triggers" if abs(s - self.triggers_at) < 1e-9 else ""
-            rel = (" <-releases" if (self.releases_at is not None
-                                     and abs(s - self.releases_at) < 1e-9)
-                   else "")
-            rows.append(f"    {s:>5g}    {u}{tr:<11}  {d}{rel}".rstrip())
+        up = "  ".join(f"{s:g}->{n}" for s, n in self.up_path)
+        down = "  ".join(f"{s:g}->{n}" for s, n in self.down_path)
         w = "∞" if self.width == float("inf") else f"{self.width:g}"
         head = (f"HYSTERESIS — {self.name} (connectivity {self.connectivity:g}):"
-                + "\n" + "\n".join(rows) + "\n"
+                f"\n  stress up:   {up}\n  stress down: {down}\n"
                 f"  triggers at {self.triggers_at}, "
                 + (f"never releases in range"
                    if self.releases_at is None else
@@ -429,8 +407,6 @@ class EquilibriumModes:
         top = max(self.histogram) if self.histogram else 0
         bars = "\n".join(
             f"    {k:>2} active: {'█' * self.histogram.get(k, 0)}"
-            f"{' ' if self.histogram.get(k, 0) else ''}"
-            f"{self.histogram.get(k, 0) or '·'}"
             for k in range(top + 1))
         return (f"EQUILIBRIUM MODES — {self.name} "
                 f"(connectivity {self.connectivity:g}), across the transition "
@@ -509,11 +485,9 @@ class KindlingReport:
     sensitization: float           # per-episode drop in threshold
 
     def render(self) -> str:
-        thr0 = max((thr for _, _, thr in self.episodes), default=1.0) or 1.0
-        from soma.viz import bar
         rows = "\n".join(
             f"    episode {n}: triggered by stress {ts:g} "
-            f"(threshold now {bar(thr / thr0, 10)} {thr:.2f})"
+            f"(threshold now {thr:.2f})"
             + ("  <- AUTONOMOUS: no stressor needed" if ts <= 0.001 else "")
             for n, ts, thr in self.episodes)
         tail = (f"\n  became autonomous at episode {self.became_autonomous_at}: "

@@ -311,9 +311,6 @@ class _Lie:
     feeling: str = "worthlessness"  # the ache the lie defends against
     harms: str = "self"        # "self" (psychological) or "others" (moral) weakness
     says: Optional[str] = None
-    evidence_trust: float = 0.35   # precision granted to the disconfirming
-                                   # channel; low = motivated ignorance
-                                   # (Friesen, Laurin et al., 2019)
 
 
 @dataclass
@@ -802,7 +799,7 @@ class Character:
                  conviction: float = 0.85, learn: float = 0.03,
                  breakable=True, feeling: str = "worthlessness",
                  harms: str = "self", says: Optional[str] = None,
-                 baseline: float = 0.0, evidence_trust: float = 0.35):
+                 baseline: float = 0.0):
         """The Lie the character believes -- a false belief, adopted to survive the
         wound, that they can no longer see past. `disconfirmed_by` is the channel of
         life-evidence that contradicts it; the lie predicts that channel reads low
@@ -826,15 +823,6 @@ class Character:
         `harms` is 'self' (a psychological weakness) or 'others' (a moral one). The
         `feeling` is the ache the lie exists to keep out of awareness.
 
-        `evidence_trust` (default 0.35) is the precision granted to the
-        disconfirming channel -- how much the evidence is allowed to count at
-        all. Lowering it is *motivated ignorance* (Friesen et al., 2019): the
-        felt error shrinks below the firing threshold, so the belief is not so
-        much defended as never tested. The auto breaking point scales as
-        conviction / evidence_trust, so a distrusted-evidence lie also resists
-        longer. `soma.narrative.legitimacy` derives this dial from a
-        character's dependence on and inability to leave a system.
-
             blade.believes("only-rank-makes-me-real",
                 claim="If I'm not ranked above them, I'm the surplus again.",
                 disconfirmed_by="equal_regard", feeling="worthlessness",
@@ -851,8 +839,7 @@ class Character:
             name=lie, claim=claim, evidence=disconfirmed_by, expects=expects,
             threshold=threshold, conviction=conviction, learn=learn,
             overwhelm=absolute, overwhelm_auto=auto,
-            feeling=feeling, harms=harms, says=says,
-            evidence_trust=evidence_trust))
+            feeling=feeling, harms=harms, says=says))
         return self
 
     def needs(self, truth: str, *, feeling: str = "longing",

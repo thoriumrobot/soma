@@ -61,9 +61,6 @@ from .phase import (phase_portrait, fit_influence, resilience,
                     LandscapeChange, Attractor, HysteresisReport)
 from .futures import (futures, pivotal, dose_response, by_outcome, by_break,
                       FuturesReport, DoseResponse)
-from .legitimacy import (justifies, derived_conviction,
-                         derived_evidence_trust, palliative_tradeoff,
-                         antecedent_dose, conscientize)
 from .network import (symptom_network, depression_network, stress_response,
                       tipping_stress, hysteresis_loop, equilibrium_modes,
                       kindling, target_symptom, SymptomNetwork,

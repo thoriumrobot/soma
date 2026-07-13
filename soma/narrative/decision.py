@@ -216,12 +216,9 @@ class SATReport:
     def render(self) -> str:
         lines = [f"SPEED-ACCURACY TRADEOFF — {self.who}, boundary swept "
                  f"(drift held fixed):"]
-        from soma.viz import bar
-        rt_top = max((rt for *_, rt in self.rows), default=1.0) or 1.0
-        lines.append("    boundary   accuracy               mean RT")
+        lines.append("    boundary   accuracy   mean RT")
         for b, acc, rt in self.rows:
-            lines.append(f"      {b:.2f}    {acc:5.0%} {bar(acc, 10)}"
-                         f"   {rt:.2f}s {bar(rt / rt_top, 8)}")
+            lines.append(f"      {b:.2f}      {acc:5.0%}     {rt:.2f}s")
         for claim, want, got, ok in self.verdicts:
             mark = "✓" if ok else "✗"
             lines.append(f"    {mark} {'CONFIRMED' if ok else 'FALSIFIED'}: "

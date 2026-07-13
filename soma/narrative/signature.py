@@ -78,14 +78,8 @@ class IfThen:
                 "mixed": "it divides them",
                 "unmoved": "it does not reach them"}[self.route] + felt
 
-    def glyph(self) -> str:
-        if self.breaks_lie:
-            return "◆"                       # the situation that turns them
-        return {"suppress": "▼", "take-in": "▲",
-                "mixed": "◇", "unmoved": "–"}.get(self.route, "?")
-
     def render(self) -> str:
-        return f"{self.glyph()} if {self.situation:<24} then {self.then_clause()}"
+        return f"if {self.situation:<24} then {self.then_clause()}"
 
 
 @dataclass
@@ -116,8 +110,7 @@ class SignatureReport:
         return None
 
     def render(self) -> str:
-        head = (f"Behavioral signature -- {self.who} (if...then profile; "
-                f"every situation unseen; ▼ suppress ▲ take in ◆ breaks):")
+        head = f"Behavioral signature -- {self.who} (if...then profile; every situation unseen):"
         body = "\n".join("  " + c.render() for c in self.cells)
         m = self.mean_level()
         foot = (f"  mean level (the trait-score view): suppresses {m['suppress_rate']:.0%},"
