@@ -3,7 +3,7 @@
 *A self-contained guide to the high-level libraries for turning a described
 character into falsifiable predictions.*
 
-Generated against SOMA 0.26.0. Every code block in this tutorial was executed
+Generated against SOMA 0.27.0. Every code block in this tutorial was executed
 through the same library the browser playground uses; every output block is the
 real, unedited result of running the code directly above it.
 
@@ -35,7 +35,7 @@ output, and what the output means.**
 **A companion tutorial.** This document covers the *predictive
 characterization* layers — signature, self-guides, density, landscape, network,
 inverse problem, choice, theory of mind, the tell, and legitimacy/system
-justification (the 0.15–0.25 work). Its companion,
+justification, fusion and hope (the 0.15–0.27 work). Its companion,
 [`TUTORIAL_PREDICTIVE.md`](TUTORIAL_PREDICTIVE.md), covers the earlier
 *prediction* layers — appraisal, attachment, tipping points, conditioning, the
 Gottman model, drift-diffusion decisions, and the sensitivity/counterfactual
@@ -243,9 +243,10 @@ single response to the *space* of trajectories — first for a relationship
 next make a person *emergent* from a symptom network (2.7) and then recover
 that network from behaviour (2.8), before moving from what a character feels to
 what they *do*: how they choose (2.9), how they play against other minds (2.10),
-and how readable they are in the process (2.11). The last (2.12) turns the whole
+and how readable they are in the process (2.11). Then 2.12 turns the whole
 apparatus on a character's *loyalty to what harms them*, and derives even that
-from their circumstances.
+from their circumstances — and 2.13 closes on the long haul: what a bond is
+made of, and what a pair can cross that neither person could.
 
 Two ideas recur and are worth watching for. The first is the **attractor**, a
 stable state a trajectory settles into; it is introduced on a couple in 2.4 and
@@ -1086,6 +1087,87 @@ circumstances and the loyalty changes, on a curve you can read.
 
 ---
 
+### 2.13 The crossing — fusion, and the two halves of hope (0.27)
+
+Two final instruments, both for the long haul. The first asks what a
+character's *loyalty* is made of, and predicts what it will do under defeat.
+Identity fusion theory (Swann and colleagues; Whitehouse and Lanman's two
+ritual modes) distinguishes a bond built the **doctrinal** way — frequent,
+routinized, low-arousal observance, which produces *identification*: loyalty
+as a good bet — from one built the **imagistic** way — rare, intense, shared
+dysphoric experience, turned over in personal reflection (Jong and colleagues:
+reflection is the mediator), which produces *fusion*: loyalty as self. On a
+calm day the two measure nearly the same. The predictions live on the other
+days: the fused pay costly sacrifice in the worst hour at rates the identified
+never reach, and defeat re-prices a bet by more than half per loss while a
+self barely moves.
+
+The second instrument is Snyder's hope theory: hope as **agency × pathways**,
+the will and the ways, multiplicative — modeled as an explicit goal-pursuit
+machine where each wall is passed with probability set by pathways, searched
+with energy set by agency, and every wall passed feeds agency back (the
+catalog of past effectiveness).
+
+```python
+from soma.narrative import (derived_fusion, derived_identification,
+                            defeat_curve, dyad)
+
+# 0.27 -- two loyalties, and two halves of hope. A bond derived from HOW IT
+# WAS MADE: shared dysphoria x reflection (imagistic -> fusion) vs routinized
+# observance (doctrinal -> identification). Defeat re-prices a bet; it cannot
+# re-price a self.
+perch = derived_identification(participation=0.85)
+fleet = derived_fusion(intensity=0.9, reflection=0.8)
+print(defeat_curve([("the perch's identification", "identified", perch),
+                    ("the fleet's fusion", "fused", fleet)],
+                   defeats=3, reflection=0.8).render())
+print()
+
+# Snyder's hope: agency x pathways, multiplicative -- and the dyad theorem.
+print(dyad(blockages=7, samples=20, stores=90).render())
+```
+
+Output:
+
+```
+LOYALTY UNDER DEFEAT — the bond after each successive loss
+  the perch's identification:
+    after 0 defeats: ███████████····· 0.703
+    after 1 defeat : ███████········· 0.436  <- the hard year
+    after 2 defeats: ████············ 0.270
+    after 3 defeats: ███············· 0.168
+  the fleet's fusion:
+    after 0 defeats: ██████████······ 0.656
+    after 1 defeat : ██████████······ 0.647  <- the hard year
+    after 2 defeats: ██████████······ 0.639
+    after 3 defeats: ██████████······ 0.632
+  A bond made of observance is a bet, and defeat re-prices it. A bond made
+  of shared suffering IS the sufferers, and one more defeat is one more share.
+
+THE DYAD — two half-hopes, alone and pooled
+  will without ways   (0.9, 0.2): █············· 10% reach
+  ways without will   (0.2, 0.9): ███████······· 50% reach
+  pooled as one agent (0.9, 0.9): ██████████████ 100% reach
+  Will without ways shatters at the walls; ways without will drifts while the
+  stores run out. Two people who trust each other's missing half cross as one
+  high-hope agent -- a mechanical account of why some pairs survive what neither
+  person would.
+```
+
+**What the output means.** The defeat curve is a whole political argument in
+eight bars: the doctrinal bond (0.703) collapses to 0.168 across three hard
+years — which is why a declining order must find someone to blame — while the
+fused bond loses three hundredths, because a shared defeat, reflected on, is
+one more share of the very thing the bond is made of. And the dyad theorem is
+a mechanical account of a certain kind of pair: an agent with will but no ways
+reaches one crossing in ten (walls do not answer to courage); ways without
+will reaches half (drift, while the stores run out); the two halves pooled
+reach every time. Two people who trust each other's missing half are, to this
+machine, a single high-hope agent — which is a prediction about *pairs*, not
+persons, and the first one in this tutorial that is.
+
+---
+
 ## How the instruments relate
 
 Every instrument in Part 2 reads a different prediction off the *same* small
@@ -1109,6 +1191,9 @@ machine introduced in Part 1 — a character as a set of arbitration dials
   derives the conviction behind that defense from their circumstances —
   dependence, inescapability, threat — so that loyalty to a harmful system
   becomes a curve you can move rather than a fixed trait.
+- **Fusion and hope** (2.13) predict what a bond will pay and whether it
+  survives defeat, from how the bond was made — and what a pair can cross that
+  neither person could, from the two halves of hope they pool.
 
 The through-line is the definition we began with. Each instrument stakes a claim
 about what a described person will do in a situation you have not yet shown them,

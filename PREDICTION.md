@@ -1340,3 +1340,48 @@ landscapes are described generically now).
 density,earlywarning,sensitivity,discriminate,helplessness,decision}.py`
 (render methods only), both tutorials + WordPress exports, NARRATIVE.md,
 README.md, GRAMMAR.md, CHARACTER_DEPTH.md.*
+
+---
+
+## 0.27 — The crossing: fusion and hope
+
+Two layers for the second half of a novel — what holds a fleet together, and
+what carries it across.
+
+**`soma/narrative/fusion.py`** implements identity fusion (Swann, Jetten,
+Gómez, Whitehouse & Bastian 2012) and the two ritual modes (Whitehouse &
+Lanman 2014): `derived_fusion(intensity, reflection, shared=)` builds the
+imagistic bond — shared dysphoric experience becomes fusion *via personal
+reflection* (Jong, Whitehouse, Kavanagh & Lane 2015; the mediator is in the
+formula: fusion is multiplicative in intensity and reflection, and an unshared
+ordeal transforms without fusing). `derived_identification(participation)`
+builds the doctrinal bond. The predictions separate the two where the theory
+does: `sacrifice_willingness` (the fused pay in the worst hour what the
+identified only applaud — and threat amplifies the fused response), and
+`loyalty_under_defeat` (defeat re-prices identification by ~62% per loss;
+fusion is near-stable, and among the strongly fused a reflected-on defeat is
+one more share of what the bond is made of — Zabala et al. 2024 on fusion's
+stability). `fuses()` / `identifies_with()` wire either bond into a body.
+
+**`soma/narrative/hope.py`** implements Snyder's hope theory (1994–2002) as an
+explicit goal-pursuit machine: a voyage through `blockages`, where the
+probability of finding a way at a wall is pathways × (0.25 + 0.75·agency) —
+the will channels the search (Snyder 2002) — stalling drains agency (goal
+blockage as the depression trigger; Ritschel & Sheppard 2017, coupling this
+layer to helplessness), and each blockage overcome feeds agency (+0.06: the
+catalog of past effectiveness). `hope_surface` draws the multiplicative claim
+(0% reach at the low–low corner, 100% at high–high); `dyad` states the
+theorem the novel's central pair is built on: will without ways shatters at
+the walls (10% reach), ways without will drifts while the stores run out
+(50%), and two people pooling halves cross as one high-hope agent (100%).
+
+The flagship `examples/narrative/the_crossing.py` stages all four studies on
+THE UNMOORING: the perch's doctrinal loyalty collapsing across the hard years
+(0.703 → 0.168 in three defeats — the scapegoating context 0.25 predicted)
+while the fleet's Maw-forged fusion holds (0.656 → 0.619); the sacrifice
+table with the borne-alone control; the Ink–Sound dyad; and twenty seeded
+crossings with and without the Mender's book (20/20 vs 2/20 reach).
+
+*Version: SOMA 0.27.0. Tests: 431 passing. New: `soma/narrative/fusion.py`,
+`soma/narrative/hope.py`, `examples/narrative/the_crossing.py`,
+`tests/test_crossing.py` (15).*

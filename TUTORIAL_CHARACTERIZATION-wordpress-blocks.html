@@ -7,7 +7,7 @@
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>Generated against SOMA 0.26.0. Every code block in this tutorial was executed through the same library the browser playground uses; every output block is the real, unedited result of running the code directly above it.</p>
+<p>Generated against SOMA 0.27.0. Every code block in this tutorial was executed through the same library the browser playground uses; every output block is the real, unedited result of running the code directly above it.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:separator -->
@@ -31,7 +31,7 @@
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p><strong>A companion tutorial.</strong> This document covers the <em>predictive characterization</em> layers — signature, self-guides, density, landscape, network, inverse problem, choice, theory of mind, the tell, and legitimacy/system justification (the 0.15–0.25 work). Its companion, <a href="TUTORIAL_PREDICTIVE.md"><code>TUTORIAL_PREDICTIVE.md</code></a>, covers the earlier <em>prediction</em> layers — appraisal, attachment, tipping points, conditioning, the Gottman model, drift-diffusion decisions, and the sensitivity/counterfactual insight tools. The two are complementary: read either first. Everything in both runs unmodified in the browser playground (<code>index.html</code>) in <strong>Library</strong> mode.</p>
+<p><strong>A companion tutorial.</strong> This document covers the <em>predictive characterization</em> layers — signature, self-guides, density, landscape, network, inverse problem, choice, theory of mind, the tell, and legitimacy/system justification, fusion and hope (the 0.15–0.27 work). Its companion, <a href="TUTORIAL_PREDICTIVE.md"><code>TUTORIAL_PREDICTIVE.md</code></a>, covers the earlier <em>prediction</em> layers — appraisal, attachment, tipping points, conditioning, the Gottman model, drift-diffusion decisions, and the sensitivity/counterfactual insight tools. The two are complementary: read either first. Everything in both runs unmodified in the browser playground (<code>index.html</code>) in <strong>Library</strong> mode.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:separator -->
@@ -224,7 +224,7 @@ guarded  (precision 0.45): belief -&gt; [0.0, 0.0, 0.0, 0.8, 1.5, 2.2, 2.8, 3.3,
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
-<p>The instruments below build in sophistication, and they fall into three groups. The first three (2.1–2.3) predict a <em>single character's</em> responses across situations: the profile of what they take in, the emotion a failure produces, the distribution of states they occupy. The next three widen the lens from a single response to the <em>space</em> of trajectories — first for a relationship (2.4–2.5), then, turning the same idea inward, for a single psyche (2.6). The next make a person <em>emergent</em> from a symptom network (2.7) and then recover that network from behaviour (2.8), before moving from what a character feels to what they <em>do</em>: how they choose (2.9), how they play against other minds (2.10), and how readable they are in the process (2.11). The last (2.12) turns the whole apparatus on a character's <em>loyalty to what harms them</em>, and derives even that from their circumstances.</p>
+<p>The instruments below build in sophistication, and they fall into three groups. The first three (2.1–2.3) predict a <em>single character's</em> responses across situations: the profile of what they take in, the emotion a failure produces, the distribution of states they occupy. The next three widen the lens from a single response to the <em>space</em> of trajectories — first for a relationship (2.4–2.5), then, turning the same idea inward, for a single psyche (2.6). The next make a person <em>emergent</em> from a symptom network (2.7) and then recover that network from behaviour (2.8), before moving from what a character feels to what they <em>do</em>: how they choose (2.9), how they play against other minds (2.10), and how readable they are in the process (2.11). Then 2.12 turns the whole apparatus on a character's <em>loyalty to what harms them</em>, and derives even that from their circumstances — and 2.13 closes on the long haul: what a bond is made of, and what a pair can cross that neither person could.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
@@ -975,6 +975,74 @@ THE EXODUS CURVE — Drifter: tipping point of the belief as inescapability fall
 <hr class="wp-block-separator has-alpha-channel-opacity"/>
 <!-- /wp:separator -->
 
+<!-- wp:heading {"level":3} -->
+<h3>2.13 The crossing — fusion, and the two halves of hope (0.27)</h3>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>Two final instruments, both for the long haul. The first asks what a character's <em>loyalty</em> is made of, and predicts what it will do under defeat. Identity fusion theory (Swann and colleagues; Whitehouse and Lanman's two ritual modes) distinguishes a bond built the <strong>doctrinal</strong> way — frequent, routinized, low-arousal observance, which produces <em>identification</em>: loyalty as a good bet — from one built the <strong>imagistic</strong> way — rare, intense, shared dysphoric experience, turned over in personal reflection (Jong and colleagues: reflection is the mediator), which produces <em>fusion</em>: loyalty as self. On a calm day the two measure nearly the same. The predictions live on the other days: the fused pay costly sacrifice in the worst hour at rates the identified never reach, and defeat re-prices a bet by more than half per loss while a self barely moves.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>The second instrument is Snyder's hope theory: hope as <strong>agency × pathways</strong>, the will and the ways, multiplicative — modeled as an explicit goal-pursuit machine where each wall is passed with probability set by pathways, searched with energy set by agency, and every wall passed feeds agency back (the catalog of past effectiveness).</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:code -->
+<pre class="wp-block-code"><code>from soma.narrative import (derived_fusion, derived_identification,
+                            defeat_curve, dyad)
+
+# 0.27 -- two loyalties, and two halves of hope. A bond derived from HOW IT
+# WAS MADE: shared dysphoria x reflection (imagistic -&gt; fusion) vs routinized
+# observance (doctrinal -&gt; identification). Defeat re-prices a bet; it cannot
+# re-price a self.
+perch = derived_identification(participation=0.85)
+fleet = derived_fusion(intensity=0.9, reflection=0.8)
+print(defeat_curve([("the perch's identification", "identified", perch),
+                    ("the fleet's fusion", "fused", fleet)],
+                   defeats=3, reflection=0.8).render())
+print()
+
+# Snyder's hope: agency x pathways, multiplicative -- and the dyad theorem.
+print(dyad(blockages=7, samples=20, stores=90).render())</code></pre>
+<!-- /wp:code -->
+
+<!-- wp:paragraph -->
+<p>Output:</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:code -->
+<pre class="wp-block-code"><code>LOYALTY UNDER DEFEAT — the bond after each successive loss
+  the perch's identification:
+    after 0 defeats: ███████████····· 0.703
+    after 1 defeat : ███████········· 0.436  &lt;- the hard year
+    after 2 defeats: ████············ 0.270
+    after 3 defeats: ███············· 0.168
+  the fleet's fusion:
+    after 0 defeats: ██████████······ 0.656
+    after 1 defeat : ██████████······ 0.647  &lt;- the hard year
+    after 2 defeats: ██████████······ 0.639
+    after 3 defeats: ██████████······ 0.632
+  A bond made of observance is a bet, and defeat re-prices it. A bond made
+  of shared suffering IS the sufferers, and one more defeat is one more share.
+
+THE DYAD — two half-hopes, alone and pooled
+  will without ways   (0.9, 0.2): █············· 10% reach
+  ways without will   (0.2, 0.9): ███████······· 50% reach
+  pooled as one agent (0.9, 0.9): ██████████████ 100% reach
+  Will without ways shatters at the walls; ways without will drifts while the
+  stores run out. Two people who trust each other's missing half cross as one
+  high-hope agent -- a mechanical account of why some pairs survive what neither
+  person would.</code></pre>
+<!-- /wp:code -->
+
+<!-- wp:paragraph -->
+<p><strong>What the output means.</strong> The defeat curve is a whole political argument in eight bars: the doctrinal bond (0.703) collapses to 0.168 across three hard years — which is why a declining order must find someone to blame — while the fused bond loses three hundredths, because a shared defeat, reflected on, is one more share of the very thing the bond is made of. And the dyad theorem is a mechanical account of a certain kind of pair: an agent with will but no ways reaches one crossing in ten (walls do not answer to courage); ways without will reaches half (drift, while the stores run out); the two halves pooled reach every time. Two people who trust each other's missing half are, to this machine, a single high-hope agent — which is a prediction about <em>pairs</em>, not persons, and the first one in this tutorial that is.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:separator -->
+<hr class="wp-block-separator has-alpha-channel-opacity"/>
+<!-- /wp:separator -->
+
 <!-- wp:heading -->
 <h2>How the instruments relate</h2>
 <!-- /wp:heading -->
@@ -1002,6 +1070,9 @@ THE EXODUS CURVE — Drifter: tipping point of the belief as inescapability fall
 <!-- /wp:list-item -->
 <!-- wp:list-item -->
 <li><strong>Legitimacy</strong> (2.12) predicts why a character defends what injures them, and derives the conviction behind that defense from their circumstances — dependence, inescapability, threat — so that loyalty to a harmful system becomes a curve you can move rather than a fixed trait.</li>
+<!-- /wp:list-item -->
+<!-- wp:list-item -->
+<li><strong>Fusion and hope</strong> (2.13) predict what a bond will pay and whether it survives defeat, from how the bond was made — and what a pair can cross that neither person could, from the two halves of hope they pool.</li>
 <!-- /wp:list-item -->
 </ul>
 <!-- /wp:list -->

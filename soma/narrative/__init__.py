@@ -61,6 +61,11 @@ from .phase import (phase_portrait, fit_influence, resilience,
                     LandscapeChange, Attractor, HysteresisReport)
 from .futures import (futures, pivotal, dose_response, by_outcome, by_break,
                       FuturesReport, DoseResponse)
+from .fusion import (derived_fusion, derived_identification,
+                     sacrifice_willingness, loyalty_under_defeat,
+                     fuses, identifies_with, sacrifice_table,
+                     defeat_curve)
+from .hope import voyage, hope_surface, dyad, hopes
 from .legitimacy import (justifies, derived_conviction,
                          derived_evidence_trust, palliative_tradeoff,
                          antecedent_dose, conscientize)

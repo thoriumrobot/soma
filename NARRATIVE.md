@@ -590,6 +590,24 @@ on inescapability; Friesen et al. on the three antecedents).
   consciousness: each session of dialogic challenge lowers *felt* inescapability,
   and the tipping point falls with it.
 
+## The crossing — fusion and hope (0.27)
+
+`soma.narrative.fusion`: a bond derived from how it was made. `derived_fusion
+(intensity=, reflection=, shared=)` is the imagistic path (shared dysphoria,
+turned over in reflection, becomes a visceral oneness); `derived_identification
+(participation=)` the doctrinal one (routinized observance). `sacrifice_
+willingness(bond, kind=, threat=)` predicts what each will pay — the fused pay
+in the worst hour what the identified only applaud — and `loyalty_under_defeat`
+predicts what defeat costs each: a bet is re-priced, a self is not. `fuses()`
+and `identifies_with()` wire either bond into a character.
+
+`soma.narrative.hope`: Snyder's hope as a goal-pursuit machine. `voyage(agency,
+pathways, blockages=)` runs one crossing — walls, rerouting, despair, agency
+fed by every wall passed; `hope_surface()` draws the multiplicative claim;
+`dyad()` states the pair theorem (will without ways shatters at the walls,
+ways without will drifts while the stores run out, pooled halves cross as one
+high-hope agent). `hopes(char, goal, agency=, pathways=)` wires it into a body.
+
 Every prediction is a claim about the *model* of a character, never about a real
 person; the reports print that caveat themselves.
 

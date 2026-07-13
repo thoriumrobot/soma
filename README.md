@@ -1,4 +1,4 @@
-# SOMA 0.26.0 — a compiler & runtime for the simulation of embodied consciousness
+# SOMA 0.27.0 — a compiler & runtime for the simulation of embodied consciousness
 
 SOMA is a domain-specific language for novelists. You describe a character as a
 set of **loops** — prediction ⇄ error ⇄ action circuits — running on many
@@ -19,7 +19,7 @@ python -m soma query   examples/a_marriage.soma
 python -m soma run     examples/bad_news.soma --phi
 python -m soma run     examples/the_appointment.soma      # medical dismissal
 python -m soma run     examples/the_interrogation.soma    # dissociation in bands
-python -m pytest -q            # 416 tests
+python -m pytest -q            # 431 tests
 ```
 
 ### Run it in a browser — no install
@@ -428,6 +428,21 @@ tournaments mark who is out-thinking whom, signatures open with route glyphs
 temporal networks carry magnitude bars. Mechanisms untouched; both tutorials
 regenerated from live runs. `PREDICTION.md` §0.26 has the full list.
 
+## 0.27: the crossing — fusion and hope
+
+Two layers for a voyage. `soma.narrative.fusion` implements identity fusion
+(Swann/Whitehouse): a bond derived from how it was made — shared dysphoria ×
+reflection (imagistic) versus routinized observance (doctrinal) — and the
+predictions that separate them: the fused pay in the worst hour what the
+identified only applaud, and defeat re-prices a bet but cannot re-price a
+self. `soma.narrative.hope` implements Snyder's agency × pathways as an
+explicit goal-pursuit machine: blockages, rerouting, despair, and agency fed
+by every wall passed. The hope surface is multiplicative; the dyad theorem
+(will without ways shatters, ways without will drifts, pooled halves cross)
+is the mechanical account of the novel's central pair.
+`examples/narrative/the_crossing.py` stages it all; §0.27 of `PREDICTION.md`
+records the research and the numbers.
+
 **The full predictive suite (0.8–0.14).** What began as three tools is now a
 library of documented psychological models, each rebuilt in SOMA and each making
 a falsifiable, signature prediction a weaker account could not:
@@ -760,7 +775,7 @@ UNMOORING's cast). Alongside them are the character studies (`a_marriage`,
 `five_marriages`, `the_spiral`, `twelve_seconds_in_a_jury_room`,
 `the_strange_situation`, `what_the_body_learns`, and more).
 
-**The playground library** (`examples/library/`, 31 examples) — every layer
+**The playground library** (`examples/library/`, 33 examples) — every layer
 above, plus the core-language demos, packaged to run in the browser with no
 install. Open `index.html` and pick from the **Library** menu.
 
@@ -848,7 +863,7 @@ soma/
   narrative/      high-level authoring library (Story, Character, temperaments,
                   arcs) that compiles narrative intent to ordinary SOMA
 examples/         17 worked programs (+ examples/narrative/ library scripts)
-tests/            416 tests (pytest; 91 core + 325 narrative, prediction, web & playground)
+tests/            431 tests (pytest; 91 core + 325 narrative, prediction, web & playground)
 ```
 
 ## Invariants the implementation guarantees

@@ -368,6 +368,63 @@ print(f"stage THIS to tell them apart: '{d['situation']}' "
       f"(separation {d['separation']})")
 """)
 
+_ex("lib/pc_landscape", "0.16 · the landscape & the ensemble", "a bistable marriage: attractors, basins, and the pivotal dial",
+r"""
+# 0.16 -- THE LANDSCAPE: the space a relationship IS. A brittle couple whose
+# plane is BISTABLE -- a warm basin and a cold one, and which marriage they
+# have is decided by where the evening starts. Then the ENSEMBLE: across
+# nearby worlds, the distribution over endings and the dial the fate turns on.
+from soma.narrative import Story, trusting
+from soma.narrative.phase import phase_portrait
+from soma.narrative.futures import futures, pivotal, by_outcome
+from soma.narrative import arc
+
+def brittle_couple(gain=0.9):
+    s = Story("brittle", span="24s", step="1s", about="marital friction")
+    a = s.character("Ada", temperament=trusting)
+    b = s.character("Ben", temperament=trusting)
+    for ch in (a, b):
+        ch._add_sense("manner", "proprio", 5.0, "Expression")
+    a.reads(b, "manner", into="their_manner", gain=gain, lag="1s")
+    b.reads(a, "manner", into="their_manner", gain=gain, lag="1s")
+    for ch in (a, b):
+        ch.appraises("their_manner", when="their_manner >= 5.5",
+                     feeling="ease", shows_on="manner", shows_value=8.0,
+                     expects=5.0)
+        ch.appraises("their_manner", when="their_manner <= 4.0",
+                     as_threat=True, feeling="friction", shows_on="manner",
+                     shows_value=2.0, drives="heart", to=100, expects=5.0)
+    return s
+
+print(phase_portrait(brittle_couple(), grid=4, beats=16).render())
+print()
+
+def soren(learn=0.08):
+    s = Story("the_marriage", span="30y", step="1y", cadence=True,
+              about="the slow erosion of intimacy")
+    from soma.narrative import tender
+    m = s.character("Soren", temperament=tender, clock="life")
+    m.senses("her_face", baseline=5)
+    m.appraises("her_face", feeling="delight_at_error", when="her_face > 1",
+                precision=0.75, conviction=0.2, updates=True,
+                stops_seeing=True)
+    m.learns(learn)
+    s.over(arc.wobble(around=5, span="24y", every="1y", unit="y", amplitude=3),
+           lambda v: m.hears("her_face", v))
+    return s
+
+LOOP = "appraising_her_face"
+classify = by_outcome("perceive_frac", above=0.6,
+                      labels=("stays open", "curdles"))
+rep = futures(soren(), {f"{LOOP}.learn": (0.0, 0.12),
+                        f"{LOOP}.precision": (0.55, 0.95)},
+              classify, samples=24, seed=7)
+print(rep.render())
+piv = pivotal(rep)
+print(f"  pivotal dial: {piv[0][0]} (d={piv[0][1]:+.2f}) "
+      f"vs {piv[1][0]} (d={piv[1][1]:+.2f})")
+""")
+
 _ex("lib/pc_portrait", "0.17 · the intrapersonal landscape", "calm and panic as attractors; reappraisal as a bifurcation",
 r"""
 # 0.17 -- the INTRAPERSONAL LANDSCAPE: a panic-prone psyche has TWO stable
@@ -572,6 +629,30 @@ def drifter(inescapability):
 
 print(antecedent_dose(drifter, "Drifter",
                       levels=(0.95, 0.5, 0.1)).render())
+""")
+
+_ex("lib/pc_crossing", "0.27 · the crossing (fusion & hope)", "a bet vs a self under defeat; will, ways, and the pair as one agent",
+r"""
+# 0.27 -- THE CROSSING: what holds a fleet together (identity fusion --
+# Swann/Whitehouse: a bond made of shared suffering IS the sufferers) and what
+# carries it across (Snyder's hope: agency x pathways, multiplicative).
+from soma.narrative import (derived_fusion, derived_identification,
+                            defeat_curve, sacrifice_table, dyad)
+
+perch = derived_identification(participation=0.85)
+fleet = derived_fusion(intensity=0.9, reflection=0.8)
+print(defeat_curve([("the perch (doctrinal)", "identified", perch),
+                    ("the fleet (imagistic)", "fused", fleet)],
+                   defeats=3, reflection=0.8).render())
+print()
+print(sacrifice_table([
+    ("fused at the Maw", "fused", fleet),
+    ("feast-row loyalty", "identified", perch),
+    ("same storm, borne alone", "fused",
+     derived_fusion(intensity=0.9, reflection=0.8, shared=False)),
+]).render())
+print()
+print(dyad(blockages=7, samples=20, stores=90).render())
 """)
 
 _ex("lib/pc_files", "files · SOMA files, from Python", "write a .soma file, run it with run_file, change a dial, diff the endings",
@@ -1643,8 +1724,8 @@ _RAIL_ORDER = [
     "lib/conditioning", "lib/helplessness", "lib/decision",
     "lib/strange_situation", "lib/gottman",
     "lib/sensitivity", "lib/counterfactual",
-    "lib/pc_signature", "lib/pc_portrait", "lib/pc_network", "lib/pc_diary",
-    "lib/pc_choice", "lib/pc_other_mind", "lib/pc_tell", "lib/pc_legitimacy",
+    "lib/pc_signature", "lib/pc_landscape", "lib/pc_portrait", "lib/pc_network", "lib/pc_diary",
+    "lib/pc_choice", "lib/pc_other_mind", "lib/pc_tell", "lib/pc_legitimacy", "lib/pc_crossing",
     "lib/pc_files",
     "capstone/four_ways_of_leaving", "capstone/anatomy_of_a_breaking",
     "capstone/marriage_that_could_have_held", "capstone/five_marriages",
